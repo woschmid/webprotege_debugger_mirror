@@ -10,6 +10,8 @@ import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditor;
 import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditorImpl;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditor;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditorImpl;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerViewImpl;
 import edu.stanford.bmir.protege.web.client.editor.EditorManagerSelector;
 import edu.stanford.bmir.protege.web.client.editor.EntityManagerSelectorImpl;
 import edu.stanford.bmir.protege.web.client.entity.CreateEntitiesDialogViewImpl;
@@ -474,6 +476,9 @@ public class ClientProjectModule {
     EntityGraphFilterTokenView provideEntityGraphFilterTokenView(EntityGraphFilterTokenViewImpl impl) {
         return impl;
     }
+
+    @Provides
+    DebuggerView provideDebuggerView(DebuggerViewImpl impl) { return impl; }
 
 }
 

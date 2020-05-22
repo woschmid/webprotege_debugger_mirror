@@ -1,31 +1,3 @@
 {
-  "direction": "ROW",
-  "children": [
-    {
-      "weight": 0.6,
-      "node": {
-        "direction": "COLUMN",
-        "children": [
-          {
-            "weight": 0.6,
-            "node": {
-              "portlet": "portlets.IndividualsList"
-            }
-          },
-          {
-            "weight": 0.4,
-            "node": {
-              "portlet": "portlets.Comments"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "weight": 0.4,
-      "node": {
-        "portlet": "portlets.ClassHierarchy"
-      }
-    }
-  ]
+  "portlet": "portlet.Debugger"
 }
