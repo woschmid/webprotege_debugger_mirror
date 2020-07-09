@@ -56,6 +56,15 @@ To run WebProtégé in SuperDev Mode using maven
     ```
 3) Browse to WebProtégé in a Web browser by navigating to [http://localhost:8080](http://localhost:8080)
 
+4) If not yet done, set up an administrator account by executing the webprotege-cli.jar application. Enter your chosen user name, email address and password to complete the setup.
+   
+   java -jar /webprotege-cli.jar create-admin-account
+   Please enter a user name for the administrator:
+   Please enter an email address for the administrator:
+   Please enter a password for the administrator account:
+   Please confirm the password:
+
+
 Running from Docker
 -------------------
 
