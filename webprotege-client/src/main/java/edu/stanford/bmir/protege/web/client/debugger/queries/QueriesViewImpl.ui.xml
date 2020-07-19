@@ -1,9 +1,5 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
-             xmlns:text="urn:import:edu.stanford.bmir.protege.web.client.library.text"
-             xmlns:pagination="urn:import:edu.stanford.bmir.protege.web.client.pagination"
-             xmlns:progress="urn:import:edu.stanford.bmir.protege.web.client.progress"
-             xmlns:list="urn:import:edu.stanford.bmir.protege.web.client.list"
 >
     <ui:with field="msg" type="edu.stanford.bmir.protege.web.client.Messages"/>
     <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
@@ -25,13 +21,6 @@
             padding: 2px;
             margin: 1px;
             border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
-        }
-        .statusLabel {
-            flex-grow: 0;
-            flex-shrink: 0;
-            padding: 3px;
-            border-top: 1px solid literal("var(--inlay-panel--background-color)");
-            padding-right: 10px;
         }
         .individualsList {
             flex-grow: 1;
@@ -65,24 +54,43 @@
         .levelRadio {
             padding-left: 10px;
         }
-        .individualsList {
-            flex-grow: 1;
-            flex-shrink: 1;
-            overflow: auto;
-            background-color: literal("var(--primary--background-color)");
-            border: 1px solid literal("var(--alternate--separator--color)");
-            margin: 1px;
+        .executeButton {
+<!--            align-self: flex-start;-->
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+        .newTabButton {
+            flex-grow: 0;
+            flex-shrink: 0;
+            margin-right: 5px;
+        }
+        .criteriaContainer {
+            flex-grow: 0;
+            flex-shrink: 0;
+            margin-bottom: 10px;
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
-        <g:HorizontalPanel ui:field="verticalPanel"  addStyleNames="{style.typeGroup}">
-            <g:FlowPanel addStyleNames="{style.typeGroup}" >
-                <g:SimplePanel ui:field="queriesContainer"  addStyleNames="{style.individualsList}" />
-                <g:SimplePanel ui:field="repairsContainer"  addStyleNames="{style.individualsList}"/>
-            </g:FlowPanel >
-            <g:FlowPanel addStyleNames=" {style.typeGroup}" >
-                <g:SimplePanel ui:field="testcasesContainer"  addStyleNames="{style.individualsList}"/>
-            </g:FlowPanel>
+
+        <div class="{style.typeGroup}">
+            <g:Label text="Queries" addStyleNames="{wp.style.formLabel}"/>
+        </div>
+
+        <g:HorizontalPanel width="100%">
+            <g:cell horizontalAlignment="ALIGN_LEFT" >
+                <g:Button ui:field="startButton" text="Start"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
+            </g:cell>
+            <g:cell horizontalAlignment="ALIGN_LEFT" >
+                <g:Button ui:field="stopButton" text="Stop"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
+            </g:cell>
+            <g:cell horizontalAlignment="ALIGN_RIGHT" width="100%" >
+                <g:Button ui:field="submitButton" text="Submit" addStyleNames="{style.newTabButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
+            </g:cell>
         </g:HorizontalPanel>
+
+        <g:HTMLPanel addStyleNames="{style.individualsList}">
+            <g:Label text="Please answer if these statements are true(+) or not true(-) in your intended domain" addStyleNames="{style.searchBox}"/>
+            <g:SimplePanel ui:field="criteriaContainer"  height="100%" />
+        </g:HTMLPanel>
     </g:HTMLPanel>
 </ui:UiBinder>

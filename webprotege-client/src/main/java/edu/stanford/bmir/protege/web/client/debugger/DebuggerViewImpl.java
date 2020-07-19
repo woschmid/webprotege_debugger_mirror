@@ -48,28 +48,13 @@ public class DebuggerViewImpl extends Composite implements DebuggerView {
     private static IndividualsListViewImplUiBinder ourUiBinder = GWT.create(IndividualsListViewImplUiBinder.class);
 
     @UiField
-    protected ListBox<OWLNamedIndividual, EntityNode> individualsList;
+    SimplePanel queriesContainer;
 
     @UiField
-    protected Label statusLabel;
+    SimplePanel repairsContainer;
 
     @UiField
-    protected TextBox searchBox;
-
-    @UiField(provided = true)
-    protected PaginatorView paginator;
-
-    @UiField
-    protected BusyView busyView;
-
-    @UiField
-    AcceptsOneWidget typeFieldContainer;
-
-    @UiField
-    RadioButton indirectRadioButton;
-
-    @UiField
-    RadioButton directRadioButton;
+    SimplePanel testcasesContainer;
 
     private SearchStringChangedHandler searchStringChangedHandler = () -> {};
 
@@ -80,130 +65,133 @@ public class DebuggerViewImpl extends Composite implements DebuggerView {
     public DebuggerViewImpl(@Nonnull PaginatorPresenter paginatorPresenter,
                             @Nonnull EntityNodeListCellRenderer renderer) {
         this.paginatorPresenter = paginatorPresenter;
-        paginator = paginatorPresenter.getView();
+//        paginator = paginatorPresenter.getView();
         this.renderer = checkNotNull(renderer);
         initWidget(ourUiBinder.createAndBindUi(this));
-        individualsList.setRenderer(renderer);
-        individualsList.setKeyExtractor(node -> (OWLNamedIndividual) node.getEntity());
+//        individualsList.setRenderer(renderer);
+//        individualsList.setKeyExtractor(node -> (OWLNamedIndividual) node.getEntity());
     }
 
     @Nonnull
     public AcceptsOneWidget getTypeFieldContainer() {
-        return typeFieldContainer;
+//        return typeFieldContainer;
+        return null;
     }
 
     @Override
     public void setBusy(boolean busy) {
-        GWT.log("Set Busy: " + busy);
-        busyView.setVisible(busy);
+//        GWT.log("Set Busy: " + busy);
+//        busyView.setVisible(busy);
+    }
+    @Nonnull
+    public AcceptsOneWidget getQueriesContainer() {
+        return queriesContainer;
     }
 
-    @UiHandler("searchBox")
-    protected void handleSearchStringChanged(KeyUpEvent event) {
-        searchStringChangedHandler.handleSearchStringChanged();
+    @Nonnull
+    public AcceptsOneWidget getRepairsContainer() {
+        return repairsContainer;
     }
 
-    @UiHandler("directRadioButton")
-    public void directChanged(ValueChangeEvent<Boolean> event) {
-        GWT.log("[DebuggerViewImpl] Retrieval Type Changed");
-        retrievalTypeChangedHandler.handleInstanceRetrievalTypeChanged();
-    }
-
-    @UiHandler("indirectRadioButton")
-    public void indirectChanges(ValueChangeEvent<Boolean> event) {
-        GWT.log("[DebuggerViewImpl] Retrieval Type Changed");
-        retrievalTypeChangedHandler.handleInstanceRetrievalTypeChanged();
+    @Nonnull
+    public AcceptsOneWidget getTestcasesContainer() {
+        return testcasesContainer;
     }
 
     @Override
     public void setDisplayLanguage(@Nonnull DisplayNameSettings language) {
-        renderer.setDisplayLanguage(language);
-        individualsList.setRenderer(renderer);
+//        renderer.setDisplayLanguage(language);
+//        individualsList.setRenderer(renderer);
     }
 
     @Override
     public void updateNode(@Nonnull EntityNode entityNode) {
-        individualsList.updateElement(entityNode);
+//        individualsList.updateElement(entityNode);
     }
 
     @Override
     public void setListData(List<EntityNode> individuals) {
-        individualsList.setListData(individuals);
+//        individualsList.setListData(individuals);
     }
 
     @Override
     public void addListData(Collection<EntityNode> individuals) {
-        List<EntityNode> elements = individualsList.getElements();
-        elements.addAll(0, individuals);
-        individualsList.setListData(elements);
+//        List<EntityNode> elements = individualsList.getElements();
+//        elements.addAll(0, individuals);
+//        individualsList.setListData(elements);
     }
 
     @Override
     public void removeListData(Collection<EntityNode> individuals) {
-        individualsList.setListData(ImmutableList.of());
+//        individualsList.setListData(ImmutableList.of());
     }
 
     @Override
     public Collection<EntityNode> getSelectedIndividuals() {
-        return individualsList.getSelection();
+//        return individualsList.getSelection();
+        return null;
     }
 
     @Override
     public Optional<EntityNode> getSelectedIndividual() {
-        return individualsList.getFirstSelectedElement();
+//        return individualsList.getFirstSelectedElement();
+        return null;
     }
 
     @Override
     public void setSelectedIndividual(OWLNamedIndividualData individual) {
-        individualsList.setSelection(individual.getEntity());
+//        individualsList.setSelection(individual.getEntity());
     }
 
     @Override
     public HandlerRegistration addSelectionHandler(SelectionHandler<List<EntityNode>> handler) {
-        return individualsList.addSelectionHandler(handler);
+//        return individualsList.addSelectionHandler(handler);
+        return null;
     }
 
     @Override
     public void setStatusMessage(String statusMessage) {
-        statusLabel.setText(statusMessage);
+//        statusLabel.setText(statusMessage);
     }
 
     @Override
     public void setStatusMessageVisible(boolean visible) {
-        statusLabel.setVisible(visible);
+//        statusLabel.setVisible(visible);
     }
 
     @Override
     public String getSearchString() {
-        return searchBox.getText();
+//        return searchBox.getText();
+        return null;
     }
 
     @Override
     public void clearSearchString() {
-        searchBox.setText("");
+//        searchBox.setText("");
     }
 
     @Nonnull
     @Override
     public InstanceRetrievalMode getRetrievalMode() {
-        if(indirectRadioButton.getValue()) {
-            return InstanceRetrievalMode.ALL_INSTANCES;
-        }
-        else {
-            return InstanceRetrievalMode.DIRECT_INSTANCES;
-        }
+//        if(indirectRadioButton.getValue()) {
+//            return InstanceRetrievalMode.ALL_INSTANCES;
+//        }
+//        else {
+//            return InstanceRetrievalMode.DIRECT_INSTANCES;
+//        }
+        return null;
     }
 
     @Override
     public void setRetrievalMode(@Nonnull InstanceRetrievalMode retrievalType) {
-        directRadioButton.setValue(retrievalType == InstanceRetrievalMode.DIRECT_INSTANCES);
-        indirectRadioButton.setValue(retrievalType == InstanceRetrievalMode.ALL_INSTANCES);
+//        directRadioButton.setValue(retrievalType == InstanceRetrievalMode.DIRECT_INSTANCES);
+//        indirectRadioButton.setValue(retrievalType == InstanceRetrievalMode.ALL_INSTANCES);
     }
 
     @Override
     public void setRetrievalModeEnabled(boolean enabled) {
-        indirectRadioButton.setEnabled(enabled);
-        directRadioButton.setEnabled(enabled);
+//        indirectRadioButton.setEnabled(enabled);
+//        directRadioButton.setEnabled(enabled);
     }
 
 
