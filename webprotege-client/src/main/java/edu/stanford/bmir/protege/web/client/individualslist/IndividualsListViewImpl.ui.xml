@@ -87,7 +87,7 @@
         <g:HTMLPanel addStyleNames="{style.bottomBar}">
                 <g:Label ui:field="statusLabel" addStyleNames="{style.statusLabel}"/>
                 <pagination:PaginatorView ui:field="paginator"/>
-            </g:HTMLPanel>
+        </g:HTMLPanel>
 
     </g:HTMLPanel>
 </ui:UiBinder>
