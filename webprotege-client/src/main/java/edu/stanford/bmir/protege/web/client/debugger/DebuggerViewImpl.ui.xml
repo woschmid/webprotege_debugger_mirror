@@ -34,9 +34,9 @@
             padding-right: 10px;
         }
         .individualsList {
-            flex-grow: 1;
-            flex-shrink: 1;
-            overflow: auto;
+            width: 100%;
+            height: 100%;
+<!--            overflow: auto;-->
             background-color: literal("var(--primary--background-color)");
             border: 1px solid literal("var(--alternate--separator--color)");
             margin: 1px;
@@ -45,8 +45,12 @@
             background-color: literal("var(--inlay-panel--background-color)");
         }
         .typeGroup {
-            flex-grow: 0;
-            flex-shrink: 0;
+<!--            position: absolute;-->
+<!--            overflow: hidden;-->
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
         }
         .listGroup {
             display: flex;
@@ -65,10 +69,17 @@
         .levelRadio {
             padding-left: 10px;
         }
-        .individualsList {
-            flex-grow: 1;
-            flex-shrink: 1;
-            overflow: auto;
+        .viewGroup {
+<!--            position: absolute;-->
+            overflow: hidden;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+        }
+        .FlowPanelview {
+            width: 100%;
+            height: 50%;
             background-color: literal("var(--primary--background-color)");
             border: 1px solid literal("var(--alternate--separator--color)");
             margin: 1px;
@@ -76,11 +87,11 @@
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
         <g:HorizontalPanel ui:field="verticalPanel"  addStyleNames="{style.typeGroup}">
-            <g:FlowPanel addStyleNames="{style.typeGroup}" >
-                <g:SimplePanel ui:field="queriesContainer"  addStyleNames="{style.individualsList}" />
-                <g:SimplePanel ui:field="repairsContainer"  addStyleNames="{style.individualsList}"/>
+            <g:FlowPanel addStyleNames="{style.viewGroup}" >
+                <g:SimplePanel ui:field="queriesContainer"  addStyleNames="{style.FlowPanelview}" />
+                <g:SimplePanel ui:field="repairsContainer"  addStyleNames="{style.FlowPanelview}"/>
             </g:FlowPanel >
-            <g:FlowPanel addStyleNames=" {style.typeGroup}" >
+            <g:FlowPanel addStyleNames=" {style.viewGroup}" >
                 <g:SimplePanel ui:field="testcasesContainer"  addStyleNames="{style.individualsList}"/>
             </g:FlowPanel>
         </g:HorizontalPanel>

@@ -34,10 +34,6 @@
         .bottomBar {
             background-color: literal("var(--inlay-panel--background-color)");
         }
-        .typeGroup {
-            flex-grow: 0;
-            flex-shrink: 0;
-        }
         .listGroup {
             display: flex;
             flex-direction: column;
@@ -65,22 +61,15 @@
             flex-shrink: 0;
             margin-right: 5px;
         }
-        .criteriaContainer {
+        .typeGroup {
             flex-grow: 0;
             flex-shrink: 0;
-            margin-bottom: 10px;
-        }
-        .individualsList {
-            flex-grow: 1;
-            flex-shrink: 1;
-            overflow: auto;
-            background-color: literal("var(--primary--background-color)");
-            border: 1px solid literal("var(--alternate--separator--color)");
-            margin: 1px;
+            width: 100%;
+            height: 300px;
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
-        <g:ScrollPanel height="180px">
+        <g:ScrollPanel  addStyleNames="{style.typeGroup}">
             <g:FlexTable ui:field="table" width="100%" />
         </g:ScrollPanel>
     </g:HTMLPanel>
