@@ -130,7 +130,7 @@ public class DebuggerPresenter implements EntityNodeIndex {
 
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
-        GWT.log("[DebuggerPresenter] Started Individuals List");
+        GWT.log("[DebuggerPresenter] Started Debugger");
         queriesPresenter.start(view.getQueriesContainer());
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());

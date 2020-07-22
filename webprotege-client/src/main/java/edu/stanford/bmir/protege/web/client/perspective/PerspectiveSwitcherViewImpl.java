@@ -122,6 +122,7 @@ public class PerspectiveSwitcherViewImpl extends Composite implements Perspectiv
 
     @Override
     public void addPerspectiveLink(final PerspectiveId perspectiveId) {
+        GWT.log("[PerspectiveSwitcherViewImpl] +++++++++++++++++++++++++++++++++++++++++++++");
         this.displayedPerspectives.add(perspectiveId);
         PerspectiveLink linkWidget = linkFactory.createPerspectiveLink(perspectiveId);
         linkWidget.setLabel(perspectiveId.getId());
