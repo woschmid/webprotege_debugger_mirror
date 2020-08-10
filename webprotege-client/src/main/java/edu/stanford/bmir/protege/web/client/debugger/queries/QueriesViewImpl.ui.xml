@@ -1,5 +1,9 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:text="urn:import:edu.stanford.bmir.protege.web.client.library.text"
+             xmlns:pagination="urn:import:edu.stanford.bmir.protege.web.client.pagination"
+             xmlns:progress="urn:import:edu.stanford.bmir.protege.web.client.progress"
+             xmlns:list="urn:import:edu.stanford.bmir.protege.web.client.list"
 >
     <ui:with field="msg" type="edu.stanford.bmir.protege.web.client.Messages"/>
     <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
@@ -92,5 +96,9 @@
             <g:Label text="Please answer if these statements are true(+) or not true(-) in your intended domain" addStyleNames="{style.searchBox}"/>
             <g:SimplePanel ui:field="criteriaContainer"  height="100%" />
         </g:HTMLPanel>
+        <div class="{style.listGroup}">
+            <g:Label text="test entities" addStyleNames="{wp.style.formLabel}"/>
+            <list:ListBox ui:field="axiomList" addStyleNames="{style.individualsList}"/>
+        </div>
     </g:HTMLPanel>
 </ui:UiBinder>
