@@ -9,12 +9,19 @@ import com.google.gwt.user.client.ui.*;
 import edu.stanford.bmir.protege.web.client.debugger.queries.EntityNodeListCellRenderer;
 import edu.stanford.bmir.protege.web.client.individualslist.InstanceRetrievalTypeChangedHandler;
 import edu.stanford.bmir.protege.web.client.list.ListBox;
+import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
+import edu.stanford.bmir.protege.web.client.pagination.PaginatorPresenter;
 import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
+import edu.stanford.bmir.protege.web.shared.individuals.InstanceRetrievalMode;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,7 +41,7 @@ public class QueriesViewImpl extends Composite{
     }
 
     private static QeriesViewImplUiBinder ourUiBinder = GWT.create(QeriesViewImplUiBinder.class);
-
+    PaginatorPresenter paginatorPresenter;
 
     @UiField
     protected Button startButton;
@@ -45,7 +52,9 @@ public class QueriesViewImpl extends Composite{
 
     private InstanceRetrievalTypeChangedHandler retrievalTypeChangedHandler = () -> {};
     @Inject
-    public QueriesViewImpl(@Nonnull EntityNodeListCellRenderer renderer) {
+    public QueriesViewImpl(@Nonnull PaginatorPresenter paginatorPresenter,
+                           @Nonnull EntityNodeListCellRenderer renderer) {
+        this.paginatorPresenter = paginatorPresenter;
         initWidget(ourUiBinder.createAndBindUi(this));
         this.renderer = checkNotNull(renderer);
         axiomList.setRenderer(renderer);
@@ -70,5 +79,47 @@ public class QueriesViewImpl extends Composite{
     @UiHandler("submitButton")
     public void submitButtonClick(ClickEvent event) {
 
+    }
+
+    public void setPageCount(int pageCount) {
+        paginatorPresenter.setPageCount(pageCount);
+    }
+
+    public void setPageNumber(int pageNumber) {
+        paginatorPresenter.setPageNumber(pageNumber);
+    }
+
+    public int getPageNumber() {
+        return paginatorPresenter.getPageNumber();
+    }
+
+    public void setPageNumberChangedHandler(HasPagination.PageNumberChangedHandler handler) {
+        paginatorPresenter.setPageNumberChangedHandler(handler);
+    }
+    public InstanceRetrievalMode getRetrievalMode() {
+//        if(indirectRadioButton.getValue()) {
+//            return InstanceRetrievalMode.ALL_INSTANCES;
+//        }
+//        else {
+//            return InstanceRetrievalMode.DIRECT_INSTANCES;
+//        }
+        return InstanceRetrievalMode.ALL_INSTANCES;
+    }
+    public Collection<EntityNode> getSelectedIndividuals() {
+        return axiomList.getSelection();
+    }
+
+    public Optional<EntityNode> getSelectedIndividual() {
+        return axiomList.getFirstSelectedElement();
+    }
+
+    public void setListData(List<EntityNode> individuals) {
+        axiomList.setListData(individuals);
+    }
+
+
+    public String getSearchString() {
+//        return searchBox.getText();
+        return " ";
     }
 }
