@@ -15,16 +15,8 @@ import java.util.List;
  * Bio-Medical Informatics Research Group<br>
  * Date: 12/09/2013
  */
-public interface QueriesView extends HasSelectionHandlers<List<EntityNode>>, HasBusy, IsWidget {
+public interface QueriesView extends IsWidget  {
 
-
-    void setStatusMessage(String statusMessage);
-
-    void setStatusMessageVisible(boolean visible);
-
-    void setRetrievalMode(@Nonnull InstanceRetrievalMode retrievalType);
-
-    void setRetrievalModeEnabled(boolean enabled);
-
+    void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler);
 
 }

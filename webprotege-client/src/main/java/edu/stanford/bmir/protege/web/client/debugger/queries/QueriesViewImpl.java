@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Stanford Center for Biomedical Informatics Research
  * 16/02/16
  */
-public class QueriesViewImpl extends Composite{
+public class QueriesViewImpl extends Composite implements QueriesView {
     @UiField
     SimplePanel criteriaContainer;
 
@@ -42,6 +42,12 @@ public class QueriesViewImpl extends Composite{
 
     private static QeriesViewImplUiBinder ourUiBinder = GWT.create(QeriesViewImplUiBinder.class);
     PaginatorPresenter paginatorPresenter;
+
+    private StartDebuggingHandler startDebuggingHandler = new StartDebuggingHandler() {
+        @Override
+        public void handleStartDebugging() {
+        }
+    };
 
     @UiField
     protected Button startButton;
@@ -65,6 +71,11 @@ public class QueriesViewImpl extends Composite{
         this.retrievalTypeChangedHandler = checkNotNull(handler);
     }
 
+    @UiHandler("startButton")
+    protected void handleStartDebugging(ClickEvent clickEvent) {startDebuggingHandler.handleStartDebugging();}
+
+    @Override
+    public void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler) { this.startDebuggingHandler = checkNotNull(handler); }
 
     @Nonnull
     public AcceptsOneWidget getCriteriaContainer() {

@@ -29,6 +29,9 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 //import edu.stanford.bmir.protege.web.client.debuggerPlugin.statement.statementPresenter;
 
 /**
@@ -44,7 +47,7 @@ public class QueriesPresenter {
 
     StatementPresenter statementPresenter;
 
-    private QueriesViewImpl view;
+    private QueriesView view;
 
     private final DispatchServiceManager dsm;
 
@@ -70,11 +73,6 @@ public class QueriesPresenter {
 
     private MessageBox messageBox;
 
-    private final Timer searchStringDelayTimer = new Timer() {
-        public void run() {
-            updateList();
-        }
-    };
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
@@ -84,7 +82,7 @@ public class QueriesPresenter {
                             HierarchyFieldPresenter hierarchyFieldPresenter,
                             Messages messages,
                             @Nonnull CreateEntityPresenter createEntityPresenter, EntityNodeUpdater entityNodeUpdater, MessageBox messageBox,
-                            StatementPresenter statementPresenter, QueriesViewImpl queriesView) {
+                            StatementPresenter statementPresenter, @Nonnull QueriesView queriesView) {
         this.statementPresenter = statementPresenter;
         this.view = queriesView;
 
@@ -97,7 +95,7 @@ public class QueriesPresenter {
         this.createEntityPresenter = createEntityPresenter;
         this.entityNodeUpdater = entityNodeUpdater;
         this.messageBox = messageBox;
-        this.view.setPageNumberChangedHandler(pageNumber -> updateList());
+        this.view = checkNotNull(queriesView);
 
     }
 
@@ -106,58 +104,17 @@ public class QueriesPresenter {
 //        GWT.log("Application initialization complete.  Starting UI Initialization.");
         GWT.log("[QueriesPresenter]Start queries presenter");
         this.container = container;
+        this.view.setStartDebuggingHandler(this::startDebugging);
         container.setWidget(view.asWidget());
 //        statementPresenter = new StatementPresenter();
-        statementPresenter.start(view.getCriteriaContainer(),0);
-        view.setInstanceRetrievalTypeChangedHandler(this::handleRetrievalTypeChanged);
-        updateList();
-    }
-
-    private void handleRetrievalTypeChanged() {
-        updateList();
-    }
-
-    private void updateList() {
-
-        Optional<PageRequest> pageRequest = Optional.of(PageRequest.requestPageWithSize(view.getPageNumber(),
-                PAGE_SIZE));
-        GWT.log("[QueriesPresenter]UpdateList");
-        GetIndividualsAction action = new GetIndividualsAction(projectId,
-                currentType,
-                view.getSearchString(),
-                view.getRetrievalMode(),
-                pageRequest);
-        GWT.log("[QueriesPresenter]Action is"+ action.toString());
-//        dsm.execute(action, view, result -> {
-//            Page<EntityNode> page = result.getPaginatedResult();
-//            displayPageOfIndividuals(page);
-//            selectionModel.getSelection().ifPresent(curSel -> {
-//                if (!view.getSelectedIndividuals().equals(curSel)) {
-//                    Optional<EntityNode> selectedIndividual = view.getSelectedIndividual();
-//                    selectedIndividual.ifPresent(sel -> selectionModel.setSelection(sel.getEntity()));
-//                    if (!selectedIndividual.isPresent()) {
-//                        selectionModel.clearSelection();
-//                    }
-//                }
-//            });
-//        });
-    }
-
-    private void displayPageOfIndividuals(Page<EntityNode> page) {
-        Collection<EntityNode> curSel = view.getSelectedIndividuals();
-        List<EntityNode> individuals = page.getPageElements();
-        elementsMap.clear();
-        individuals.forEach(node -> elementsMap.put(node.getEntity(), node));
-        view.setListData(individuals);
-        view.setPageCount(page.getPageCount());
-        view.setPageNumber(page.getPageNumber());
+//        statementPresenter.start(view.getCriteriaContainer(),0);
+//        view.setInstanceRetrievalTypeChangedHandler(this::handleRetrievalTypeChanged);
 
     }
 
-    protected void addStatement(){
-        statementPresenter.addQueriesStatement();
+    private void startDebugging() {
+        GWT.log("[QueriesPresenter]Start Debugging Button pressed!!!!!");
     }
-
 
     public void clear() {
 

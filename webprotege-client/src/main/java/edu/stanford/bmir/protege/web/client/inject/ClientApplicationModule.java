@@ -18,6 +18,8 @@ import edu.stanford.bmir.protege.web.client.chgpwd.ChangePasswordViewImpl;
 import edu.stanford.bmir.protege.web.client.chgpwd.ResetPasswordView;
 import edu.stanford.bmir.protege.web.client.chgpwd.ResetPasswordViewImpl;
 import edu.stanford.bmir.protege.web.client.collection.*;
+import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
+import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
 import edu.stanford.bmir.protege.web.client.dispatch.*;
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletView;
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletViewImpl;
@@ -525,6 +527,11 @@ public class ClientApplicationModule {
 
     @Provides
     InputBoxView providesInputBoxView(InputBoxViewImpl impl) {
+        return impl;
+    }
+
+    @Provides
+    QueriesView provideQueriesView(QueriesViewImpl impl) {
         return impl;
     }
 }
