@@ -15,6 +15,7 @@ import edu.stanford.bmir.protege.web.server.crud.GetEntityCrudKitSettingsActionH
 import edu.stanford.bmir.protege.web.server.crud.GetEntityCrudKitsActionHandler;
 import edu.stanford.bmir.protege.web.server.crud.SetEntityCrudKitSettingsActionHandler;
 import edu.stanford.bmir.protege.web.server.csv.ImportCSVFileActionHandler;
+import edu.stanford.bmir.protege.web.server.debugger.StartDebuggingActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.ProjectActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.handlers.*;
 import edu.stanford.bmir.protege.web.server.entity.GetDeprecatedEntitiesActionHandler;
@@ -611,6 +612,11 @@ public class ProjectActionHandlersModule {
 
     @Provides @IntoSet
     public ProjectActionHandler provideSetEntityGraphActiveFiltersActionHandler(SetEntityGraphActiveFiltersActionHandler handler) {
+        return handler;
+    }
+
+    @Provides @IntoSet
+    public ProjectActionHandler provideStartDebuggingActionHandler(StartDebuggingActionHandler handler) {
         return handler;
     }
 }

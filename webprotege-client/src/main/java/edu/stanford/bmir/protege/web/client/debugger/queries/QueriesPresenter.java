@@ -1,11 +1,8 @@
 package edu.stanford.bmir.protege.web.client.debugger.queries;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.Messages;
-import edu.stanford.bmir.protege.web.client.action.UIAction;
-import edu.stanford.bmir.protege.web.client.debugger.DebuggerViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.entity.CreateEntityPresenter;
@@ -13,22 +10,18 @@ import edu.stanford.bmir.protege.web.client.entity.EntityNodeUpdater;
 import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsPageContainingIndividualAction;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsPageContainingIndividualResult;
-import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
+import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
 import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsAction;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsResult;
-import edu.stanford.bmir.protege.web.shared.pagination.Page;
-import edu.stanford.bmir.protege.web.shared.pagination.PageRequest;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -101,23 +94,23 @@ public class QueriesPresenter {
 
 
     public void start(AcceptsOneWidget container) {
-//        GWT.log("Application initialization complete.  Starting UI Initialization.");
         GWT.log("[QueriesPresenter]Start queries presenter");
         this.container = container;
         this.view.setStartDebuggingHandler(this::startDebugging);
         container.setWidget(view.asWidget());
-//        statementPresenter = new StatementPresenter();
-//        statementPresenter.start(view.getCriteriaContainer(),0);
-//        view.setInstanceRetrievalTypeChangedHandler(this::handleRetrievalTypeChanged);
-
     }
 
     private void startDebugging() {
         GWT.log("[QueriesPresenter]Start Debugging Button pressed!!!!!");
+        this.dsm.execute(new StartDebuggingAction(projectId), startDebuggingResult -> onSuccess(startDebuggingResult.getMsg()) );
     }
 
     public void clear() {
 
+    }
+
+    private void onSuccess(String msg) {
+        GWT.log("[QueriesPresenter]Got Start Debugging Button Result successfully with msg: \"" + msg + "\"");
     }
 
 
