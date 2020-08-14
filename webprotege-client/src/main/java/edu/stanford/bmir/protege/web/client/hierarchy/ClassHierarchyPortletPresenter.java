@@ -1,7 +1,6 @@
 package edu.stanford.bmir.protege.web.client.hierarchy;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.gwt.core.client.GWT;
 import edu.stanford.bmir.protege.web.client.Messages;
 import edu.stanford.bmir.protege.web.client.action.UIAction;
 import edu.stanford.bmir.protege.web.client.entity.CreateEntityPresenter;
@@ -153,8 +152,6 @@ public class ClassHierarchyPortletPresenter extends AbstractWebProtegePortletPre
     @Override
     public void startPortlet(@Nonnull PortletUi portletUi,
                              @Nonnull WebProtegeEventBus eventBus) {
-        GWT.log("[ClassHierarchyPortletPresenter]==================================================================================");
-        GWT.log("[ClassHierarchyPortletPresenter]Start Class Hierarchy Portlet presenter");
         portletUi.addAction(createClassAction);
         portletUi.addAction(deleteClassAction);
         portletUi.addAction(searchAction);
