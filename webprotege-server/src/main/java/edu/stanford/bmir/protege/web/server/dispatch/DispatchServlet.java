@@ -46,7 +46,6 @@ public class DispatchServlet extends WebProtegeRemoteServiceServlet implements D
         HttpSession session = request.getSession();
         final RequestContext requestContext = new RequestContext(userId);
         final ExecutionContext executionContext = new ExecutionContext(new WebProtegeSessionImpl(session));
-        DispatchServiceResultContainer resultContainer = executor.execute(action, requestContext, executionContext);
-        return resultContainer;
+        return executor.execute(action, requestContext, executionContext);
     }
 }

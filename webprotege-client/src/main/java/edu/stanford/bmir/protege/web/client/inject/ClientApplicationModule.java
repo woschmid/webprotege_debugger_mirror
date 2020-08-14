@@ -534,4 +534,5 @@ public class ClientApplicationModule {
     QueriesView provideQueriesView(QueriesViewImpl impl) {
         return impl;
     }
+
 }

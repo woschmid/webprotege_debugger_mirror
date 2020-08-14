@@ -619,4 +619,5 @@ public class ProjectActionHandlersModule {
     public ProjectActionHandler provideStartDebuggingActionHandler(StartDebuggingActionHandler handler) {
         return handler;
     }
+
 }
