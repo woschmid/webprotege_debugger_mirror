@@ -34,14 +34,20 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @UiField
     SimplePanel criteriaContainer;
 
-    EntityNodeListCellRenderer renderer;
+    @UiField
+    protected Button startButton;
+
+    @UiField
+    protected Button submitButton;
+
+    @UiField
+    protected Button stopButton;
 
     interface QeriesViewImplUiBinder extends UiBinder<HTMLPanel, QueriesViewImpl> {
 
     }
 
     private static QeriesViewImplUiBinder ourUiBinder = GWT.create(QeriesViewImplUiBinder.class);
-    PaginatorPresenter paginatorPresenter;
 
     private StartDebuggingHandler startDebuggingHandler = new StartDebuggingHandler() {
         @Override
@@ -49,88 +55,44 @@ public class QueriesViewImpl extends Composite implements QueriesView {
         }
     };
 
-    @UiField
-    protected Button startButton;
-    @UiField
-    protected Button submitButton;
-    @UiField
-    protected ListBox<OWLNamedIndividual, EntityNode> axiomList;
+    private StopDebuggingHandler stopDebuggingHandler = new StopDebuggingHandler() {
+        @Override
+        public void handleStopDebugging() {
+        }
+    };
 
-    private InstanceRetrievalTypeChangedHandler retrievalTypeChangedHandler = () -> {};
+    private SubmitDebuggingHandler submitDebuggingHandler = new SubmitDebuggingHandler() {
+        @Override
+        public void handleSubmitDebugging() {
+        }
+    };
+
     @Inject
-    public QueriesViewImpl(@Nonnull PaginatorPresenter paginatorPresenter,
-                           @Nonnull EntityNodeListCellRenderer renderer) {
-        this.paginatorPresenter = paginatorPresenter;
+    public QueriesViewImpl(@Nonnull EntityNodeListCellRenderer renderer) {
         initWidget(ourUiBinder.createAndBindUi(this));
-        this.renderer = checkNotNull(renderer);
-        axiomList.setRenderer(renderer);
-        axiomList.setKeyExtractor(node -> (OWLNamedIndividual) node.getEntity());
-    }
-
-    public void setInstanceRetrievalTypeChangedHandler(@Nonnull InstanceRetrievalTypeChangedHandler handler) {
-        this.retrievalTypeChangedHandler = checkNotNull(handler);
     }
 
     @UiHandler("startButton")
-    protected void handleStartDebugging(ClickEvent clickEvent) {startDebuggingHandler.handleStartDebugging();}
+    protected void handleStartDebugging(ClickEvent clickEvent) { startDebuggingHandler.handleStartDebugging();}
+
+    @UiHandler("stopButton")
+    protected void handleStopDebugging(ClickEvent clickEvent){ stopDebuggingHandler.handleStopDebugging();}
+
+    @UiHandler("submitButton")
+    protected void submitButtonClick(ClickEvent event) { submitDebuggingHandler.handleSubmitDebugging(); }
 
     @Override
     public void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler) { this.startDebuggingHandler = checkNotNull(handler); }
+
+    @Override
+    public void setStopDebuggingHandler(@Nonnull StopDebuggingHandler handler) { this.stopDebuggingHandler = checkNotNull(handler);}
+
+    @Override
+    public void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler){ this.submitDebuggingHandler = checkNotNull(handler);}
 
     @Nonnull
     public AcceptsOneWidget getCriteriaContainer() {
         return criteriaContainer;
     }
 
-//    @UiHandler("startButton")
-//    public void startButtonClick(ClickEvent event) {
-//        queriesPresenter.addStatement();
-//    }
-
-    @UiHandler("submitButton")
-    public void submitButtonClick(ClickEvent event) {
-
-    }
-
-    public void setPageCount(int pageCount) {
-        paginatorPresenter.setPageCount(pageCount);
-    }
-
-    public void setPageNumber(int pageNumber) {
-        paginatorPresenter.setPageNumber(pageNumber);
-    }
-
-    public int getPageNumber() {
-        return paginatorPresenter.getPageNumber();
-    }
-
-    public void setPageNumberChangedHandler(HasPagination.PageNumberChangedHandler handler) {
-        paginatorPresenter.setPageNumberChangedHandler(handler);
-    }
-    public InstanceRetrievalMode getRetrievalMode() {
-//        if(indirectRadioButton.getValue()) {
-//            return InstanceRetrievalMode.ALL_INSTANCES;
-//        }
-//        else {
-//            return InstanceRetrievalMode.DIRECT_INSTANCES;
-//        }
-        return InstanceRetrievalMode.ALL_INSTANCES;
-    }
-    public Collection<EntityNode> getSelectedIndividuals() {
-        return axiomList.getSelection();
-    }
-
-    public Optional<EntityNode> getSelectedIndividual() {
-        return axiomList.getFirstSelectedElement();
-    }
-
-    public void setListData(List<EntityNode> individuals) {
-        axiomList.setListData(individuals);
-    }
-
-
-    public String getSearchString() {
-//        return searchBox.getText();
-        return " ";
-    }
 }
