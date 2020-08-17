@@ -71,6 +71,7 @@ public class QueriesPresenter {
         this.view.setStopDebuggingHandler(this::stopDebugging);
         this.view.setSubmitDebuggingHandler(this::submitDebugging);
         container.setWidget(view.asWidget());
+        statementPresenter.start(view.getCriteriaContainer(),0);
     }
 
     private void startDebugging() {

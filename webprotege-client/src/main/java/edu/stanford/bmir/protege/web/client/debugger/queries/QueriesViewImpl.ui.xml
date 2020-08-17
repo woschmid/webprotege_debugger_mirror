@@ -94,7 +94,7 @@
 
         <g:HTMLPanel addStyleNames="{style.individualsList}">
             <g:Label text="Please answer if these statements are true(+) or not true(-) in your intended domain" addStyleNames="{style.searchBox}"/>
-            <g:SimplePanel ui:field="criteriaContainer"  height="100%" />
+            <g:SimplePanel ui:field="criteriaContainer" />
         </g:HTMLPanel>
     </g:HTMLPanel>
 </ui:UiBinder>
