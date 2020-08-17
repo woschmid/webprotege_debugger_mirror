@@ -11,7 +11,7 @@ import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
-import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,52 +45,22 @@ public class QueriesPresenter {
 
     private final DispatchServiceManager dsm;
 
-    private final HierarchyFieldPresenter hierarchyFieldPresenter;
-
-    private final Messages messages;
-
     @Nonnull
     private final ProjectId projectId;
 
-    private final SelectionModel selectionModel;
-
-    private final LoggedInUserProjectPermissionChecker permissionChecker;
-
-    @Nonnull
-    private final CreateEntityPresenter createEntityPresenter;
-
-    private final Map<OWLEntity, EntityNode> elementsMap = new HashMap<>();
-
-    private final EntityNodeUpdater entityNodeUpdater;
-
     private Optional<OWLClass> currentType = Optional.empty();
 
-    private MessageBox messageBox;
 
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
-                            final SelectionModel selectionModel,
                             DispatchServiceManager dispatchServiceManager,
-                            LoggedInUserProjectPermissionChecker permissionChecker,
-                            HierarchyFieldPresenter hierarchyFieldPresenter,
-                            Messages messages,
-                            @Nonnull CreateEntityPresenter createEntityPresenter, EntityNodeUpdater entityNodeUpdater, MessageBox messageBox,
                             StatementPresenter statementPresenter, @Nonnull QueriesView queriesView) {
         this.statementPresenter = statementPresenter;
         this.view = queriesView;
-
         this.projectId = projectId;
-        this.selectionModel = selectionModel;
-        this.permissionChecker = permissionChecker;
         this.dsm = dispatchServiceManager;
-        this.hierarchyFieldPresenter = hierarchyFieldPresenter;
-        this.messages = messages;
-        this.createEntityPresenter = createEntityPresenter;
-        this.entityNodeUpdater = entityNodeUpdater;
-        this.messageBox = messageBox;
         this.view = checkNotNull(queriesView);
-
     }
 
 
@@ -97,12 +68,39 @@ public class QueriesPresenter {
         GWT.log("[QueriesPresenter]Start queries presenter");
         this.container = container;
         this.view.setStartDebuggingHandler(this::startDebugging);
+        this.view.setStopDebuggingHandler(this::stopDebugging);
+        this.view.setSubmitDebuggingHandler(this::submitDebugging);
         container.setWidget(view.asWidget());
     }
 
     private void startDebugging() {
         GWT.log("[QueriesPresenter]Start Debugging Button pressed!!!!!");
-        this.dsm.execute(new StartDebuggingAction(projectId), startDebuggingResult -> onSuccess(startDebuggingResult.getMsg()) );
+        this.dsm.execute(new StartDebuggingAction(projectId), new Consumer<StartDebuggingResult>() {
+            @Override
+            public void accept(StartDebuggingResult startDebuggingResult) {
+                QueriesPresenter.this.onSuccess(startDebuggingResult.getMsg());
+            }
+        });
+    }
+
+    private void stopDebugging() {
+        GWT.log("[QueriesPresenter]Stop Debugging Button pressed!!!!!");
+        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<StopDebuggingResult>() {
+            @Override
+            public void accept(StopDebuggingResult stopDebuggingResult) {
+                QueriesPresenter.this.onSuccess(stopDebuggingResult.getMsg());
+            }
+        });
+    }
+
+    private void submitDebugging() {
+        GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
+        this.dsm.execute(new SubmitDebuggingAction(projectId), new Consumer<SubmitDebuggingResult>() {
+            @Override
+            public void accept(SubmitDebuggingResult submitDebuggingResult) {
+                QueriesPresenter.this.onSuccess(submitDebuggingResult.getMsg());
+            }
+        });
     }
 
     public void clear() {
@@ -110,7 +108,7 @@ public class QueriesPresenter {
     }
 
     private void onSuccess(String msg) {
-        GWT.log("[QueriesPresenter]Got Start Debugging Button Result successfully with msg: \"" + msg + "\"");
+        GWT.log("[QueriesPresenter]Got Debugging Button Result successfully with msg: \"" + msg + "\"");
     }
 
 

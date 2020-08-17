@@ -19,4 +19,8 @@ public interface QueriesView extends IsWidget  {
 
     void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler);
 
+    void setStopDebuggingHandler(@Nonnull StopDebuggingHandler handler);
+
+    void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler);
+
 }

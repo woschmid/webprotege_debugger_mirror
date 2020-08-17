@@ -96,9 +96,5 @@
             <g:Label text="Please answer if these statements are true(+) or not true(-) in your intended domain" addStyleNames="{style.searchBox}"/>
             <g:SimplePanel ui:field="criteriaContainer"  height="100%" />
         </g:HTMLPanel>
-        <div class="{style.listGroup}">
-            <g:Label text="test entities" addStyleNames="{wp.style.formLabel}"/>
-            <list:ListBox ui:field="axiomList" addStyleNames="{style.individualsList}"/>
-        </div>
     </g:HTMLPanel>
 </ui:UiBinder>
