@@ -5,22 +5,26 @@ import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstruc
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nonnull;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public class Diagnosis implements IsSerializable {
 
-    private Set<OWLLogicalAxiom> axioms;
+    private Set<String> axioms;
 
     @GwtSerializationConstructor
     private Diagnosis() {}
 
     public Diagnosis(@Nonnull Set<OWLLogicalAxiom> axioms) {
-        this.axioms = axioms;
+        this.axioms = new HashSet<>();
+        for (OWLLogicalAxiom a : axioms) {
+            this.axioms.add(a.toString());
+        }
     }
 
     @Nonnull
-    public Set<OWLLogicalAxiom> getAxioms() {
+    public Set<String> getAxioms() {
         return axioms;
     }
 

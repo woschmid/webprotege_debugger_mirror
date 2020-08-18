@@ -11,17 +11,18 @@ import java.util.Set;
 
 public class Query implements IsSerializable {
 
-    private Set<OWLLogicalAxiom> axioms;
+    private Set<String> axioms;
 
     @GwtSerializationConstructor
     private Query() {}
 
     public Query(@Nonnull Set<OWLLogicalAxiom> axioms) {
-        this.axioms = new HashSet<>(axioms);
+        this.axioms = new HashSet<>();
+        for (OWLLogicalAxiom a : axioms) this.axioms.add(a.toString());
     }
 
     @Nonnull
-    public Set<OWLLogicalAxiom> getAxioms() {
+    public Set<String> getAxioms() {
         return axioms;
     }
 
