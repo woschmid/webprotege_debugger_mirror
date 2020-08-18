@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class StartDebuggingAction implements ProjectAction<StartDebuggingResult> {
+public class StartDebuggingAction implements ProjectAction<DebuggingResult> {
 
     private ProjectId projectId;
 
@@ -18,8 +18,7 @@ public class StartDebuggingAction implements ProjectAction<StartDebuggingResult>
     }
 
     @GwtSerializationConstructor
-    private StartDebuggingAction() {
-    }
+    private StartDebuggingAction() {}
 
     @Nonnull
     @Override

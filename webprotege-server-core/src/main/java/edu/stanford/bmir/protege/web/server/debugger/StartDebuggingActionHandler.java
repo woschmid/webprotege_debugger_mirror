@@ -4,15 +4,15 @@ import edu.stanford.bmir.protege.web.server.access.AccessManager;
 import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
+import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
-import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingResult;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.exquisite.core.DiagnosisException;
 import org.exquisite.core.conflictsearch.QuickXPlain;
 import org.exquisite.core.engines.AbstractDiagnosisEngine;
 import org.exquisite.core.engines.HSTreeEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
-import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
@@ -25,11 +25,11 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semarglproject.vocab.OWL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class StartDebuggingActionHandler extends AbstractProjectActionHandler<StartDebuggingAction, StartDebuggingResult> {
+public class StartDebuggingActionHandler extends AbstractProjectActionHandler<StartDebuggingAction, DebuggingResult> {
 
     private static final Logger logger = LoggerFactory.getLogger(StartDebuggingActionHandler.class);
 
@@ -64,7 +64,7 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
 
     @Nonnull
     @Override
-    public StartDebuggingResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
+    public DebuggingResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
         try {
 
             final OWLOntologyManager owlOntologyManager = this.revisionManager.getOntologyManagerForRevision(this.revisionManager.getCurrentRevision());
@@ -86,35 +86,35 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
                 diagnosisEngine.setMaxNumberOfDiagnoses(0); // 0 means calculate all possible diagnoses
 
                 // calculate diagnoses
-                final Set diagnoses = diagnosisEngine.calculateDiagnoses();
+                final Set<org.exquisite.core.model.Diagnosis<OWLLogicalAxiom>> diagnoses = diagnosisEngine.calculateDiagnoses();
                 logger.info("{} got {} diagnoses: {}", projectId, diagnoses.size(), diagnoses);
 
                 // calculate queries
                 if (diagnoses.size() >= 2) {
                     HeuristicConfiguration<OWLLogicalAxiom> heuristicConfiguration = new HeuristicConfiguration<>((AbstractDiagnosisEngine)diagnosisEngine, null);
-                    final HeuristicQueryComputation<Object> queryComputation = new HeuristicQueryComputation<>(heuristicConfiguration);
+                    final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation = new HeuristicQueryComputation<>(heuristicConfiguration);
 
                     queryComputation.initialize(diagnoses);
 
                     if (queryComputation.hasNext()) {
-                        final Query<Object> query = queryComputation.next();
+                        final Query<OWLLogicalAxiom> query = queryComputation.next();
                         logger.info("{} computed query {}", projectId, query);
-                        return new StartDebuggingResult(query.toString());
+                        return createDebuggingResult(query, diagnoses);
                     } else {
                         logger.info("{} no query computed", projectId);
-                        return new StartDebuggingResult("No query computed");
+                        return createDebuggingResult(null, diagnoses);
                     }
                 } else {
-                    return new StartDebuggingResult("Diagnosis found!");
+                    return createDebuggingResult(null, diagnoses);
                 }
 
             } else {
                 logger.error("Only one ontology expected but there were {} ongologies", ontologies.size());
-                return new StartDebuggingResult("Hmm, expected only one ontology!");
+                return createDebuggingResult(null, null);
             }
         } catch (RuntimeException | DiagnosisException | OWLOntologyCreationException e) {
             logger.error(e.getMessage(), e);
-            return new StartDebuggingResult(e.getMessage());
+            return createDebuggingResult(null, null);
         }
     }
 
@@ -134,4 +134,23 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
         // creates a reasoner using HermiT and the diagnosis model from the ontology provided
         return new ExquisiteOWLReasoner(diagnosisModel, reasonerFactory);
     }
+
+    @Nonnull
+    private DebuggingResult createDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<org.exquisite.core.model.Diagnosis<OWLLogicalAxiom>> diagnoses) {
+
+        edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
+        List<Diagnosis> d = null;
+
+        if (query != null)
+            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(query.formulas);
+
+        if (diagnoses != null) {
+            d = new ArrayList<>();
+            for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
+                d.add(new Diagnosis(diag.getFormulas()));
+        }
+
+        return new DebuggingResult(q, d);
+    }
+
 }
