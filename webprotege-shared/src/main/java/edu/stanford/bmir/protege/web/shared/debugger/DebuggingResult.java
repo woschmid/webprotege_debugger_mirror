@@ -2,8 +2,8 @@ package edu.stanford.bmir.protege.web.shared.debugger;
 
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.Result;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -15,22 +15,20 @@ public class DebuggingResult implements Result {
     @Nullable
     private List<Diagnosis> diagnoses;
 
+    @Nullable
+    private List<TestCase> positiveTestCases;
+
+    @Nullable
+    private List<TestCase> negativeTestCases;
+
     @GwtSerializationConstructor
     private DebuggingResult() {}
 
-    public DebuggingResult(@Nullable Query query, @Nullable List<Diagnosis> diagnoses) {
+    public DebuggingResult(@Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases) {
         this.query = query;
         this.diagnoses = diagnoses;
-    }
-
-    public DebuggingResult(@Nonnull Query query) {
-        this.query = query;
-        this.diagnoses = null;
-    }
-
-    public DebuggingResult(@Nonnull List<Diagnosis> diagnoses) {
-        this.diagnoses = diagnoses;
-        this.query = null;
+        this.positiveTestCases = positiveTestCases;
+        this.negativeTestCases = negativeTestCases;
     }
 
     @Nullable
@@ -41,5 +39,15 @@ public class DebuggingResult implements Result {
     @Nullable
     public List<Diagnosis> getDiagnoses() {
         return diagnoses;
+    }
+
+    @Nullable
+    public List<TestCase> getPositiveTestCases() {
+        return positiveTestCases;
+    }
+
+    @Nullable
+    public List<TestCase> getNegativeTestCases() {
+        return negativeTestCases;
     }
 }

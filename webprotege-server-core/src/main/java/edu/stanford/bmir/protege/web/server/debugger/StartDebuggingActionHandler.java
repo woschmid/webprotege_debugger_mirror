@@ -7,6 +7,7 @@ import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.exquisite.core.DiagnosisException;
 import org.exquisite.core.conflictsearch.QuickXPlain;
@@ -65,6 +66,13 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
     @Nonnull
     @Override
     public DebuggingResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
+
+        // TODO CREATE A MANAGER CLASS THAT IS RESPONSIBLE FOR THE DEBUGGING SESSION LIFE CYCLE
+
+        // THE FOLLOWING CODE IS JUST A SCRATCHPAD FOR SOLVER AND DIAGNOSISENGINE CREATION AND USAGE FOR DIAGNOSIS CALCULATION AND QUERY GENERATION AND SHOULD BE DELEGATED TO A SEPARATE CLASS
+        IDiagnosisEngine<OWLLogicalAxiom> diagnosisEngine = null;
+        ISolver<OWLLogicalAxiom> solver = null;
+
         try {
 
             final OWLOntologyManager owlOntologyManager = this.revisionManager.getOntologyManagerForRevision(this.revisionManager.getCurrentRevision());
@@ -74,11 +82,11 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
                 logger.info("{} has ontology {})", projectId, ontology);
 
                 // create a solver using the ontology
-                final ExquisiteOWLReasoner solver = createSolver(ontology);
+                solver = createSolver(ontology);
                 logger.info("{} solver created {}", projectId, solver);
 
                 // create diagnosis engine using the solver
-                IDiagnosisEngine diagnosisEngine = getDiagnosisEngine(solver);
+                diagnosisEngine = getDiagnosisEngine(solver);
                 logger.info("{} diagnosis engine created: {}", projectId, diagnosisEngine);
 
                 // prepare for diagnosis calculation
@@ -99,27 +107,33 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
                     if (queryComputation.hasNext()) {
                         final Query<OWLLogicalAxiom> query = queryComputation.next();
                         logger.info("{} computed query {}", projectId, query);
-                        return createDebuggingResult(query, diagnoses);
+                        return createDebuggingResult(query, diagnoses, solver.getDiagnosisModel());
                     } else {
                         logger.info("{} no query computed", projectId);
-                        return createDebuggingResult(null, diagnoses);
+                        return createDebuggingResult(null, diagnoses, solver.getDiagnosisModel());
                     }
                 } else {
-                    return createDebuggingResult(null, diagnoses);
+                    return createDebuggingResult(null, diagnoses, solver.getDiagnosisModel());
                 }
 
             } else {
                 logger.error("Only one ontology expected but there were {} ongologies", ontologies.size());
-                return createDebuggingResult(null, null);
+                return createDebuggingResult(null, null, null);
             }
         } catch (RuntimeException | DiagnosisException | OWLOntologyCreationException e) {
             logger.error(e.getMessage(), e);
-            return createDebuggingResult(null, null);
+            return createDebuggingResult(null, null,null);
+        } finally {
+            // dispose diagnosis engine, solver and everything else...
+            if (diagnosisEngine!=null)
+                diagnosisEngine.dispose();
+            else
+                if (solver!=null) solver.dispose();
         }
     }
 
-    private IDiagnosisEngine getDiagnosisEngine(ISolver solver) {
-        return new HSTreeEngine<>(solver, new QuickXPlain(solver));
+    private IDiagnosisEngine<OWLLogicalAxiom> getDiagnosisEngine(ISolver<OWLLogicalAxiom> solver) {
+        return new HSTreeEngine<>(solver, new QuickXPlain<>(solver));
     }
 
     private ExquisiteOWLReasoner createSolver(OWLOntology ontology) throws OWLOntologyCreationException {
@@ -136,21 +150,31 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
     }
 
     @Nonnull
-    private DebuggingResult createDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<org.exquisite.core.model.Diagnosis<OWLLogicalAxiom>> diagnoses) {
+    private DebuggingResult createDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<org.exquisite.core.model.Diagnosis<OWLLogicalAxiom>> diagnoses, @Nullable DiagnosisModel<OWLLogicalAxiom> diagnosisModel) {
 
         edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
-        List<Diagnosis> d = null;
+        List<Diagnosis> d = new ArrayList<>();
+        List<TestCase> p = new ArrayList<>();
+        List<TestCase> n = new ArrayList<>();
 
         if (query != null)
             q = new edu.stanford.bmir.protege.web.shared.debugger.Query(query.formulas);
 
         if (diagnoses != null) {
-            d = new ArrayList<>();
             for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
                 d.add(new Diagnosis(diag.getFormulas()));
         }
 
-        return new DebuggingResult(q, d);
+        if (diagnosisModel != null)
+            for (OWLLogicalAxiom a : diagnosisModel.getEntailedExamples())
+                p.add(new TestCase(a));
+
+
+        if (diagnosisModel != null)
+            for (OWLLogicalAxiom a : diagnosisModel.getNotEntailedExamples())
+                n.add(new TestCase(a));
+
+        return new DebuggingResult(q, d, p, n);
     }
 
 }
