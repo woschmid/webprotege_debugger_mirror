@@ -38,12 +38,22 @@ public class TestcasesPresenter {
         this.container = container;
         container.setWidget(view.asWidget());
         statementPresenter1 = new StatementPresenter();
-        statementPresenter1.start(view.getEntailedCriteriaContainer(),2);
+        statementPresenter1.start(view.getEntailedCriteriaContainer());
 
         statementPresenter2 = new StatementPresenter();
-        statementPresenter2.start(view.getNonEntailedcriteriaContainer(),2);
+        statementPresenter2.start(view.getNonEntailedcriteriaContainer());
     }
 
+    public StatementPresenter getStatementPresenter1() {
+        return statementPresenter1;
+    }
 
+    public StatementPresenter getStatementPresenter2() {
+        return statementPresenter2;
+    }
 
+    public void clearAxiomtable() {
+        statementPresenter1.clearAxoim();
+        statementPresenter2.clearAxoim();
+    }
 }

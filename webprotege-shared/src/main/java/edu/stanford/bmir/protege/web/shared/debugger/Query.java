@@ -45,4 +45,8 @@ public class Query implements IsSerializable {
                 "axioms=" + axioms +
                 '}';
     }
+
+    public String StringMsg() {
+        return ""+axioms;
+    }
 }

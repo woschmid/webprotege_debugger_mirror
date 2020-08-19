@@ -25,4 +25,8 @@ public interface QueriesView extends IsWidget  {
     void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler);
 
     AcceptsOneWidget getCriteriaContainer();
+
+    void disablebutton(String s);
+
+    void enablebutton(String s);
 }

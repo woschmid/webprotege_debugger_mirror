@@ -9,6 +9,9 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -17,7 +20,7 @@ public class QueriesPresenter {
 
     AcceptsOneWidget container;
 
-    StatementPresenter statementPresenter;
+    private StatementPresenter statementPresenter;
 
     private QueriesView view;
 
@@ -38,45 +41,23 @@ public class QueriesPresenter {
         this.view = checkNotNull(queriesView);
     }
 
+    public StatementPresenter getStatementPresenter() {
+        return statementPresenter;
+    }
 
-    public void start(AcceptsOneWidget container) {
+    public void setStatementPresenter(StatementPresenter statementPresenter) {
+        this.statementPresenter = statementPresenter;
+    }
+
+    public void start(AcceptsOneWidget container, StartDebuggingHandler starthandler, StopDebuggingHandler stophandler, SubmitDebuggingHandler submithandler) {
         GWT.log("[QueriesPresenter]Start queries presenter");
         this.container = container;
-        this.view.setStartDebuggingHandler(this::startDebugging);
-        this.view.setStopDebuggingHandler(this::stopDebugging);
-        this.view.setSubmitDebuggingHandler(this::submitDebugging);
+        this.view.setStartDebuggingHandler(starthandler);
+        this.view.setStopDebuggingHandler(stophandler);
+        this.view.setSubmitDebuggingHandler(submithandler);
         container.setWidget(view.asWidget());
-        statementPresenter.start(view.getCriteriaContainer(),0);
-    }
-
-    private void startDebugging() {
-        GWT.log("[QueriesPresenter]Start Debugging Button pressed!!!!!");
-        this.dsm.execute(new StartDebuggingAction(projectId), new Consumer<DebuggingResult>() {
-            @Override
-            public void accept(DebuggingResult debuggingResult) {
-                QueriesPresenter.this.onSuccess(debuggingResult.getQuery().toString());
-            }
-        });
-    }
-
-    private void stopDebugging() {
-        GWT.log("[QueriesPresenter]Stop Debugging Button pressed!!!!!");
-        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<StopDebuggingResult>() {
-            @Override
-            public void accept(StopDebuggingResult stopDebuggingResult) {
-                QueriesPresenter.this.onSuccess(stopDebuggingResult.getMsg());
-            }
-        });
-    }
-
-    private void submitDebugging() {
-        GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
-        this.dsm.execute(new SubmitDebuggingAction(projectId), new Consumer<SubmitDebuggingResult>() {
-            @Override
-            public void accept(SubmitDebuggingResult submitDebuggingResult) {
-                QueriesPresenter.this.onSuccess(submitDebuggingResult.getMsg());
-            }
-        });
+        statementPresenter.start(view.getCriteriaContainer());
+        setEnabledButton(true);
     }
 
     public void clear() {
@@ -87,5 +68,25 @@ public class QueriesPresenter {
         GWT.log("[QueriesPresenter]Got Debugging Button Result successfully with msg: \"" + msg + "\"");
     }
 
+    public void setQueriesStatement(String msg){
+        Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+        statementPresenter.addQueriesStatement(items);
+    }
+
+    public void clearAxiomtable(){
+        statementPresenter.clearAxoim();
+    }
+
+    public void setEnabledButton(boolean start){
+        if(start){
+            view.disablebutton("stop");
+            view.disablebutton("submit");
+            view.enablebutton("start");
+        }else{
+            view.enablebutton("stop");
+            view.enablebutton("submit");
+            view.disablebutton("start");
+        }
+    }
 
 }

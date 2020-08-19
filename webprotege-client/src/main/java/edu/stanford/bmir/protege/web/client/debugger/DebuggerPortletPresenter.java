@@ -64,10 +64,8 @@ public class DebuggerPortletPresenter extends AbstractWebProtegePortletPresenter
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
         portletUi.setFilterView(filterView);
         tagVisibilityPresenter.start(filterView, portletUi);
-        presenter.installActions(portletUi);
         portletUi.addAction(new PortletAction(messages.search(), "wp-btn-g--search", this::handleSearch));
         presenter.start(portletUi, eventBus);
-        presenter.setDisplayLanguage(displayNameSettingsManager.getLocalDisplayNameSettings());
         handleAfterSetEntity(getSelectedEntity());
     }
 
@@ -75,7 +73,6 @@ public class DebuggerPortletPresenter extends AbstractWebProtegePortletPresenter
     protected void handleAfterSetEntity(Optional<OWLEntity> entity) {
         Optional<OWLNamedIndividual> sel = entity.filter(OWLEntity::isOWLNamedIndividual)
                 .map(e -> (OWLNamedIndividual) e);
-        sel.ifPresent(presenter::setDisplayedIndividual);
     }
 
     private void handleSearch() {

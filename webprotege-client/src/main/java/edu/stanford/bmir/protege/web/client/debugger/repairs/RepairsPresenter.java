@@ -36,13 +36,19 @@ public class RepairsPresenter {
 //        GWT.log(view.toString());
         this.container = container;
         container.setWidget(view.asWidget());
-        statementPresenter.start(view.getCriteriaContainer(),1);
+        statementPresenter.start(view.getCriteriaContainer());
     }
 
 
-//    public void clear() {
-//        container.clear();
-//    }
+    public StatementPresenter getStatementPresenter() {
+        return statementPresenter;
+    }
 
+    public void setStatementPresenter(StatementPresenter statementPresenter) {
+        this.statementPresenter = statementPresenter;
+    }
 
+    public void clearAxiomtable() {
+        statementPresenter.clearAxoim();
+    }
 }

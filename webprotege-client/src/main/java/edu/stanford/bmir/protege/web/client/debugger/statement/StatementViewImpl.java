@@ -9,12 +9,16 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
+import java.util.Set;
+
 /**
  * Matthew Horridge
  * Stanford Center for Biomedical Informatics Research
  * 16/02/16
  */
 public class StatementViewImpl extends Composite{
+
+
 
     interface QeriesViewImplUiBinder extends UiBinder<HTMLPanel, StatementViewImpl> {
 
@@ -36,60 +40,49 @@ public class StatementViewImpl extends Composite{
         table.getColumnFormatter().setWidth(2, "50px");
     }
 
-    public void startQueriesStatement(){
-        table.addStyleName("style.searchBox");
-        table.getColumnFormatter().setWidth(0, "400px");
-        table.getColumnFormatter().setWidth(1, "50px");
-        table.getColumnFormatter().setWidth(2, "50px");
-        int row = table.getRowCount();
-        Label statement = new Label("statement");
-        RadioButton rb0 = new RadioButton("myRadioGroup", "+");
-        RadioButton rb1 = new RadioButton("myRadioGroup", "-");
-        table.setWidget(row,0,statement);
-        table.setWidget(row,1,rb0);
-        table.setWidget(row,2,rb1);
+    public void addQueriesStatement(Set<String> axiomStatement){
+        for (String axiom :
+                axiomStatement) {
+            int row = table.getRowCount();
+            String radioGroup = axiom+"RadioGroup";
+            Label statement = new Label(axiom);
+            RadioButton rb0 = new RadioButton(radioGroup, "+");
+            RadioButton rb1 = new RadioButton(radioGroup, "-");
+            table.setWidget(row,0,statement);
+            table.setWidget(row,1,rb0);
+            table.setWidget(row,2,rb1);
+        }
+
     }
-    public void addQueriesStatement(){
-        table.addStyleName("style.searchBox");
-        table.getColumnFormatter().setWidth(0, "400px");
-        table.getColumnFormatter().setWidth(1, "50px");
-        table.getColumnFormatter().setWidth(2, "50px");
-        int row = table.getRowCount();
-        Label statement = new Label("statement");
-        RadioButton rb0 = new RadioButton("myRadioGroup", "+");
-        RadioButton rb1 = new RadioButton("myRadioGroup", "-");
-        table.setWidget(row,0,statement);
-        table.setWidget(row,1,rb0);
-        table.setWidget(row,2,rb1);
+    public void addRepairsStatement(Set<String> axiomStatement){
+        int numOfRepairs = 1;
+        for (String axiom :
+                axiomStatement) {
+            int row = table.getRowCount();
+            Label repair = new Label("Repair #"+(numOfRepairs++));
+            Label statement = new Label(axiom);
+            Button rb0 = new Button("Fix");
+            rb0.addClickHandler(new ClickHandler() {
+                public void onClick(ClickEvent event) {
+                    Window.alert("Do fixing");
+                }
+            });
+            rb0.setStyleName("button");
+            table.setWidget(row,0,repair);
+            table.setWidget(row,1,rb0);
+            table.setWidget(row+1,0,statement);
+        }
     }
 
-    public void startRepairsStatement(){
-        table.addStyleName("style.searchBox");
-        table.getColumnFormatter().setWidth(0, "400px");
-        int row = table.getRowCount();
-        Label repair = new Label("Repair #"+(row+1));
-        Label statement = new Label("statement");
-        Button rb0 = new Button("Fix");
-        rb0.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                Window.alert("Do fixing");
-            }
-        });
-        rb0.setStyleName("button");
-        table.setWidget(row,0,repair);
-        table.setWidget(row,1,rb0);
-        table.setWidget(row+1,0,statement);
-    }
-
-    public void startTestcasesStatement(){
-        table.addStyleName("style.searchBox");
-        table.getColumnFormatter().setWidth(0, "400px");
-        table.getColumnFormatter().setWidth(1, "50px");
-        int row = table.getRowCount();
-        Label statement = new Label("statement");
-        Button rb0 = new Button("X");
-        table.setWidget(row,0,statement);
-        table.setWidget(row,1,rb0);
+    public void addTestcasesStatement(Set<String> axiomStatement){
+        for (String axiom :
+                axiomStatement) {
+            int row = table.getRowCount();
+            Label statement = new Label(axiom);
+            Button rb0 = new Button("X");
+            table.setWidget(row, 0, statement);
+            table.setWidget(row, 1, rb0);
+        }
     }
 
 }

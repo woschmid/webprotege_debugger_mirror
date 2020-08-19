@@ -6,7 +6,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
-import edu.stanford.bmir.protege.web.client.debugger.queries.EntityNodeListCellRenderer;
 import edu.stanford.bmir.protege.web.client.individualslist.InstanceRetrievalTypeChangedHandler;
 import edu.stanford.bmir.protege.web.client.list.ListBox;
 import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
@@ -68,7 +67,7 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     };
 
     @Inject
-    public QueriesViewImpl(@Nonnull EntityNodeListCellRenderer renderer) {
+    public QueriesViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 
@@ -93,6 +92,35 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @Nonnull
     public AcceptsOneWidget getCriteriaContainer() {
         return criteriaContainer;
+    }
+
+    @Override
+    public void disablebutton(String s) {
+        switch (s){
+            case "start":
+                startButton.setEnabled(false);
+                break;
+            case "stop":
+                stopButton.setEnabled(false);
+                break;
+            case "submit":
+                submitButton.setEnabled(false);
+                break;
+        }
+    }
+
+    public void enablebutton(String s) {
+        switch (s){
+            case "start":
+                startButton.setEnabled(true);
+                break;
+            case "stop":
+                stopButton.setEnabled(true);
+                break;
+            case "submit":
+                submitButton.setEnabled(true);
+                break;
+        }
     }
 
 }
