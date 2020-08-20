@@ -1,19 +1,25 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
+import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SubmitDebuggingAction implements ProjectAction<SubmitDebuggingResult> {
     private ProjectId projectId;
+    private ImmutableMap<String, Boolean> answers;
 
-    public SubmitDebuggingAction(@Nonnull ProjectId projectId) {
+    public SubmitDebuggingAction(@Nonnull ProjectId projectId,
+                                 @Nonnull ImmutableMap<String, Boolean> answers
+                                 ) {
         this.projectId = checkNotNull(projectId);
+        this.answers = checkNotNull(answers);
     }
 
     @GwtSerializationConstructor
@@ -26,27 +32,30 @@ public class SubmitDebuggingAction implements ProjectAction<SubmitDebuggingResul
         return projectId;
     }
 
-    @Override
-    public int hashCode() {
-        return projectId.hashCode();
+    @Nonnull
+    public ImmutableMap<String, Boolean> getAnswers() {
+        return answers;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof StartDebuggingAction)) {
-            return false;
-        }
-        SubmitDebuggingAction other = (SubmitDebuggingAction) obj;
-        return this.projectId.equals(other.projectId);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SubmitDebuggingAction that = (SubmitDebuggingAction) o;
+        return projectId.equals(that.projectId) &&
+                answers.equals(that.answers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(projectId, answers);
     }
 
     @Override
     public String toString() {
-        return toStringHelper("StartDebuggingAction")
+        return toStringHelper("SubmitDebuggingAction")
                 .addValue(projectId)
+                .addValue(answers)
                 .toString();
     }
 }

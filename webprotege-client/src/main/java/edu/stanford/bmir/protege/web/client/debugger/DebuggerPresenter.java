@@ -1,13 +1,9 @@
 package edu.stanford.bmir.protege.web.client.debugger;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.Messages;
-import edu.stanford.bmir.protege.web.client.action.UIAction;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesPresenter;
@@ -17,38 +13,17 @@ import edu.stanford.bmir.protege.web.client.entity.EntityNodeUpdater;
 import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
-import edu.stanford.bmir.protege.web.client.portlet.HasPortletActions;
-import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
-import edu.stanford.bmir.protege.web.shared.DataFactory;
 import edu.stanford.bmir.protege.web.shared.debugger.*;
-import edu.stanford.bmir.protege.web.shared.dispatch.actions.CreateNamedIndividualsAction;
-import edu.stanford.bmir.protege.web.shared.entity.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsAction;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsPageContainingIndividualAction;
-import edu.stanford.bmir.protege.web.shared.individuals.GetIndividualsPageContainingIndividualResult;
-import edu.stanford.bmir.protege.web.shared.lang.DisplayNameSettings;
-import edu.stanford.bmir.protege.web.shared.pagination.Page;
-import edu.stanford.bmir.protege.web.shared.pagination.PageRequest;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static edu.stanford.bmir.protege.web.client.library.dlg.DialogButton.CANCEL;
-import static edu.stanford.bmir.protege.web.client.library.dlg.DialogButton.DELETE;
-import static edu.stanford.bmir.protege.web.client.ui.NumberFormatter.format;
-import static edu.stanford.bmir.protege.web.shared.access.BuiltInAction.CREATE_INDIVIDUAL;
-import static edu.stanford.bmir.protege.web.shared.access.BuiltInAction.DELETE_INDIVIDUAL;
-import static java.util.stream.Collectors.toSet;
-import static org.semanticweb.owlapi.model.EntityType.NAMED_INDIVIDUAL;
 
 /**
  * Author: Matthew Horridge<br> Stanford University<br> Bio-Medical Informatics Research Group<br> Date: 12/09/2013
@@ -122,7 +97,7 @@ public class DebuggerPresenter{
 
     private void submitDebugging() {
         GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
-        this.dsm.execute(new SubmitDebuggingAction(projectId), new Consumer<SubmitDebuggingResult>() {
+        this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()), new Consumer<SubmitDebuggingResult>() {
             @Override
             public void accept(SubmitDebuggingResult submitDebuggingResult) {
 //                QueriesPresenter.this.onSuccess(submitDebuggingResult.getMsg());
@@ -131,6 +106,13 @@ public class DebuggerPresenter{
         clearAxiomtabel();
         queriesPresenter.setEnabledButton(true);
     }
+
+    private ImmutableMap<String, Boolean> getAnswers() {
+        // todo
+        ImmutableMap<String, Boolean> answers = new ImmutableMap.Builder<String, Boolean>().put("hallo",true).build();
+        return answers;
+    }
+
     private void setQueriesStatement(String msg){
         Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
         queriesPresenter.getStatementPresenter().addQueriesStatement(items);
