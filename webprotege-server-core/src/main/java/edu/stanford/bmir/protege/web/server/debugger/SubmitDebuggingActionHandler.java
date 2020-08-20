@@ -3,13 +3,13 @@ package edu.stanford.bmir.protege.web.server.debugger;
 import edu.stanford.bmir.protege.web.server.access.AccessManager;
 import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SubmitDebuggingAction;
-import edu.stanford.bmir.protege.web.shared.debugger.SubmitDebuggingResult;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<SubmitDebuggingAction, SubmitDebuggingResult> {
+public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<SubmitDebuggingAction, DebuggingResult> {
 
     @Inject
     public SubmitDebuggingActionHandler(@Nonnull AccessManager accessManager) {
@@ -24,7 +24,7 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
 
     @Nonnull
     @Override
-    public SubmitDebuggingResult execute(@Nonnull SubmitDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return new SubmitDebuggingResult("Hi, you pressed the Submit button!");
+    public DebuggingResult execute(@Nonnull SubmitDebuggingAction action, @Nonnull ExecutionContext executionContext) {
+        return new DebuggingResult(null,null,null,null);
     }
 }

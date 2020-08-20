@@ -14,7 +14,10 @@ import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
-import edu.stanford.bmir.protege.web.shared.debugger.*;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
+import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.debugger.StopDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.debugger.SubmitDebuggingAction;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -85,9 +88,9 @@ public class DebuggerPresenter{
 
     private void stopDebugging() {
         GWT.log("[QueriesPresenter]Stop Debugging Button pressed!!!!!");
-        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<StopDebuggingResult>() {
+        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<DebuggingResult>() {
             @Override
-            public void accept(StopDebuggingResult stopDebuggingResult) {
+            public void accept(DebuggingResult stopDebuggingResult) {
 //                QueriesPresenter.this.onSuccess(stopDebuggingResult.getMsg());
             }
         });
@@ -97,9 +100,9 @@ public class DebuggerPresenter{
 
     private void submitDebugging() {
         GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
-        this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()), new Consumer<SubmitDebuggingResult>() {
+        this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()), new Consumer<DebuggingResult>() {
             @Override
-            public void accept(SubmitDebuggingResult submitDebuggingResult) {
+            public void accept(DebuggingResult submitDebuggingResult) {
 //                QueriesPresenter.this.onSuccess(submitDebuggingResult.getMsg());
             }
         });
