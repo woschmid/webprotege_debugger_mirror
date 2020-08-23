@@ -1,14 +1,11 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
-import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
-import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.exquisite.core.DiagnosisException;
 import org.exquisite.core.engines.AbstractDiagnosisEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
 import org.exquisite.core.model.Diagnosis;
-import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
@@ -16,57 +13,56 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static edu.stanford.bmir.protege.web.server.debugger.DebuggingSessionManagerImpl.createDebuggingResult;
 
 public class DebuggingSession {
 
     private static final Logger logger = LoggerFactory.getLogger(DebuggingSession.class);
 
-    enum SessionState {INIT, RUNNING, STOPPED, FAILED}
+    enum SessionState {INVALID, IN_USE}
 
-    private String id;
+    final private String id;
 
-    private ProjectId projectId;
+    private SessionState state = SessionState.INVALID;
 
-    private SessionState state = SessionState.INIT;
+    final private IDiagnosisEngine<OWLLogicalAxiom> engine;
 
-    private IDiagnosisEngine<OWLLogicalAxiom> engine;
-
-    public DebuggingSession(ProjectId projectId, IDiagnosisEngine<OWLLogicalAxiom> engine) {
+    protected DebuggingSession(IDiagnosisEngine<OWLLogicalAxiom> engine) {
         id = UUID.randomUUID().toString();
-        this.projectId = projectId;
         this.engine = engine;
     }
 
-    public IDiagnosisEngine<OWLLogicalAxiom> getDiagnosisEngine() {
+    protected IDiagnosisEngine<OWLLogicalAxiom> getDiagnosisEngine() {
         return engine;
     }
 
-    public String getId() {
+    protected String getId() {
         return id;
     }
 
-    public SessionState getState() {
+    protected SessionState getState() {
         return state;
     }
 
-    public void reset() {
+    protected void reset() {
         // prepare for diagnosis calculation
         engine.resetEngine();
         engine.setMaxNumberOfDiagnoses(0); // 0 means calculate all possible diagnoses
-        state = SessionState.RUNNING;
+        this.state = SessionState.IN_USE;
     }
 
-    public DebuggingResult calc() {
+    protected DebuggingResult calc() {
+
         try {
+            if (state == SessionState.INVALID)
+                throw new DiagnosisException("Debugging session state is invalid");
+
             // calculate diagnoses
             final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = engine.calculateDiagnoses();
-            logger.info("{} got {} diagnoses: {}", projectId, diagnoses.size(), diagnoses);
+            logger.info("got {} diagnoses: {}", diagnoses.size(), diagnoses);
 
             // calculate queries
             if (diagnoses.size() >= 2) {
@@ -77,10 +73,10 @@ public class DebuggingSession {
 
                 if (queryComputation.hasNext()) {
                     final Query<OWLLogicalAxiom> query = queryComputation.next();
-                    logger.info("{} computed query {}", projectId, query);
+                    logger.info("computed query {}", query);
                     return createDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
                 } else {
-                    logger.info("{} no query computed", projectId);
+                    logger.info("no query computed");
                     return createDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
                 }
             } else {
@@ -91,40 +87,10 @@ public class DebuggingSession {
         }
     }
 
-    public DebuggingResult dispose() {
+    protected void dispose() {
         // dispose diagnosis engine, solver and everything else...
         engine.dispose();
-        state = SessionState.STOPPED;
-        return createDebuggingResult(null, null, null);
+        state = SessionState.INVALID;
     }
-
-    @Nonnull
-    private DebuggingResult createDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<org.exquisite.core.model.Diagnosis<OWLLogicalAxiom>> diagnoses, @Nullable DiagnosisModel<OWLLogicalAxiom> diagnosisModel) {
-
-        edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
-        List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
-        List<TestCase> p = new ArrayList<>();
-        List<TestCase> n = new ArrayList<>();
-
-        if (query != null)
-            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(query.formulas);
-
-        if (diagnoses != null) {
-            for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
-                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(diag.getFormulas()));
-        }
-
-        if (diagnosisModel != null)
-            for (OWLLogicalAxiom a : diagnosisModel.getEntailedExamples())
-                p.add(new TestCase(a));
-
-
-        if (diagnosisModel != null)
-            for (OWLLogicalAxiom a : diagnosisModel.getNotEntailedExamples())
-                n.add(new TestCase(a));
-
-        return new DebuggingResult(q, d, p, n);
-    }
-
 
 }
