@@ -19,8 +19,6 @@ import edu.stanford.bmir.protege.web.server.change.OntologyChangeRecordTranslato
 import edu.stanford.bmir.protege.web.server.change.OntologyChangeRecordTranslatorImpl;
 import edu.stanford.bmir.protege.web.server.collection.CollectionItemDataRepository;
 import edu.stanford.bmir.protege.web.server.collection.CollectionItemDataRepositoryImpl;
-import edu.stanford.bmir.protege.web.server.debugger.DebuggingSessionManager;
-import edu.stanford.bmir.protege.web.server.debugger.DebuggingSessionManagerImpl;
 import edu.stanford.bmir.protege.web.server.dispatch.ActionHandlerRegistry;
 import edu.stanford.bmir.protege.web.server.dispatch.DispatchServiceExecutor;
 import edu.stanford.bmir.protege.web.server.dispatch.impl.ActionHandlerRegistryImpl;
@@ -149,12 +147,6 @@ public class ApplicationModule {
     public ProjectAccessManager provideProjectAccessManager(ProjectAccessManagerImpl projectAccessManager) {
         projectAccessManager.ensureIndexes();
         return projectAccessManager;
-    }
-
-    @ApplicationSingleton
-    @Provides
-    public DebuggingSessionManager provideDebuggingSessionManager(DebuggingSessionManagerImpl debuggingSessionManager) {
-        return debuggingSessionManager;
     }
 
     @Provides

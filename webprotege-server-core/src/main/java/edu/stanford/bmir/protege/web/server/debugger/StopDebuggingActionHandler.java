@@ -5,15 +5,28 @@ import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandle
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
 import edu.stanford.bmir.protege.web.shared.debugger.StopDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class StopDebuggingActionHandler extends AbstractProjectActionHandler<StopDebuggingAction, DebuggingResult> {
 
+    @Nonnull
+    private final ProjectId projectId;
+
+    @Nonnull
+    private final DebuggingSessionManager debuggingSessionManager;
+
     @Inject
-    public StopDebuggingActionHandler(@Nonnull AccessManager accessManager) {
+    public StopDebuggingActionHandler(@Nonnull ProjectId projectId,
+                                      @Nonnull AccessManager accessManager,
+                                      @Nonnull DebuggingSessionManager debuggingSessionManager) {
         super(accessManager);
+        this.projectId = checkNotNull(projectId);
+        this.debuggingSessionManager = checkNotNull(debuggingSessionManager);
     }
 
     @Nonnull
@@ -25,6 +38,6 @@ public class StopDebuggingActionHandler extends AbstractProjectActionHandler<Sto
     @Nonnull
     @Override
     public DebuggingResult execute(@Nonnull StopDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return new DebuggingResult(null, null, null, null);
+        return this.debuggingSessionManager.stopDebugging(projectId);
     }
 }

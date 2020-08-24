@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.UUID;
 
-import static edu.stanford.bmir.protege.web.server.debugger.DebuggingSessionManagerImpl.createDebuggingResult;
+import static edu.stanford.bmir.protege.web.server.debugger.DebuggingSessionManager.createDebuggingResult;
 
 public class DebuggingSession {
 
