@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -83,7 +84,7 @@ public class DebuggerPresenter{
 
             }
         });
-        queriesPresenter.setEnabledButton(false);
+        queriesPresenter.setEnabledButton("start");
     }
 
     private void stopDebugging() {
@@ -95,7 +96,7 @@ public class DebuggerPresenter{
             }
         });
         clearAxiomtabel();
-        queriesPresenter.setEnabledButton(true);
+        queriesPresenter.setEnabledButton("stop");
     }
 
     private void submitDebugging() {
@@ -107,12 +108,13 @@ public class DebuggerPresenter{
             }
         });
         clearAxiomtabel();
-        queriesPresenter.setEnabledButton(true);
+        queriesPresenter.setEnabledButton("start");
     }
 
     private ImmutableMap<String, Boolean> getAnswers() {
-        // todo
-        ImmutableMap<String, Boolean> answers = new ImmutableMap.Builder<String, Boolean>().put("hallo",true).build();
+        Map allSelectQueries = queriesPresenter.getStatementPresenter().getTableInfo();
+        GWT.log("[QueriesPresenter] Selected Queries are "+ allSelectQueries.toString());
+        ImmutableMap<String, Boolean> answers = new ImmutableMap.Builder<String, Boolean>().putAll(allSelectQueries).build();
         return answers;
     }
 

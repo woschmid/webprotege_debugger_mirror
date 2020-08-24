@@ -4,7 +4,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
-import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
@@ -12,7 +11,6 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -57,7 +55,7 @@ public class QueriesPresenter {
         this.view.setSubmitDebuggingHandler(submithandler);
         container.setWidget(view.asWidget());
         statementPresenter.start(view.getCriteriaContainer());
-        setEnabledButton(true);
+        setEnabledButton("stop");
     }
 
     public void clear() {
@@ -77,15 +75,17 @@ public class QueriesPresenter {
         statementPresenter.clearAxoim();
     }
 
-    public void setEnabledButton(boolean start){
-        if(start){
+    public void setEnabledButton(String buttonTyp){
+        if(buttonTyp.equals("stop")){
             view.disablebutton("stop");
             view.disablebutton("submit");
             view.enablebutton("start");
-        }else{
+        }else if (buttonTyp.equals("start")){
             view.enablebutton("stop");
             view.enablebutton("submit");
             view.disablebutton("start");
+        }else {
+
         }
     }
 

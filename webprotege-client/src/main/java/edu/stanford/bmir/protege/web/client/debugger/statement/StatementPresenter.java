@@ -1,9 +1,12 @@
 package edu.stanford.bmir.protege.web.client.debugger.statement;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -51,5 +54,22 @@ public class StatementPresenter {
     public void clearAxoim(){
         view.table.clear();
         view.table.removeAllRows();
+    }
+
+    public Map<String, Boolean> getTableInfo() {
+        Map<String, Boolean> answers = new HashMap<>();
+        for(int i  = 0; i < view.table.getRowCount(); i++ ){
+            String axiom = view.table.getText(i,0);
+            RadioButton flagTrue = (RadioButton) view.table.getWidget(i,1);
+            RadioButton flagFalse = (RadioButton) view.table.getWidget(i,2);
+            if (flagTrue.getValue() == true){
+                answers.put(axiom,true);
+            }
+            if (flagFalse.getValue() == true){
+                answers.put(axiom,false);
+            }
+        }
+        return answers;
+
     }
 }

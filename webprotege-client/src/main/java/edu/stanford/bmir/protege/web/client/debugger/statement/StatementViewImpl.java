@@ -1,14 +1,11 @@
 package edu.stanford.bmir.protege.web.client.debugger.statement;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,6 +25,8 @@ public class StatementViewImpl extends Composite{
 
     @UiField
     protected FlexTable table;
+
+    public List<RadioButton> radioGroups;
 
     protected StatementPresenter statementPresenter;
 
@@ -52,7 +51,6 @@ public class StatementViewImpl extends Composite{
             table.setWidget(row,1,rb0);
             table.setWidget(row,2,rb1);
         }
-
     }
     public void addRepairsStatement(Set<String> axiomStatement){
         int numOfRepairs = 1;
@@ -61,15 +59,7 @@ public class StatementViewImpl extends Composite{
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
             Label statement = new Label(axiom);
-            Button rb0 = new Button("Fix");
-            rb0.addClickHandler(new ClickHandler() {
-                public void onClick(ClickEvent event) {
-                    Window.alert("Do fixing");
-                }
-            });
-            rb0.setStyleName("button");
             table.setWidget(row,0,repair);
-            table.setWidget(row,1,rb0);
             table.setWidget(row+1,0,statement);
         }
     }
