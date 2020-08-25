@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.rmi.UnexpectedException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -35,6 +35,8 @@ public class DebuggingSession {
     private SessionState state;
 
     final private IDiagnosisEngine<OWLLogicalAxiom> engine;
+
+    private Query<OWLLogicalAxiom> query; // we save the query for the answering process in the next step
 
     protected DebuggingSession(IDiagnosisEngine<OWLLogicalAxiom> engine) {
         id = UUID.randomUUID().toString();
@@ -77,19 +79,21 @@ public class DebuggingSession {
             if (answers != null)
                 addAnswer(answers);
 
+            query = null;
+
             // calculate diagnoses
             final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = engine.calculateDiagnoses();
             logger.info("got {} diagnoses: {}", diagnoses.size(), diagnoses);
 
             // calculate queries
             if (diagnoses.size() >= 2) {
-                HeuristicConfiguration<OWLLogicalAxiom> heuristicConfiguration = new HeuristicConfiguration<>((AbstractDiagnosisEngine) engine, null);
+                final HeuristicConfiguration<OWLLogicalAxiom> heuristicConfiguration = new HeuristicConfiguration<>((AbstractDiagnosisEngine) engine, null);
                 final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation = new HeuristicQueryComputation<>(heuristicConfiguration);
 
                 queryComputation.initialize(diagnoses);
 
                 if (queryComputation.hasNext()) {
-                    final Query<OWLLogicalAxiom> query = queryComputation.next();
+                    query = queryComputation.next();
                     logger.info("computed query {}", query);
                     return createDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
                 } else {
@@ -118,27 +122,28 @@ public class DebuggingSession {
         DiagnosisModel<OWLLogicalAxiom> diagnosisModel = getDiagnosisEngine().getSolver().getDiagnosisModel();
         for (Map.Entry<String, Boolean> answer : answers.entrySet()) {
             // look up the axiom representing this string
-            final OWLLogicalAxiom axiom = lookupAxiom(diagnosisModel.getPossiblyFaultyFormulas(), answer.getKey());
-            if (axiom != null)
-                if (answer.getValue()) {
-                    diagnosisModel.getEntailedExamples().add(axiom);
-                    logger.info("got positive answer for {}", axiom);
-                } else {
-                    diagnosisModel.getNotEntailedExamples().add(axiom);
-                    logger.info("got negative answer for {}", axiom);
-                }
-            else
-                logger.warn("no axiom found for {}", answer.getKey());
+            final OWLLogicalAxiom axiom = lookupAxiomFromPreviousQuery(answer.getKey());
+            if (answer.getValue()) {
+                diagnosisModel.getEntailedExamples().add(axiom);
+                logger.info("got positive answer for {}", axiom);
+            } else {
+                diagnosisModel.getNotEntailedExamples().add(axiom);
+                logger.info("got negative answer for {}", axiom);
+            }
         }
     }
 
-    private static OWLLogicalAxiom lookupAxiom(@Nonnull List<OWLLogicalAxiom> possiblyFaultyFormulas, @Nonnull String key) {
-        for (OWLLogicalAxiom a : possiblyFaultyFormulas) {
-            String axiom = a.toString();
-            logger.info("Is {} matching {} ?", axiom, key);
-            if (key.equals(a.toString())) return a;
-        }
-        return null;
+    private OWLLogicalAxiom lookupAxiomFromPreviousQuery(@Nonnull String axiomAsString) {
+        if (query == null)
+            throw new ActionExecutionException(new UnexpectedException("No previous query instance found"));
+
+        for (OWLLogicalAxiom a : query.formulas) // lookup
+            if (axiomAsString.equals(a.toString()))
+                return a;
+
+        // here the axiom could not be found.
+        state = SessionState.FAILED;
+        throw new ActionExecutionException(new UnexpectedException(axiomAsString + " could not be not found"));
     }
 
 }
