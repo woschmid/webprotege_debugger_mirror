@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.server.debugger.diagnosis.DiagnosisEngineFactory;
 import edu.stanford.bmir.protege.web.server.debugger.solver.SolverFactory;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
@@ -53,6 +54,11 @@ public class DebuggingSessionManager {
     public DebuggingResult submitQuery(ProjectId projectId) {
         final DebuggingSession session = getDebuggingSession(projectId);
         return session.calc();
+    }
+
+    public void addAnswer(ProjectId projectId, ImmutableMap<String, Boolean> answers) {
+        final DebuggingSession session = getDebuggingSession(projectId);
+        session.addAnswer(answers);
     }
 
     private DebuggingSession getDebuggingSession(ProjectId projectId) {
