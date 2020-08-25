@@ -115,20 +115,24 @@ public class DebuggerPresenter{
     }
 
     private void setQueriesStatement(Query msg){
-        //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
-        Set<String> items = msg.getAxioms();
-        queriesPresenter.getStatementPresenter().addQueriesStatement(items);
+        if (msg != null) {
+            //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+            Set<String> items = msg.getAxioms();
+            queriesPresenter.getStatementPresenter().addQueriesStatement(items);
+        }
     }
 
     private void setReqairsStatement(List<Diagnosis> msg){
 //        GWT.log("[DebuggerPresenter]setReqairsStatement's msg is "+ msg);
         //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
         //Set<String> items =
-        Set<String> items = new HashSet<>();
-        for (Diagnosis diagnosis : msg) {
-            items.addAll(diagnosis.getAxioms());
+        if (msg != null) {
+            Set<String> items = new HashSet<>();
+            for (Diagnosis diagnosis : msg) {
+                items.addAll(diagnosis.getAxioms());
+            }
+            repairsPresenter.getStatementPresenter().addRepairsStatement(items);
         }
-        repairsPresenter.getStatementPresenter().addRepairsStatement(items);
     }
 /*
     private void setTestCasesStatement(String msgP, String msgN){
@@ -142,10 +146,14 @@ public class DebuggerPresenter{
         //Set<String> itemsP = new HashSet<String>(Arrays.asList(msgP.split(", ")));
         //Set<String> itemsN = new HashSet<String>(Arrays.asList(msgN.split(", ")));
         Set<String> itemsP = new HashSet<>();
-        for (TestCase p: msgP) itemsP.add(p.getAxiom());
+        if (msgP != null) {
+            for (TestCase p : msgP) itemsP.add(p.getAxiom());
+        }
 
         Set<String> itemsN = new HashSet<>();
-        for (TestCase n: msgN) itemsN.add(n.getAxiom());
+        if (msgN != null) {
+            for (TestCase n : msgN) itemsN.add(n.getAxiom());
+        }
 
         testcasesPresenter.getStatementPresenter1().addTestCasesStatement(itemsP);
         testcasesPresenter.getStatementPresenter2().addTestCasesStatement(itemsN);
