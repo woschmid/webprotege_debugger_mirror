@@ -14,19 +14,13 @@ import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
-import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
-import edu.stanford.bmir.protege.web.shared.debugger.StopDebuggingAction;
-import edu.stanford.bmir.protege.web.shared.debugger.SubmitDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -78,9 +72,9 @@ public class DebuggerPresenter{
         this.dsm.execute(new StartDebuggingAction(projectId), new Consumer<DebuggingResult>() {
             @Override
             public void accept(DebuggingResult debuggingResult) {
-                DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery().StringMsg());
-                DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses().toString());
-                DebuggerPresenter.this.setTestCasesStatement(debuggingResult.getPositiveTestCases().toString(),debuggingResult.getNegativeTestCases().toString());
+                DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
+                DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
+                DebuggerPresenter.this.setTestCasesStatement(debuggingResult.getPositiveTestCases(),debuggingResult.getNegativeTestCases());
 
             }
         });
@@ -104,7 +98,9 @@ public class DebuggerPresenter{
         this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()), new Consumer<DebuggingResult>() {
             @Override
             public void accept(DebuggingResult submitDebuggingResult) {
-//                QueriesPresenter.this.onSuccess(submitDebuggingResult.getMsg());
+                DebuggerPresenter.this.setQueriesStatement(submitDebuggingResult.getQuery());
+                DebuggerPresenter.this.setReqairsStatement(submitDebuggingResult.getDiagnoses());
+                DebuggerPresenter.this.setTestCasesStatement(submitDebuggingResult.getPositiveTestCases(),submitDebuggingResult.getNegativeTestCases());
             }
         });
         clearAxiomtabel();
@@ -118,23 +114,43 @@ public class DebuggerPresenter{
         return answers;
     }
 
-    private void setQueriesStatement(String msg){
-        Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+    private void setQueriesStatement(Query msg){
+        //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+        Set<String> items = msg.getAxioms();
         queriesPresenter.getStatementPresenter().addQueriesStatement(items);
     }
 
-    private void setReqairsStatement(String msg){
+    private void setReqairsStatement(List<Diagnosis> msg){
 //        GWT.log("[DebuggerPresenter]setReqairsStatement's msg is "+ msg);
-        Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+        //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+        //Set<String> items =
+        Set<String> items = new HashSet<>();
+        for (Diagnosis diagnosis : msg) {
+            items.addAll(diagnosis.getAxioms());
+        }
         repairsPresenter.getStatementPresenter().addRepairsStatement(items);
     }
-
+/*
     private void setTestCasesStatement(String msgP, String msgN){
         Set<String> itemsP = new HashSet<String>(Arrays.asList(msgP.split(", ")));
         Set<String> itemsN = new HashSet<String>(Arrays.asList(msgN.split(", ")));
         testcasesPresenter.getStatementPresenter1().addTestCasesStatement(itemsP);
         testcasesPresenter.getStatementPresenter2().addTestCasesStatement(itemsN);
     }
+*/
+    private void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
+        //Set<String> itemsP = new HashSet<String>(Arrays.asList(msgP.split(", ")));
+        //Set<String> itemsN = new HashSet<String>(Arrays.asList(msgN.split(", ")));
+        Set<String> itemsP = new HashSet<>();
+        for (TestCase p: msgP) itemsP.add(p.getAxiom());
+
+        Set<String> itemsN = new HashSet<>();
+        for (TestCase n: msgN) itemsN.add(n.getAxiom());
+
+        testcasesPresenter.getStatementPresenter1().addTestCasesStatement(itemsP);
+        testcasesPresenter.getStatementPresenter2().addTestCasesStatement(itemsN);
+    }
+
     private void clearAxiomtabel(){
         queriesPresenter.clearAxiomtable();
         repairsPresenter.clearAxiomtable();
