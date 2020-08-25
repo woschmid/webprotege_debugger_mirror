@@ -116,35 +116,19 @@ public class DebuggerPresenter{
 
     private void setQueriesStatement(Query msg){
         if (msg != null) {
-            //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
             Set<String> items = msg.getAxioms();
             queriesPresenter.getStatementPresenter().addQueriesStatement(items);
         }
     }
 
     private void setReqairsStatement(List<Diagnosis> msg){
-//        GWT.log("[DebuggerPresenter]setReqairsStatement's msg is "+ msg);
-        //Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
-        //Set<String> items =
         if (msg != null) {
-            Set<String> items = new HashSet<>();
-            for (Diagnosis diagnosis : msg) {
-                items.addAll(diagnosis.getAxioms());
-            }
-            repairsPresenter.getStatementPresenter().addRepairsStatement(items);
+            repairsPresenter.getStatementPresenter().addRepairsStatement(msg);
         }
+
     }
-/*
-    private void setTestCasesStatement(String msgP, String msgN){
-        Set<String> itemsP = new HashSet<String>(Arrays.asList(msgP.split(", ")));
-        Set<String> itemsN = new HashSet<String>(Arrays.asList(msgN.split(", ")));
-        testcasesPresenter.getStatementPresenter1().addTestCasesStatement(itemsP);
-        testcasesPresenter.getStatementPresenter2().addTestCasesStatement(itemsN);
-    }
-*/
+
     private void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
-        //Set<String> itemsP = new HashSet<String>(Arrays.asList(msgP.split(", ")));
-        //Set<String> itemsN = new HashSet<String>(Arrays.asList(msgN.split(", ")));
         Set<String> itemsP = new HashSet<>();
         if (msgP != null) {
             for (TestCase p : msgP) itemsP.add(p.getAxiom());

@@ -1,9 +1,12 @@
 package edu.stanford.bmir.protege.web.client.debugger.statement;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 import java.util.List;
 import java.util.Set;
@@ -52,13 +55,18 @@ public class StatementViewImpl extends Composite{
             table.setWidget(row,2,rb1);
         }
     }
-    public void addRepairsStatement(Set<String> axiomStatement){
+    public void addRepairsStatement(List<Diagnosis> diagnoseStatement){
         int numOfRepairs = 1;
-        for (String axiom :
-                axiomStatement) {
+        for (Diagnosis diagnosis :
+                diagnoseStatement) {
+            String diagnosisString = "";
+            for (String axiom:
+                 diagnosis.getAxioms())
+                diagnosisString += new SafeHtmlBuilder().appendEscaped(axiom).toSafeHtml().asString() + "<br/>";
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
-            Label statement = new Label(axiom);
+//            Label statement = getMultilineLabel(diagnosisString);
+            Label statement = new HTML( diagnosisString );
             table.setWidget(row,0,repair);
             table.setWidget(row+1,0,statement);
         }

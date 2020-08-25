@@ -3,9 +3,11 @@ package edu.stanford.bmir.protege.web.client.debugger.statement;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
+import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,7 +44,7 @@ public class StatementPresenter {
         view.addQueriesStatement(msg);
     }
 
-    public void addRepairsStatement(Set<String> msg){
+    public void addRepairsStatement(List<Diagnosis> msg){
         view.addRepairsStatement(msg);
     }
 
