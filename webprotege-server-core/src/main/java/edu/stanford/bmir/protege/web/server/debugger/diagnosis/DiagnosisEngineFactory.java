@@ -15,6 +15,8 @@ public class DiagnosisEngineFactory {
      * @return A diagnosis engine.
      */
     public static IDiagnosisEngine<OWLLogicalAxiom> getDiagnosisEngine(ISolver<OWLLogicalAxiom> solver) {
-        return new HSTreeEngine<>(solver, new QuickXPlain<>(solver));
+        final HSTreeEngine<OWLLogicalAxiom> engine = new HSTreeEngine<>(solver, new QuickXPlain<>(solver));
+        engine.setMaxNumberOfDiagnoses(0);
+        return engine;
     }
 }

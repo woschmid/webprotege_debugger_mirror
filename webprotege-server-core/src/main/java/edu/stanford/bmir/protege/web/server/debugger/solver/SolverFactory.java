@@ -9,6 +9,7 @@ import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.reasoner.InferenceType;
 
 public class SolverFactory {
 
@@ -23,7 +24,9 @@ public class SolverFactory {
         try {
             diagnosisModel = ConsistencyChecker.checkConsistency(ontology, diagnosisModel, reasonerFactory, true, true, null, null).getDiagnosisModel();
             // creates a reasoner using HermiT and the diagnosis model from the ontology provided
-            return new ExquisiteOWLReasoner(diagnosisModel, reasonerFactory);
+            ExquisiteOWLReasoner solver = new ExquisiteOWLReasoner(diagnosisModel, reasonerFactory);
+            solver.setEntailmentTypes(InferenceType.CLASS_HIERARCHY, InferenceType.DISJOINT_CLASSES);
+            return solver;
         } catch (OWLOntologyCreationException e) {
             throw new ActionExecutionException(e);
         }

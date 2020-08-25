@@ -42,23 +42,20 @@ public class DebuggingSessionManager {
 
     public DebuggingResult startDebugging(ProjectId projectId) {
         final DebuggingSession session = getDebuggingSession(projectId);
-        session.reset();
-        return submitQuery(projectId);
+        session.start();
+        return session.calc(null);
+    }
+
+    public DebuggingResult submitQuery(@Nonnull ProjectId projectId, @Nullable ImmutableMap<String, Boolean> answers) {
+        final DebuggingSession session = getDebuggingSession(projectId);
+        return session.calc(answers);
     }
 
     public DebuggingResult stopDebugging(ProjectId projectId) {
-        disposeDebuggingSession(projectId);
+        final DebuggingSession session = getDebuggingSession(projectId);
+        session.stop();
+        debuggingSessions.remove(projectId, session);
         return createDebuggingResult(null,null,null);
-    }
-
-    public DebuggingResult submitQuery(ProjectId projectId) {
-        final DebuggingSession session = getDebuggingSession(projectId);
-        return session.calc();
-    }
-
-    public void addAnswer(ProjectId projectId, ImmutableMap<String, Boolean> answers) {
-        final DebuggingSession session = getDebuggingSession(projectId);
-        session.addAnswer(answers);
     }
 
     private DebuggingSession getDebuggingSession(ProjectId projectId) {
@@ -97,12 +94,6 @@ public class DebuggingSessionManager {
 
         return new DebuggingSession(diagnosisEngine);
 
-    }
-
-    private void disposeDebuggingSession(ProjectId projectId) {
-        final DebuggingSession session = getDebuggingSession(projectId);
-        session.dispose();
-        debuggingSessions.remove(projectId, session);
     }
 
     @Nonnull

@@ -38,7 +38,6 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
     @Nonnull
     @Override
     public DebuggingResult execute(@Nonnull SubmitDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        this.debuggingSessionManager.addAnswer(this.projectId, action.getAnswers());
-        return debuggingSessionManager.submitQuery(this.projectId);
+        return debuggingSessionManager.submitQuery(this.projectId, action.getAnswers());
     }
 }
