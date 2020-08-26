@@ -2,7 +2,6 @@ package edu.stanford.bmir.protege.web.shared.debugger;
 
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.Result;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nullable;
 import java.util.List;
