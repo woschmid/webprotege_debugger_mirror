@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.server.debugger.solver;
+package edu.stanford.bmir.protege.web.server.debugger;
 
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import org.exquisite.core.model.DiagnosisModel;

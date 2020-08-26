@@ -1,18 +1,12 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.collect.ImmutableMap;
-import edu.stanford.bmir.protege.web.server.debugger.diagnosis.DiagnosisEngineFactory;
-import edu.stanford.bmir.protege.web.server.debugger.solver.SolverFactory;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
-import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.exquisite.core.engines.IDiagnosisEngine;
-import org.exquisite.core.model.Diagnosis;
-import org.exquisite.core.model.DiagnosisModel;
-import org.exquisite.core.query.Query;
 import org.exquisite.core.solver.ISolver;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -23,7 +17,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @ProjectSingleton
 public class DebuggingSessionManager {
@@ -55,7 +53,7 @@ public class DebuggingSessionManager {
         final DebuggingSession session = getDebuggingSession(projectId);
         session.stop();
         debuggingSessions.remove(projectId, session);
-        return createDebuggingResult(null,null,null);
+        return DebuggingResultFactory.getDebuggingResult(null,null,null);
     }
 
     private DebuggingSession getDebuggingSession(ProjectId projectId) {
@@ -93,34 +91,6 @@ public class DebuggingSessionManager {
         logger.info("diagnosis engine created: {}", diagnosisEngine);
 
         return new DebuggingSession(diagnosisEngine);
-
     }
 
-    @Nonnull
-    protected static DebuggingResult createDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<Diagnosis<OWLLogicalAxiom>> diagnoses, @Nullable DiagnosisModel<OWLLogicalAxiom> diagnosisModel) {
-
-        edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
-        List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
-        List<TestCase> p = new ArrayList<>();
-        List<TestCase> n = new ArrayList<>();
-
-        if (query != null)
-            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(query.formulas);
-
-        if (diagnoses != null) {
-            for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
-                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(diag.getFormulas()));
-        }
-
-        if (diagnosisModel != null)
-            for (OWLLogicalAxiom a : diagnosisModel.getEntailedExamples())
-                p.add(new TestCase(a));
-
-
-        if (diagnosisModel != null)
-            for (OWLLogicalAxiom a : diagnosisModel.getNotEntailedExamples())
-                n.add(new TestCase(a));
-
-        return new DebuggingResult(q, d, p, n);
-    }
 }

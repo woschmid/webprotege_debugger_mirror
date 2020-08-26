@@ -17,12 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.rmi.UnexpectedException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import static edu.stanford.bmir.protege.web.server.debugger.DebuggingSessionManager.createDebuggingResult;
 
 public class DebuggingSession {
 
@@ -36,20 +33,13 @@ public class DebuggingSession {
 
     final private IDiagnosisEngine<OWLLogicalAxiom> engine;
 
-    private Query<OWLLogicalAxiom> query; // we save the query for the answering process in the next step
+    /** Remember the query for the answering process in the next step */
+    private Query<OWLLogicalAxiom> query;
 
     protected DebuggingSession(IDiagnosisEngine<OWLLogicalAxiom> engine) {
         id = UUID.randomUUID().toString();
         this.engine = engine;
         this.state = SessionState.INIT;
-    }
-
-    protected IDiagnosisEngine<OWLLogicalAxiom> getDiagnosisEngine() {
-        return engine;
-    }
-
-    protected String getId() {
-        return id;
     }
 
     /**
@@ -64,21 +54,22 @@ public class DebuggingSession {
     /**
      * Calculates a new query depending on the given answers.
      *
-     * @param answers
-     * @return
+     * @param answers String representations of axioms from previous queris and their answers (true or false).
+     * @return A result for the front end representing the current state of the backend.
      */
     protected DebuggingResult calc(@Nullable ImmutableMap<String, Boolean> answers) {
         try {
             if (state != SessionState.STARTED)
-                throw new DiagnosisException("Debugging session in invalid state (state: " + state + ")");
+                throw new DiagnosisException("Debugging session is in invalid state (state: " + state + ")");
 
             // reset the engine
             engine.resetEngine();
 
             // add possible answers
-            if (answers != null)
-                addAnswer(answers);
+            if (answers != null && !answers.isEmpty())
+                addAnswersToDiagnosisModel(answers);
 
+            // delete the previous query - we do not need them anymore for answer lookup now
             query = null;
 
             // calculate diagnoses
@@ -95,13 +86,17 @@ public class DebuggingSession {
                 if (queryComputation.hasNext()) {
                     query = queryComputation.next();
                     logger.info("computed query {}", query);
-                    return createDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
+                    return DebuggingResultFactory.getDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
                 } else {
                     logger.info("no query computed");
-                    return createDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
+                    return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
                 }
+            } else if (diagnoses.size() == 1) {
+                // we are finished!
+                return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
             } else {
-                return createDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
+                // this is an unexpected case and should not occur
+                throw new ActionExecutionException(new RuntimeException("Unexpected number of " + diagnoses.size() + " diagnoses."));
             }
         } catch (DiagnosisException e) {
             state = SessionState.FAILED;
@@ -118,8 +113,13 @@ public class DebuggingSession {
         state = SessionState.STOPPED;
     }
 
-    private void addAnswer(ImmutableMap<String, Boolean> answers) {
-        DiagnosisModel<OWLLogicalAxiom> diagnosisModel = getDiagnosisEngine().getSolver().getDiagnosisModel();
+    /**
+     * Adds answers from the previous query to the diagnosis model as positive and negative test cases.
+     *
+     * @param answers String representations of axioms from previous queris and their answers (true or false).
+     */
+    private void addAnswersToDiagnosisModel(@Nonnull ImmutableMap<String, Boolean> answers) {
+        final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = engine.getSolver().getDiagnosisModel();
         for (Map.Entry<String, Boolean> answer : answers.entrySet()) {
             // look up the axiom representing this string
             final OWLLogicalAxiom axiom = lookupAxiomFromPreviousQuery(answer.getKey());
@@ -133,17 +133,26 @@ public class DebuggingSession {
         }
     }
 
+    /**
+     * Get the axiom representing the string.
+     *
+     * @param axiomAsString A string representation of an axiom to look up in the previous query.
+     * @return The OWLLogicalAxiom instance representing the string.
+     * @throws ActionExecutionException if no axiom representing this string can be found from the previous query.
+     */
     private OWLLogicalAxiom lookupAxiomFromPreviousQuery(@Nonnull String axiomAsString) {
-        if (query == null)
-            throw new ActionExecutionException(new UnexpectedException("No previous query instance found"));
+        if (query == null) {
+            state = SessionState.FAILED;
+            throw new ActionExecutionException(new RuntimeException("No previous query instance found"));
+        }
 
         for (OWLLogicalAxiom a : query.formulas) // lookup
             if (axiomAsString.equals(a.toString()))
                 return a;
 
-        // here the axiom could not be found.
+        // if no axiom could be found, we have to throw an exception
         state = SessionState.FAILED;
-        throw new ActionExecutionException(new UnexpectedException(axiomAsString + " could not be not found"));
+        throw new ActionExecutionException(new RuntimeException(axiomAsString + " could not be not found"));
     }
 
 }

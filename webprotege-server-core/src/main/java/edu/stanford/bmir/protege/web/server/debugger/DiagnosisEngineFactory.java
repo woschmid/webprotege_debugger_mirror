@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.server.debugger.diagnosis;
+package edu.stanford.bmir.protege.web.server.debugger;
 
 import org.exquisite.core.conflictsearch.QuickXPlain;
 import org.exquisite.core.engines.HSTreeEngine;
