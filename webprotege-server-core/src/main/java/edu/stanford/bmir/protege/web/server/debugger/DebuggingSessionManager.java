@@ -38,17 +38,36 @@ public class DebuggingSessionManager {
         this.debuggingSessions = new HashMap<>();
     }
 
+    /**
+     * Starts a new debugging session for the project.
+     *
+     * @param projectId The project.
+     * @return A result representing the current state of the debugging session.
+     */
     public DebuggingResult startDebugging(ProjectId projectId) {
         final DebuggingSession session = getDebuggingSession(projectId);
         session.start();
-        return session.calc(null);
+        return session.calculateQuery(null);
     }
 
+    /**
+     * Submits a query and it's answers to the debugger.
+     *
+     * @param projectId The project.
+     * @param answers Map containing answers to the previously given query.
+     * @return A result representing the current state of the debugging session.
+     */
     public DebuggingResult submitQuery(@Nonnull ProjectId projectId, @Nullable ImmutableMap<String, Boolean> answers) {
         final DebuggingSession session = getDebuggingSession(projectId);
-        return session.calc(answers);
+        return session.calculateQuery(answers);
     }
 
+    /**
+     * Stops the runnning debugging session of the project.
+     *
+     * @param projectId The project.
+     * @return A result representing the current state of the debugging session.
+     */
     public DebuggingResult stopDebugging(ProjectId projectId) {
         final DebuggingSession session = getDebuggingSession(projectId);
         session.stop();
@@ -56,6 +75,12 @@ public class DebuggingSessionManager {
         return DebuggingResultFactory.getDebuggingResult(null,null,null);
     }
 
+    /**
+     * Returns a debugging session belonging exclusively to the project.
+     *
+     * @param projectId A project.
+     * @return A debugging session instance.
+     */
     private DebuggingSession getDebuggingSession(ProjectId projectId) {
         // TODO check which user is requesting for a debugging session
         synchronized (logger) {
@@ -69,7 +94,8 @@ public class DebuggingSessionManager {
     }
 
     /**
-     * Starts a debugging session.
+     * Creates a new instance of a debugging session.
+     *
      * Prepares everything that is necessary for a debugging session and returns a DebuggingSession if sucessfully.
      * @return DebuggingSession if successfully prepare and start a debugging session.
      */

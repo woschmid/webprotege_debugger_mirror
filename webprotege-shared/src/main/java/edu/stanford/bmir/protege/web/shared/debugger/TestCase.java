@@ -15,8 +15,8 @@ public class TestCase implements IsSerializable, Serializable {
     @GwtSerializationConstructor
     public TestCase() {}
 
-    public TestCase(@Nonnull OWLLogicalAxiom a) {
-        this.axiom = a.toString();
+    public TestCase(@Nonnull String a) {
+        this.axiom = a;
     }
 
     @Nonnull

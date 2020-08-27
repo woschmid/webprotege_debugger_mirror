@@ -16,11 +16,8 @@ public class Diagnosis implements IsSerializable {
     @GwtSerializationConstructor
     private Diagnosis() {}
 
-    public Diagnosis(@Nonnull Set<OWLLogicalAxiom> axioms) {
-        this.axioms = new HashSet<>();
-        for (OWLLogicalAxiom a : axioms) {
-            this.axioms.add(a.toString());
-        }
+    public Diagnosis(@Nonnull Set<String> axioms) {
+        this.axioms = new HashSet<>(axioms);
     }
 
     @Nonnull

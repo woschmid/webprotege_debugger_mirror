@@ -25,7 +25,12 @@ public class DebuggingSession {
 
     private static final Logger logger = LoggerFactory.getLogger(DebuggingSession.class);
 
-    enum SessionState {INIT, STARTED, STOPPED , FAILED}
+    /**
+     * INIT ... session has been created not not yet started<br/>
+     * STARTED ... session has been started manually<br/>
+     * STOPPED ... session has been stopped manually<br/>
+     */
+    enum SessionState {INIT, STARTED, STOPPED}
 
     final private String id;
 
@@ -40,15 +45,29 @@ public class DebuggingSession {
         id = UUID.randomUUID().toString();
         this.engine = engine;
         this.state = SessionState.INIT;
+        this.query = null;
+    }
+
+    @Override
+    public String toString() {
+        return "DebuggingSession{" +
+                "id='" + id + '\'' +
+                ", state=" + state +
+                '}';
     }
 
     /**
      * Starts a new debugging session.
      */
     protected void start() {
+        // guarantee that the session state is either in INIT, STOPPED or FAILED
+        // let's not allow to start an already started session
+        if (state == SessionState.STARTED) {
+            stop();
+            throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
+        }
         this.state = SessionState.STARTED;
-        // reset the engine
-        engine.resetEngine();
+        this.query = null;
     }
 
     /**
@@ -57,15 +76,18 @@ public class DebuggingSession {
      * @param answers String representations of axioms from previous queris and their answers (true or false).
      * @return A result for the front end representing the current state of the backend.
      */
-    protected DebuggingResult calc(@Nullable ImmutableMap<String, Boolean> answers) {
+    protected DebuggingResult calculateQuery(@Nullable ImmutableMap<String, Boolean> answers) {
         try {
+            // verify that the session state in STARTED state
             if (state != SessionState.STARTED)
-                throw new DiagnosisException("Debugging session is in invalid state (state: " + state + ")");
+                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
 
             // reset the engine
             engine.resetEngine();
 
             // add possible answers
+            // when we start a new session, then answers will be null,
+            // otherwise this map should have at least one element
             if (answers != null && !answers.isEmpty())
                 addAnswersToDiagnosisModel(answers);
 
@@ -76,30 +98,32 @@ public class DebuggingSession {
             final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = engine.calculateDiagnoses();
             logger.info("got {} diagnoses: {}", diagnoses.size(), diagnoses);
 
-            // calculate queries
             if (diagnoses.size() >= 2) {
-                final HeuristicConfiguration<OWLLogicalAxiom> heuristicConfiguration = new HeuristicConfiguration<>((AbstractDiagnosisEngine) engine, null);
-                final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation = new HeuristicQueryComputation<>(heuristicConfiguration);
+                // there are more than one diagnoses, therefore we need to create a query for the user to narrow down the problem.
 
+                // configure and calculate the query
+                final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation =
+                        new HeuristicQueryComputation<>(
+                                new HeuristicConfiguration<>((AbstractDiagnosisEngine<OWLLogicalAxiom>) engine, null));
                 queryComputation.initialize(diagnoses);
 
+                // get the calculated query
                 if (queryComputation.hasNext()) {
                     query = queryComputation.next();
-                    logger.info("computed query {}", query);
+                    logger.info("calculated query {}", query);
                     return DebuggingResultFactory.getDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
                 } else {
-                    logger.info("no query computed");
-                    return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
+                    throw new RuntimeException("No query could be calculated.");
                 }
             } else if (diagnoses.size() == 1) {
-                // we are finished!
+                // we found the diagnosis with the faulty axioms
                 return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
             } else {
-                // this is an unexpected case and should not occur
-                throw new ActionExecutionException(new RuntimeException("Unexpected number of " + diagnoses.size() + " diagnoses."));
+                // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
+                return DebuggingResultFactory.getDebuggingResult(null, null, engine.getSolver().getDiagnosisModel());
             }
-        } catch (DiagnosisException e) {
-            state = SessionState.FAILED;
+        } catch (RuntimeException | DiagnosisException e) {
+            stop();
             throw new ActionExecutionException(e);
         }
     }
@@ -109,8 +133,10 @@ public class DebuggingSession {
      */
     protected void stop() {
         // dispose diagnosis engine, solver and everything else...
+        // No check will be done on the session state beforehand.
         engine.dispose();
         state = SessionState.STOPPED;
+        query = null;
     }
 
     /**
@@ -141,17 +167,20 @@ public class DebuggingSession {
      * @throws ActionExecutionException if no axiom representing this string can be found from the previous query.
      */
     private OWLLogicalAxiom lookupAxiomFromPreviousQuery(@Nonnull String axiomAsString) {
+
+        // we expect that the query stated before does exist
         if (query == null) {
-            state = SessionState.FAILED;
+            stop();
             throw new ActionExecutionException(new RuntimeException("No previous query instance found"));
         }
 
-        for (OWLLogicalAxiom a : query.formulas) // lookup
-            if (axiomAsString.equals(a.toString()))
+        // lookup the matching axiom
+        for (OWLLogicalAxiom a : query.formulas)
+            if (axiomAsString.equals(ManchesterSyntaxRenderer.renderAxiom(a)))
                 return a;
 
         // if no axiom could be found, we have to throw an exception
-        state = SessionState.FAILED;
+        stop();
         throw new ActionExecutionException(new RuntimeException(axiomAsString + " could not be not found"));
     }
 

@@ -16,9 +16,8 @@ public class Query implements IsSerializable {
     @GwtSerializationConstructor
     private Query() {}
 
-    public Query(@Nonnull Set<OWLLogicalAxiom> axioms) {
-        this.axioms = new HashSet<>();
-        for (OWLLogicalAxiom a : axioms) this.axioms.add(a.toString());
+    public Query(@Nonnull Set<String> axioms) {
+        this.axioms = new HashSet<>(axioms);
     }
 
     @Nonnull

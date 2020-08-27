@@ -22,18 +22,18 @@ public class DebuggingResultFactory {
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> n = new ArrayList<>();
 
         if (query != null)
-            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(query.formulas);
+            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(ManchesterSyntaxRenderer.renderAxioms(query.formulas));
 
         if (diagnoses != null)
             for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
-                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(diag.getFormulas()));
+                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(ManchesterSyntaxRenderer.renderAxioms(diag.getFormulas())));
 
         if (diagnosisModel != null) {
             for (OWLLogicalAxiom a : diagnosisModel.getEntailedExamples())
-                p.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(a));
+                p.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(ManchesterSyntaxRenderer.renderAxiom(a)));
 
             for (OWLLogicalAxiom a : diagnosisModel.getNotEntailedExamples())
-                n.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(a));
+                n.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(ManchesterSyntaxRenderer.renderAxiom(a)));
         }
 
         return new edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult(q, d, p, n);
