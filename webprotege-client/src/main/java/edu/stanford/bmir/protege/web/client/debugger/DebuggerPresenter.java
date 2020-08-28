@@ -20,7 +20,10 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -118,6 +121,8 @@ public class DebuggerPresenter{
         if (msg != null) {
             Set<String> items = msg.getAxioms();
             queriesPresenter.getStatementPresenter().addQueriesStatement(items);
+        }else{
+            stopDebugging();
         }
     }
 

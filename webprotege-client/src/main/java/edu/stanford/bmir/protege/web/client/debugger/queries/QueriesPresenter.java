@@ -1,7 +1,9 @@
 package edu.stanford.bmir.protege.web.client.debugger.queries;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.CheckBox;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -10,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,15 +40,14 @@ public class QueriesPresenter {
         this.projectId = projectId;
         this.dsm = dispatchServiceManager;
         this.view = checkNotNull(queriesView);
+        statementPresenter.addCheckBoxClickhandler(this::CheckCheckBox);
     }
 
     public StatementPresenter getStatementPresenter() {
         return statementPresenter;
     }
 
-    public void setStatementPresenter(StatementPresenter statementPresenter) {
-        this.statementPresenter = statementPresenter;
-    }
+
 
     public void start(AcceptsOneWidget container, StartDebuggingHandler starthandler, StopDebuggingHandler stophandler, SubmitDebuggingHandler submithandler) {
         GWT.log("[QueriesPresenter]Start queries presenter");
@@ -62,8 +64,22 @@ public class QueriesPresenter {
 
     }
 
-    private void onSuccess(String msg) {
-        GWT.log("[QueriesPresenter]Got Debugging Button Result successfully with msg: \"" + msg + "\"");
+    public void CheckCheckBox(ClickEvent event, CheckBox checkBoxOther, List<CheckBox> list) {
+        boolean checked = ((CheckBox)event.getSource()).getValue();
+        if (checked){
+            checkBoxOther.setValue(false);
+//            setEnabledButton("submit");
+        }
+        boolean flag = false;
+        for ( CheckBox checkbox:
+             list) {
+            flag = checkbox.getValue() || flag;
+        }
+        if(flag){
+            setEnabledButton("submit");
+        }else{
+            setEnabledButton("unsubmit");
+        }
     }
 
     public void setQueriesStatement(String msg){
@@ -82,10 +98,12 @@ public class QueriesPresenter {
             view.enablebutton("start");
         }else if (buttonTyp.equals("start")){
             view.enablebutton("stop");
-            view.enablebutton("submit");
+            view.disablebutton("submit");
             view.disablebutton("start");
-        }else {
-
+        }else if (buttonTyp.equals("submit")){
+            view.enablebutton("submit");
+        }else if (buttonTyp.equals("unsubmit")){
+            view.disablebutton("submit");
         }
     }
 
