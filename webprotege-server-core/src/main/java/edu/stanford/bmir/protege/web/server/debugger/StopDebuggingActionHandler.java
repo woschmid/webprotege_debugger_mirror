@@ -46,6 +46,6 @@ public class StopDebuggingActionHandler extends AbstractProjectActionHandler<Sto
     @Nullable
     @Override
     protected BuiltInAction getRequiredExecutableBuiltInAction() {
-        return BuiltInAction.EDIT_ONTOLOGY;
+        return BuiltInAction.DEBUG_ONTOLOGY;
     }
 }

@@ -46,6 +46,6 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
     @Nullable
     @Override
     protected BuiltInAction getRequiredExecutableBuiltInAction() {
-        return BuiltInAction.EDIT_ONTOLOGY;
+        return BuiltInAction.DEBUG_ONTOLOGY;
     }
 }

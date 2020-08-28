@@ -75,6 +75,7 @@ public enum BuiltInRole {
     PROJECT_EDITOR(OBJECT_COMMENTER,
                    EDIT_ONTOLOGY,
                    EDIT_ONTOLOGY_ANNOTATIONS,
+                   DEBUG_ONTOLOGY,
                    CREATE_CLASS,
                    DELETE_CLASS,
                    MERGE_ENTITIES,

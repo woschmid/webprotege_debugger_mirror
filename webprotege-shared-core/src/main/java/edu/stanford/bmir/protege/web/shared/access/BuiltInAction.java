@@ -46,6 +46,8 @@ public enum BuiltInAction {
 
     EDIT_ONTOLOGY_ANNOTATIONS,
 
+    DEBUG_ONTOLOGY,
+
     CREATE_CLASS,
 
     DELETE_CLASS,

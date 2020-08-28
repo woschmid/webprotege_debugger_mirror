@@ -48,6 +48,6 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
     @Nullable
     @Override
     protected BuiltInAction getRequiredExecutableBuiltInAction() {
-        return BuiltInAction.EDIT_ONTOLOGY;
+        return BuiltInAction.DEBUG_ONTOLOGY;
     }
 }
