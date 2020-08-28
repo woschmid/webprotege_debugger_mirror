@@ -1,13 +1,15 @@
 package edu.stanford.bmir.protege.web.client.debugger.statement;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +25,13 @@ public class StatementViewImpl extends Composite{
     interface QeriesViewImplUiBinder extends UiBinder<HTMLPanel, StatementViewImpl> {
 
     }
+
+    private CheckCheckBoxHandler checkCheckBox = new CheckCheckBoxHandler() {
+        @Override
+        public void onClick(ClickEvent clickEvent, CheckBox checkBoxOther, List<CheckBox> list) {
+
+        }
+    };
 
     private static QeriesViewImplUiBinder ourUiBinder = GWT.create(QeriesViewImplUiBinder.class);
 
@@ -43,18 +52,37 @@ public class StatementViewImpl extends Composite{
     }
 
     public void addQueriesStatement(Set<String> axiomStatement){
+        List<CheckBox> listcheckbox= new ArrayList<>();
         for (String axiom :
                 axiomStatement) {
             int row = table.getRowCount();
-            String radioGroup = axiom+"RadioGroup";
             Label statement = new Label(axiom);
-            RadioButton rb0 = new RadioButton(radioGroup, "+");
-            RadioButton rb1 = new RadioButton(radioGroup, "-");
+            CheckBox checkBoxP = new CheckBox("+");
+
+            CheckBox checkBoxN = new CheckBox("-");
+
+            listcheckbox.add(checkBoxP);
+            listcheckbox.add(checkBoxN);
+
+            checkBoxN.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent clickEvent) {
+                    checkCheckBox.onClick(clickEvent,checkBoxP, listcheckbox);
+                }
+            });
+
+            checkBoxP.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent clickEvent) {
+                    checkCheckBox.onClick(clickEvent,checkBoxN, listcheckbox);
+                }
+            });
             table.setWidget(row,0,statement);
-            table.setWidget(row,1,rb0);
-            table.setWidget(row,2,rb1);
+            table.setWidget(row,1, checkBoxP);
+            table.setWidget(row,2, checkBoxN);
         }
     }
+
     public void addRepairsStatement(List<Diagnosis> diagnoseStatement){
         int numOfRepairs = 1;
         for (Diagnosis diagnosis :
@@ -83,4 +111,7 @@ public class StatementViewImpl extends Composite{
         }
     }
 
+    public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {
+        this.checkCheckBox = checkCheckBox;
+    }
 }

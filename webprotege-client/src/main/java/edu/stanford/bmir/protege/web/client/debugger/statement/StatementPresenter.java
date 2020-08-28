@@ -1,11 +1,10 @@
 package edu.stanford.bmir.protege.web.client.debugger.statement;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +24,13 @@ public class StatementPresenter {
 
     private StatementViewImpl view;
 
-    @Inject
     public StatementPresenter() {
         this.view = new StatementViewImpl(this);
     }
 
+    public void addCheckBoxClickhandler(CheckCheckBoxHandler checkCheckBox){
+        view.setCheckCheckBox(checkCheckBox);
+    }
 
     public void start(AcceptsOneWidget container) {
         this.container = container;
@@ -62,8 +63,8 @@ public class StatementPresenter {
         Map<String, Boolean> answers = new HashMap<>();
         for(int i  = 0; i < view.table.getRowCount(); i++ ){
             String axiom = view.table.getText(i,0);
-            RadioButton flagTrue = (RadioButton) view.table.getWidget(i,1);
-            RadioButton flagFalse = (RadioButton) view.table.getWidget(i,2);
+            CheckBox flagTrue = (CheckBox) view.table.getWidget(i,1);
+            CheckBox flagFalse = (CheckBox) view.table.getWidget(i,2);
             if (flagTrue.getValue() == true){
                 answers.put(axiom,true);
             }
