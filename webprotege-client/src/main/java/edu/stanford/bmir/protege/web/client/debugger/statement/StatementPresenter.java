@@ -5,6 +5,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class StatementPresenter {
 
     private StatementViewImpl view;
 
+    @Inject
     public StatementPresenter() {
         this.view = new StatementViewImpl(this);
     }
