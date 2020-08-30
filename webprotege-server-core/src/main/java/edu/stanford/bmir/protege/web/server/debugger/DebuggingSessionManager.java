@@ -30,7 +30,7 @@ public class DebuggingSessionManager {
 
     private final RevisionManager revisionManager;
 
-    private Map<ProjectId, DebuggingSession> debuggingSessions;
+    private final Map<ProjectId, DebuggingSession> debuggingSessions;
 
     @Inject
     public DebuggingSessionManager(RevisionManager revisionManager) {
@@ -71,7 +71,9 @@ public class DebuggingSessionManager {
     public DebuggingResult stopDebugging(ProjectId projectId) {
         final DebuggingSession session = getDebuggingSession(projectId);
         session.stop();
-        debuggingSessions.remove(projectId, session);
+        final boolean isRemoved = debuggingSessions.remove(projectId, session);
+        if (!isRemoved)
+            throw new ActionExecutionException(new RuntimeException("The debugging session could not be stopped appropriately"));
         return DebuggingResultFactory.getDebuggingResult(null,null,null);
     }
 
@@ -82,7 +84,6 @@ public class DebuggingSessionManager {
      * @return A debugging session instance.
      */
     private DebuggingSession getDebuggingSession(ProjectId projectId) {
-        // TODO check which user is requesting for a debugging session
         synchronized (logger) {
             DebuggingSession debuggingSession = this.debuggingSessions.get(projectId);
             if (debuggingSession == null) {
@@ -106,17 +107,20 @@ public class DebuggingSessionManager {
             throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
 
         final OWLOntology ontology = ontologies.get(0);
-        logger.info("Got ontology {})", ontology);
+        logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
 
         // creates a solver instance  using the ontology
         final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology);
-        logger.info("solver created {}", solver);
+        logger.info("Solver created: {}", solver);
 
         // create diagnosis engine using the solver
         IDiagnosisEngine<OWLLogicalAxiom> diagnosisEngine = DiagnosisEngineFactory.getDiagnosisEngine(solver);
-        logger.info("diagnosis engine created: {}", diagnosisEngine);
+        logger.info("Diagnosis engine created: {}", diagnosisEngine);
 
-        return new DebuggingSession(diagnosisEngine);
+        final DebuggingSession session = new DebuggingSession(diagnosisEngine);
+        logger.info("DebuggingSession created: {}", session);
+
+        return session;
     }
 
 }

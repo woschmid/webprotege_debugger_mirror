@@ -41,6 +41,8 @@ public class DebuggingSession {
     /** Remember the query for the answering process in the next step */
     private Query<OWLLogicalAxiom> query;
 
+    private LoggingQueryProgressMonitor monitor;
+
     protected DebuggingSession(IDiagnosisEngine<OWLLogicalAxiom> engine) {
         id = UUID.randomUUID().toString();
         this.engine = engine;
@@ -49,12 +51,7 @@ public class DebuggingSession {
     }
 
     @Override
-    public String toString() {
-        return "DebuggingSession{" +
-                "id='" + id + '\'' +
-                ", state=" + state +
-                '}';
-    }
+    public String toString() { return "DebuggingSession{" + id + '}'; }
 
     /**
      * Starts a new debugging session.
@@ -68,6 +65,7 @@ public class DebuggingSession {
         }
         this.state = SessionState.STARTED;
         this.query = null;
+        this.monitor = new LoggingQueryProgressMonitor();
     }
 
     /**
@@ -96,7 +94,7 @@ public class DebuggingSession {
 
             // calculate diagnoses
             final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = engine.calculateDiagnoses();
-            logger.info("got {} diagnoses: {}", diagnoses.size(), diagnoses);
+            logger.info("{} got {} diagnoses: {}", this, diagnoses.size(), diagnoses);
 
             if (diagnoses.size() >= 2) {
                 // there are more than one diagnoses, therefore we need to create a query for the user to narrow down the problem.
@@ -104,21 +102,25 @@ public class DebuggingSession {
                 // configure and calculate the query
                 final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation =
                         new HeuristicQueryComputation<>(
-                                new HeuristicConfiguration<>((AbstractDiagnosisEngine<OWLLogicalAxiom>) engine, null));
+                                new HeuristicConfiguration<>((AbstractDiagnosisEngine<OWLLogicalAxiom>) engine, monitor));
+
+                logger.info("{} calculating query from {} diagnoses ...", this, diagnoses.size());
                 queryComputation.initialize(diagnoses);
 
                 // get the calculated query
                 if (queryComputation.hasNext()) {
                     query = queryComputation.next();
-                    logger.info("calculated query {}", query);
+                    logger.info("{} calculated query {}", this, query);
                     return DebuggingResultFactory.getDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
                 } else {
                     throw new RuntimeException("No query could be calculated.");
                 }
             } else if (diagnoses.size() == 1) {
                 // we found the diagnosis with the faulty axioms
+                logger.info("{} found final diagnosis! {}", this, diagnoses);
                 return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
             } else {
+                logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
                 // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
                 return DebuggingResultFactory.getDebuggingResult(null, null, engine.getSolver().getDiagnosisModel());
             }
@@ -134,15 +136,16 @@ public class DebuggingSession {
     protected void stop() {
         // dispose diagnosis engine, solver and everything else...
         // No check will be done on the session state beforehand.
-        engine.dispose();
         state = SessionState.STOPPED;
+        engine.dispose();
         query = null;
+        monitor = null;
     }
 
     /**
-     * Adds answers from the previous query to the diagnosis model as positive and negative test cases.
+     * Adds answers that were given to the previous query to the diagnosis model either as positive or as negative test cases.
      *
-     * @param answers String representations of axioms from previous queris and their answers (true or false).
+     * @param answers String representations of axioms from the previous query and the answers (either true or false) given to them.
      */
     private void addAnswersToDiagnosisModel(@Nonnull ImmutableMap<String, Boolean> answers) {
         final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = engine.getSolver().getDiagnosisModel();
@@ -151,10 +154,10 @@ public class DebuggingSession {
             final OWLLogicalAxiom axiom = lookupAxiomFromPreviousQuery(answer.getKey());
             if (answer.getValue()) {
                 diagnosisModel.getEntailedExamples().add(axiom);
-                logger.info("got positive answer for {}", axiom);
+                logger.info("{} got positive answer for {}", this, axiom);
             } else {
                 diagnosisModel.getNotEntailedExamples().add(axiom);
-                logger.info("got negative answer for {}", axiom);
+                logger.info("{} got negative answer for {}", this, axiom);
             }
         }
     }
