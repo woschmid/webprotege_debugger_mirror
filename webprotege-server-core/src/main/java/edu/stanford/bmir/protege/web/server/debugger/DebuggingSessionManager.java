@@ -74,7 +74,7 @@ public class DebuggingSessionManager {
         final boolean isRemoved = debuggingSessions.remove(projectId, session);
         if (!isRemoved)
             throw new ActionExecutionException(new RuntimeException("The debugging session could not be stopped appropriately"));
-        return DebuggingResultFactory.getDebuggingResult(null,null,null);
+        return DebuggingResultFactory.getDebuggingResult(null,null,null, session.getState());
     }
 
     /**

@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
+import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import org.exquisite.core.DiagnosisException;
 import org.exquisite.core.engines.AbstractDiagnosisEngine;
@@ -25,13 +26,6 @@ public class DebuggingSession {
 
     private static final Logger logger = LoggerFactory.getLogger(DebuggingSession.class);
 
-    /**
-     * INIT ... session has been created not not yet started<br/>
-     * STARTED ... session has been started manually<br/>
-     * STOPPED ... session has been stopped manually<br/>
-     */
-    enum SessionState {INIT, STARTED, STOPPED}
-
     final private String id;
 
     private SessionState state;
@@ -52,6 +46,10 @@ public class DebuggingSession {
 
     @Override
     public String toString() { return "DebuggingSession{" + id + '}'; }
+
+    protected SessionState getState() {
+        return state;
+    }
 
     /**
      * Starts a new debugging session.
@@ -111,18 +109,18 @@ public class DebuggingSession {
                 if (queryComputation.hasNext()) {
                     query = queryComputation.next();
                     logger.info("{} calculated query {}", this, query);
-                    return DebuggingResultFactory.getDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel());
+                    return DebuggingResultFactory.getDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel(), getState());
                 } else {
                     throw new RuntimeException("No query could be calculated.");
                 }
             } else if (diagnoses.size() == 1) {
                 // we found the diagnosis with the faulty axioms
                 logger.info("{} found final diagnosis! {}", this, diagnoses);
-                return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel());
+                return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel(), getState());
             } else {
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
                 // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
-                return DebuggingResultFactory.getDebuggingResult(null, null, engine.getSolver().getDiagnosisModel());
+                return DebuggingResultFactory.getDebuggingResult(null, null, engine.getSolver().getDiagnosisModel(), getState());
             }
         } catch (RuntimeException | DiagnosisException e) {
             stop();

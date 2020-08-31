@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
@@ -14,7 +15,7 @@ import java.util.Set;
 public class DebuggingResultFactory {
 
     @Nonnull
-    protected static edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult getDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<Diagnosis<OWLLogicalAxiom>> diagnoses, @Nullable DiagnosisModel<OWLLogicalAxiom> diagnosisModel) {
+    protected static edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult getDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<Diagnosis<OWLLogicalAxiom>> diagnoses, @Nullable DiagnosisModel<OWLLogicalAxiom> diagnosisModel, @Nonnull SessionState sessionState) {
 
         edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
         List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
@@ -36,7 +37,7 @@ public class DebuggingResultFactory {
                 n.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(ManchesterSyntaxRenderer.renderAxiom(a)));
         }
 
-        return new edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult(q, d, p, n);
+        return new edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult(q, d, p, n, sessionState);
     }
 
 }
