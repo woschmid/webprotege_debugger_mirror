@@ -5,7 +5,6 @@ import edu.stanford.bmir.protege.web.client.filter.FilterView;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameSettingsManager;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
-import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
 import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
 import edu.stanford.bmir.protege.web.client.search.SearchModal;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
@@ -62,9 +61,9 @@ public class DebuggerPortletPresenter extends AbstractWebProtegePortletPresenter
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        portletUi.setFilterView(filterView);
-        tagVisibilityPresenter.start(filterView, portletUi);
-        portletUi.addAction(new PortletAction(messages.search(), "wp-btn-g--search", this::handleSearch));
+//        portletUi.setFilterView(filterView);
+//        tagVisibilityPresenter.start(filterView, portletUi);
+//        portletUi.addAction(new PortletAction(messages.search(), "wp-btn-g--search", this::handleSearch));
         presenter.start(portletUi, eventBus);
         handleAfterSetEntity(getSelectedEntity());
     }

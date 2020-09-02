@@ -68,6 +68,7 @@ public class DebuggerPresenter{
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());
         container.setWidget(view.asWidget());
+        stopDebugging();
     }
 
     private void startDebugging() {
@@ -75,25 +76,26 @@ public class DebuggerPresenter{
         this.dsm.execute(new StartDebuggingAction(projectId), new Consumer<DebuggingResult>() {
             @Override
             public void accept(DebuggingResult debuggingResult) {
+                clearAxiomtabel();
                 DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
                 DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
                 DebuggerPresenter.this.setTestCasesStatement(debuggingResult.getPositiveTestCases(),debuggingResult.getNegativeTestCases());
-
+                changeSessionState(debuggingResult.getSessionState());
             }
         });
-        queriesPresenter.setEnabledButton("start");
     }
 
     private void stopDebugging() {
         GWT.log("[QueriesPresenter]Stop Debugging Button pressed!!!!!");
         this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<DebuggingResult>() {
+
             @Override
             public void accept(DebuggingResult stopDebuggingResult) {
-//                QueriesPresenter.this.onSuccess(stopDebuggingResult.getMsg());
+                clearAxiomtabel();
+                changeSessionState(stopDebuggingResult.getSessionState());
             }
         });
-        clearAxiomtabel();
-        queriesPresenter.setEnabledButton("stop");
+
     }
 
     private void submitDebugging() {
@@ -101,13 +103,14 @@ public class DebuggerPresenter{
         this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()), new Consumer<DebuggingResult>() {
             @Override
             public void accept(DebuggingResult submitDebuggingResult) {
+                clearAxiomtabel();
                 DebuggerPresenter.this.setQueriesStatement(submitDebuggingResult.getQuery());
                 DebuggerPresenter.this.setReqairsStatement(submitDebuggingResult.getDiagnoses());
                 DebuggerPresenter.this.setTestCasesStatement(submitDebuggingResult.getPositiveTestCases(),submitDebuggingResult.getNegativeTestCases());
+                changeSessionState(submitDebuggingResult.getSessionState());
             }
         });
-        clearAxiomtabel();
-        queriesPresenter.setEnabledButton("start");
+
     }
 
     private ImmutableMap<String, Boolean> getAnswers() {
@@ -121,8 +124,6 @@ public class DebuggerPresenter{
         if (msg != null) {
             Set<String> items = msg.getAxioms();
             queriesPresenter.getStatementPresenter().addQueriesStatement(items);
-        }else{
-            stopDebugging();
         }
     }
 
@@ -152,6 +153,14 @@ public class DebuggerPresenter{
         queriesPresenter.clearAxiomtable();
         repairsPresenter.clearAxiomtable();
         testcasesPresenter.clearAxiomtable();
+    }
+
+    private void changeSessionState(SessionState state){
+        if(state == SessionState.STARTED){
+            queriesPresenter.setEnabledButton("start");
+        }else if (state == SessionState.STOPPED){
+            queriesPresenter.setEnabledButton("stop");
+        }
     }
 
 }
