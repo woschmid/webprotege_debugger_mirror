@@ -1,26 +1,21 @@
 package edu.stanford.bmir.protege.web.client.debugger;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.*;
-import edu.stanford.bmir.protege.web.client.list.ListBox;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
 import edu.stanford.bmir.protege.web.client.pagination.PaginatorPresenter;
-import edu.stanford.bmir.protege.web.client.pagination.PaginatorView;
-import edu.stanford.bmir.protege.web.client.progress.BusyView;
 import edu.stanford.bmir.protege.web.client.search.SearchStringChangedHandler;
 import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
 import edu.stanford.bmir.protege.web.shared.entity.OWLNamedIndividualData;
 import edu.stanford.bmir.protege.web.shared.individuals.InstanceRetrievalMode;
 import edu.stanford.bmir.protege.web.shared.lang.DisplayNameSettings;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -55,10 +50,6 @@ public class DebuggerViewImpl extends Composite implements DebuggerView {
 
     @UiField
     SimplePanel testcasesContainer;
-
-    private SearchStringChangedHandler searchStringChangedHandler = () -> {};
-
-    private InstanceRetrievalTypeChangedHandler retrievalTypeChangedHandler = () -> {};
 
 
     @Inject
@@ -194,16 +185,16 @@ public class DebuggerViewImpl extends Composite implements DebuggerView {
 //        directRadioButton.setEnabled(enabled);
     }
 
-
     @Override
     public void setSearchStringChangedHandler(@Nonnull SearchStringChangedHandler handler) {
-        searchStringChangedHandler = checkNotNull(handler);
+
     }
 
     @Override
     public void setInstanceRetrievalTypeChangedHandler(@Nonnull InstanceRetrievalTypeChangedHandler handler) {
-        this.retrievalTypeChangedHandler = checkNotNull(handler);
+
     }
+
 
     @Override
     public void setPageCount(int pageCount) {

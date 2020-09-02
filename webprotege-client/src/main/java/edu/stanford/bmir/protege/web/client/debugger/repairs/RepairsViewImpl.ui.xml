@@ -4,68 +4,30 @@
     <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
     <ui:style>
         .main {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1px;
-        box-sizing: border-box;
-        }
-        .typeFieldContainer {
-        margin-bottom: 0.3rem;
-        }
-        .searchBox {
-        flex-grow: 0;
-        flex-shrink: 0;
-        padding: 2px;
-        margin: 1px;
-        border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
+            height : 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 1px;
+            box-sizing: border-box;
         }
         .individualsList {
-        flex-grow: 1;
-        flex-shrink: 1;
-        overflow: auto;
-        background-color: literal("var(--primary--background-color)");
-        border: 1px solid literal("var(--alternate--separator--color)");
-        margin: 1px;
-        }
-        .bottomBar {
-        background-color: literal("var(--inlay-panel--background-color)");
+            flex-grow: 1;
+            flex-shrink: 1;
+            overflow: auto;
+            background-color: literal("var(--primary--background-color)");
+            border: 1px solid literal("var(--alternate--separator--color)");
+            margin: 1px;
         }
         .typeGroup {
-        flex-grow: 0;
-        flex-shrink: 0;
+            flex-grow: 0;
+            flex-shrink: 0;
         }
-        .listGroup {
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 1;
-        flex-grow: 1;
-        }
-        .levelField {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        }
-        .levelField > span {
-        padding: 5px;
-        }
-        .levelRadio {
-        padding-left: 10px;
-        }
-        .executeButton {
-        <!--            align-self: flex-start;-->
-        flex-grow: 0;
-        flex-shrink: 0;
-        }
-        .newTabButton {
-        flex-grow: 0;
-        flex-shrink: 0;
-        margin-right: 5px;
-        }
+
         .criteriaContainer {
-        flex-grow: 0;
-        flex-shrink: 0;
-        margin-bottom: 10px;
+            flex-grow: 0;
+            flex-shrink: 0;
+            margin-bottom: 10px;
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">

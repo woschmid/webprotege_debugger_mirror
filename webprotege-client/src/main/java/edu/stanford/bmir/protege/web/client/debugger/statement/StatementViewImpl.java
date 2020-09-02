@@ -13,16 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Matthew Horridge
- * Stanford Center for Biomedical Informatics Research
- * 16/02/16
- */
+
 public class StatementViewImpl extends Composite{
 
 
 
-    interface QeriesViewImplUiBinder extends UiBinder<HTMLPanel, StatementViewImpl> {
+    interface StatementViewImplUiBinder extends UiBinder<HTMLPanel, StatementViewImpl> {
 
     }
 
@@ -33,7 +29,7 @@ public class StatementViewImpl extends Composite{
         }
     };
 
-    private static QeriesViewImplUiBinder ourUiBinder = GWT.create(QeriesViewImplUiBinder.class);
+    private static StatementViewImplUiBinder ourUiBinder = GWT.create(StatementViewImplUiBinder.class);
 
     @UiField
     protected FlexTable table;
@@ -45,10 +41,6 @@ public class StatementViewImpl extends Composite{
     public StatementViewImpl(StatementPresenter statementPresenter) {
         this.statementPresenter = statementPresenter;
         initWidget(ourUiBinder.createAndBindUi(this));
-        table.addStyleName("style.searchBox");
-        table.getColumnFormatter().setWidth(0, "400px");
-        table.getColumnFormatter().setWidth(1, "50px");
-        table.getColumnFormatter().setWidth(2, "50px");
     }
 
     public void addQueriesStatement(Set<String> axiomStatement){
@@ -85,6 +77,7 @@ public class StatementViewImpl extends Composite{
 
     public void addRepairsStatement(List<Diagnosis> diagnoseStatement){
         int numOfRepairs = 1;
+        GWT.log("[addRepairsStatement] StyleName"+getStyleName() );
         for (Diagnosis diagnosis :
                 diagnoseStatement) {
             String diagnosisString = "";
@@ -93,8 +86,9 @@ public class StatementViewImpl extends Composite{
                 diagnosisString += new SafeHtmlBuilder().appendEscaped(axiom).toSafeHtml().asString() + "<br/>";
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
-//            Label statement = getMultilineLabel(diagnosisString);
+            repair.getElement().getStyle().setColor("blue");
             Label statement = new HTML( diagnosisString );
+//            statement.setStyleName("searchBox");
             table.setWidget(row,0,repair);
             table.setWidget(row+1,0,statement);
         }

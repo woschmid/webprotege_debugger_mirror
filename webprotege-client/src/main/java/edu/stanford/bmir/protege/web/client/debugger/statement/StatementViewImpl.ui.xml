@@ -1,12 +1,20 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
-             xmlns:list="urn:import:edu.stanford.bmir.protege.web.client.list"
 >
     <ui:with field="msg" type="edu.stanford.bmir.protege.web.client.Messages"/>
     <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
     <ui:import field="edu.stanford.bmir.protege.web.shared.individuals.InstanceRetrievalMode.*"/>
     <ui:style>
+        .searchBox {
+            flex-grow: 0;
+            flex-shrink: 0;
+            padding: 2px;
+            margin: 1px;
+            border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
+            color:blue;
+        }
         .main {
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -16,56 +24,12 @@
         .typeFieldContainer {
             margin-bottom: 0.3rem;
         }
-        .searchBox {
-            flex-grow: 0;
-            flex-shrink: 0;
-            padding: 2px;
-            margin: 1px;
-            border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
-        }
-        .individualsList {
-            flex-grow: 1;
-            flex-shrink: 1;
-            overflow: auto;
-            background-color: literal("var(--primary--background-color)");
-            border: 1px solid literal("var(--alternate--separator--color)");
-            margin: 1px;
-        }
-        .bottomBar {
-            background-color: literal("var(--inlay-panel--background-color)");
-        }
-        .listGroup {
+
+        .typeGroup {
             display: flex;
             flex-direction: column;
-            flex-shrink: 1;
-            flex-grow: 1;
-        }
-        .levelField {
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row;
-        }
-        .levelField > span {
-            padding: 5px;
-        }
-        .levelRadio {
-            padding-left: 10px;
-        }
-        .executeButton {
-<!--            align-self: flex-start;-->
-            flex-grow: 0;
-            flex-shrink: 0;
-        }
-        .newTabButton {
-            flex-grow: 0;
-            flex-shrink: 0;
-            margin-right: 5px;
-        }
-        .typeGroup {
-            flex-grow: 0;
-            flex-shrink: 0;
             width: 100%;
-            height: 300px;
+            height: 100%;
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
