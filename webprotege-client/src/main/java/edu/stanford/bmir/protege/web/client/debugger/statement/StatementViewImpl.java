@@ -6,7 +6,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
-import edu.stanford.bmir.protege.web.client.diff.DiffClientBundle;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 import java.util.ArrayList;
@@ -123,7 +122,7 @@ public class StatementViewImpl extends Composite{
     private String changeAxoimsStyle(String axiom){
         DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();;
         if(!axiom.equals("")) {
-            return ("<span class=\"")+(style.source())+("\">[")+(axiom)+("]</span>");
+            return ("<span class=\"")+(style.lineElement())+("\">[")+(axiom)+("]</span>");
         }
         return "";
     }

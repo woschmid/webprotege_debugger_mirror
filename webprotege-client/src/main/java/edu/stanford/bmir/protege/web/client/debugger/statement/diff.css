@@ -3,6 +3,8 @@
 
 .line {
     border-bottom: 1px solid literal("var(--separator--color)");
+    padding-right: 5px;
+    padding-left: 5px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -54,6 +56,7 @@
 
 .lineElement {
     display: inline-block;
+    padding-left: 5px;
     width: 500px;
     vertical-align: top;
     white-space: normal;
