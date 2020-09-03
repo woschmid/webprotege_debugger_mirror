@@ -3,10 +3,10 @@ package edu.stanford.bmir.protege.web.client.debugger.statement;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.client.diff.DiffClientBundle;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ public class StatementViewImpl extends Composite{
     protected StatementPresenter statementPresenter;
 
     public StatementViewImpl(StatementPresenter statementPresenter) {
+        DiffClientBundle.INSTANCE.style().ensureInjected();
         this.statementPresenter = statementPresenter;
         initWidget(ourUiBinder.createAndBindUi(this));
     }
@@ -49,10 +50,10 @@ public class StatementViewImpl extends Composite{
                 axiomStatement) {
             int row = table.getRowCount();
             Label statement = new Label(axiom);
-            CheckBox checkBoxP = new CheckBox("+");
-
-            CheckBox checkBoxN = new CheckBox("-");
-
+            CheckBox checkBoxP = new CheckBox();
+            setCheckboxStyle(checkBoxP, true);
+            CheckBox checkBoxN = new CheckBox();
+            setCheckboxStyle(checkBoxN, false);
             listcheckbox.add(checkBoxP);
             listcheckbox.add(checkBoxN);
 
@@ -75,20 +76,34 @@ public class StatementViewImpl extends Composite{
         }
     }
 
+    private void setCheckboxStyle( CheckBox checkBox , boolean b){
+        DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();
+        StringBuilder sb = new StringBuilder();
+        if (b){
+            sb.append("<div class=\"").append( style.addBullet()).append(" \">").append("</div>");
+        }else{
+            sb.append("<div class=\"").append(style.removeBullet()).append(" \">").append("</div>");
+        }
+        checkBox.setHTML(sb.toString());
+    }
+
     public void addRepairsStatement(List<Diagnosis> diagnoseStatement){
         int numOfRepairs = 1;
-        GWT.log("[addRepairsStatement] StyleName"+getStyleName() );
+
         for (Diagnosis diagnosis :
                 diagnoseStatement) {
             String diagnosisString = "";
             for (String axiom:
-                 diagnosis.getAxioms())
-                diagnosisString += new SafeHtmlBuilder().appendEscaped(axiom).toSafeHtml().asString() + "<br/>";
+                 diagnosis.getAxioms()) {
+                String axioms = "";
+                axioms = changeAxoimsStyle(axiom);
+                diagnosisString += axioms +"</br>";
+
+            }
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
             repair.getElement().getStyle().setColor("blue");
             Label statement = new HTML( diagnosisString );
-//            statement.setStyleName("searchBox");
             table.setWidget(row,0,repair);
             table.setWidget(row+1,0,statement);
         }
@@ -103,6 +118,14 @@ public class StatementViewImpl extends Composite{
             table.setWidget(row, 0, statement);
             table.setWidget(row, 1, rb0);
         }
+    }
+
+    private String changeAxoimsStyle(String axiom){
+        DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();;
+        if(!axiom.equals("")) {
+            return ("<span class=\"")+(style.source())+("\">[")+(axiom)+("]</span>");
+        }
+        return "";
     }
 
     public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {
