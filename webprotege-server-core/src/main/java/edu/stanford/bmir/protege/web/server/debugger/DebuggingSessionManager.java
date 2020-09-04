@@ -88,6 +88,8 @@ public class DebuggingSessionManager {
             DebuggingSession debuggingSession = this.debuggingSessions.get(projectId);
             if (debuggingSession == null) {
                 debuggingSession = createDebuggingSession(revisionManager);
+                logger.info("DebuggingSession {} created for project {}", debuggingSession, projectId);
+
                 this.debuggingSessions.put(projectId, debuggingSession);
             }
             return debuggingSession;
@@ -117,10 +119,7 @@ public class DebuggingSessionManager {
         IDiagnosisEngine<OWLLogicalAxiom> diagnosisEngine = DiagnosisEngineFactory.getDiagnosisEngine(solver);
         logger.info("Diagnosis engine created: {}", diagnosisEngine);
 
-        final DebuggingSession session = new DebuggingSession(diagnosisEngine);
-        logger.info("DebuggingSession created: {}", session);
-
-        return session;
+        return new DebuggingSession(diagnosisEngine);
     }
 
 }
