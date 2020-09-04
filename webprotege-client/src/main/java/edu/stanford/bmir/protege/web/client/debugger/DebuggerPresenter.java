@@ -7,7 +7,10 @@ import edu.stanford.bmir.protege.web.client.Messages;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesPresenter;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
+import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.entity.CreateEntityPresenter;
 import edu.stanford.bmir.protege.web.client.entity.EntityNodeUpdater;
 import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
@@ -24,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Author: Matthew Horridge<br> Stanford University<br> Bio-Medical Informatics Research Group<br> Date: 12/09/2013
@@ -34,6 +36,10 @@ public class DebuggerPresenter{
     private final DispatchServiceManager dsm;
 
     private final DebuggerViewImpl view;
+
+    private final DispatchErrorMessageDisplay errorDisplay;
+
+    private final ProgressDisplay progressDisplay;
 
     @Nonnull
     private final ProjectId projectId;
@@ -53,10 +59,12 @@ public class DebuggerPresenter{
                              HierarchyFieldPresenter hierarchyFieldPresenter,
                              Messages messages,
                              @Nonnull CreateEntityPresenter createEntityPresenter, EntityNodeUpdater entityNodeUpdater, MessageBox messageBox,
-                             QueriesPresenter queriesPresenter, RepairsPresenter repairsPresenter, TestcasesPresenter testcasesPresenter) {
+                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, QueriesPresenter queriesPresenter, RepairsPresenter repairsPresenter, TestcasesPresenter testcasesPresenter) {
         this.projectId = projectId;
         this.view = view;
         this.dsm = dispatchServiceManager;
+        this.errorDisplay = errorDisplay;
+        this.progressDisplay = progressDisplay;
         this.queriesPresenter = queriesPresenter;
         this.repairsPresenter = repairsPresenter;
         this.testcasesPresenter = testcasesPresenter;
@@ -68,14 +76,25 @@ public class DebuggerPresenter{
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());
         container.setWidget(view.asWidget());
-        stopDebugging();
+//        stopDebugging();
     }
 
     private void startDebugging() {
         GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!");
-        this.dsm.execute(new StartDebuggingAction(projectId), new Consumer<DebuggingResult>() {
+        this.dsm.execute(new StartDebuggingAction(projectId),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
+                                                                                progressDisplay) {
             @Override
-            public void accept(DebuggingResult debuggingResult) {
+            public String getProgressDisplayTitle() {
+                return "Start Debugging";
+            }
+
+            @Override
+            public String getProgressDisplayMessage() {
+                return "Please wait";
+            }
+
+            public void handleSuccess(DebuggingResult debuggingResult) {
                 clearAxiomtabel();
                 DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
                 DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
@@ -87,30 +106,60 @@ public class DebuggerPresenter{
 
     private void stopDebugging() {
         GWT.log("[QueriesPresenter]Stop Debugging Button pressed!!!!!");
-        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<DebuggingResult>() {
 
-            @Override
-            public void accept(DebuggingResult stopDebuggingResult) {
-                clearAxiomtabel();
-                changeSessionState(stopDebuggingResult.getSessionState());
-            }
-        });
+        this.dsm.execute(new StopDebuggingAction(projectId),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Stop debugging";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingResult stopDebuggingResult) {
+                        clearAxiomtabel();
+                        changeSessionState(stopDebuggingResult.getSessionState());
+                    }
+                });
+//        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<DebuggingResult>() {
+//
+//            @Override
+//            public void accept(DebuggingResult stopDebuggingResult) {
+//                clearAxiomtabel();
+//                changeSessionState(stopDebuggingResult.getSessionState());
+//            }
+//        });
 
     }
 
     private void submitDebugging() {
         GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
-        this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()), new Consumer<DebuggingResult>() {
-            @Override
-            public void accept(DebuggingResult submitDebuggingResult) {
-                clearAxiomtabel();
-                DebuggerPresenter.this.setQueriesStatement(submitDebuggingResult.getQuery());
-                DebuggerPresenter.this.setReqairsStatement(submitDebuggingResult.getDiagnoses());
-                DebuggerPresenter.this.setTestCasesStatement(submitDebuggingResult.getPositiveTestCases(),submitDebuggingResult.getNegativeTestCases());
-                changeSessionState(submitDebuggingResult.getSessionState());
-            }
-        });
 
+        this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Submit axioms";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingResult submitDebuggingResult) {
+                        clearAxiomtabel();
+                        DebuggerPresenter.this.setQueriesStatement(submitDebuggingResult.getQuery());
+                        DebuggerPresenter.this.setReqairsStatement(submitDebuggingResult.getDiagnoses());
+                        DebuggerPresenter.this.setTestCasesStatement(submitDebuggingResult.getPositiveTestCases(),submitDebuggingResult.getNegativeTestCases());
+                        changeSessionState(submitDebuggingResult.getSessionState());
+                    }
+                });
     }
 
     private ImmutableMap<String, Boolean> getAnswers() {
