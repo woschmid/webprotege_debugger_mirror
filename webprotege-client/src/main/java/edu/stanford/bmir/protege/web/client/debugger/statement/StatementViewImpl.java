@@ -113,9 +113,7 @@ public class StatementViewImpl extends Composite{
                 axiomStatement) {
             int row = table.getRowCount();
             Label statement = new Label(axiom);
-            Button rb0 = new Button("X");
             table.setWidget(row, 0, statement);
-            table.setWidget(row, 1, rb0);
         }
     }
 
