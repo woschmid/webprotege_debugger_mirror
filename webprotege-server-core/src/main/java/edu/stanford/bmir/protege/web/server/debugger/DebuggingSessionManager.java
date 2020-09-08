@@ -6,6 +6,7 @@ import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
+import edu.stanford.bmir.protege.web.shared.user.UserId;
 import org.exquisite.core.engines.IDiagnosisEngine;
 import org.exquisite.core.solver.ISolver;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -17,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @ProjectSingleton
@@ -30,7 +28,7 @@ public class DebuggingSessionManager {
 
     private final RevisionManager revisionManager;
 
-    private final Map<ProjectId, DebuggingSession> debuggingSessions;
+    private final Map<ProjectId, Map<UserId, DebuggingSession>> debuggingSessions;
 
     @Inject
     public DebuggingSessionManager(RevisionManager revisionManager) {
@@ -42,10 +40,11 @@ public class DebuggingSessionManager {
      * Starts a new debugging session for the project.
      *
      * @param projectId The project.
+     * @param userId
      * @return A result representing the current state of the debugging session.
      */
-    public DebuggingResult startDebugging(ProjectId projectId) {
-        final DebuggingSession session = getDebuggingSession(projectId);
+    public DebuggingResult startDebugging(ProjectId projectId, UserId userId) {
+        final DebuggingSession session = getDebuggingSession(projectId, userId);
         session.start();
         return session.calculateQuery(null);
     }
@@ -54,11 +53,12 @@ public class DebuggingSessionManager {
      * Submits a query and it's answers to the debugger.
      *
      * @param projectId The project.
+     * @param userId
      * @param answers Map containing answers to the previously given query.
      * @return A result representing the current state of the debugging session.
      */
-    public DebuggingResult submitQuery(@Nonnull ProjectId projectId, @Nullable ImmutableMap<String, Boolean> answers) {
-        final DebuggingSession session = getDebuggingSession(projectId);
+    public DebuggingResult submitQuery(@Nonnull ProjectId projectId, UserId userId, @Nullable ImmutableMap<String, Boolean> answers) {
+        final DebuggingSession session = getDebuggingSession(projectId, userId);
         return session.calculateQuery(answers);
     }
 
@@ -66,12 +66,13 @@ public class DebuggingSessionManager {
      * Stops the runnning debugging session of the project.
      *
      * @param projectId The project.
+     * @param userId
      * @return A result representing the current state of the debugging session.
      */
-    public DebuggingResult stopDebugging(ProjectId projectId) {
-        final DebuggingSession session = getDebuggingSession(projectId);
+    public DebuggingResult stopDebugging(ProjectId projectId, UserId userId) {
+        final DebuggingSession session = getDebuggingSession(projectId, userId);
         session.stop();
-        final boolean isRemoved = debuggingSessions.remove(projectId, session);
+        final boolean isRemoved = debuggingSessions.remove(projectId, Collections.singletonMap(userId,session));
         if (!isRemoved)
             throw new ActionExecutionException(new RuntimeException("The debugging session could not be stopped appropriately"));
         return DebuggingResultFactory.getDebuggingResult(null,null,null, session.getState());
@@ -81,16 +82,25 @@ public class DebuggingSessionManager {
      * Returns a debugging session belonging exclusively to the project.
      *
      * @param projectId A project.
+     * @param userId
      * @return A debugging session instance.
      */
-    private DebuggingSession getDebuggingSession(ProjectId projectId) {
+    private DebuggingSession getDebuggingSession(ProjectId projectId, UserId userId) {
         synchronized (logger) {
-            DebuggingSession debuggingSession = this.debuggingSessions.get(projectId);
-            if (debuggingSession == null) {
+            DebuggingSession debuggingSession;
+            Map<UserId, DebuggingSession> debuggingSessionOfProject = this.debuggingSessions.get(projectId);
+            if (debuggingSessionOfProject == null) {
+                // project yet has no debugging session
                 debuggingSession = createDebuggingSession(revisionManager);
-                logger.info("DebuggingSession {} created for project {}", debuggingSession, projectId);
-
-                this.debuggingSessions.put(projectId, debuggingSession);
+                debuggingSessionOfProject = Collections.singletonMap(userId, debuggingSession); // only a single debugging session is allowed per project
+                this.debuggingSessions.put(projectId, debuggingSessionOfProject);
+                logger.info("DebuggingSession {} created for user {} in project {}", debuggingSessionOfProject, userId, projectId);
+            } else {
+                // there exists a debugging session for this project
+                debuggingSession = debuggingSessionOfProject.get(userId);
+                // check if the user is it's owner
+                if (debuggingSession == null)
+                    throw new ActionExecutionException(new RuntimeException("A debugging session is already running for this project by user " + userId + "!"));
             }
             return debuggingSession;
         }
