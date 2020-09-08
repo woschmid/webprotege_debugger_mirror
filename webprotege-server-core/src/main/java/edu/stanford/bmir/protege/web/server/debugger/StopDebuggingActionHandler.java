@@ -40,7 +40,7 @@ public class StopDebuggingActionHandler extends AbstractProjectActionHandler<Sto
     @Nonnull
     @Override
     public DebuggingResult execute(@Nonnull StopDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return this.debuggingSessionManager.stopDebugging(projectId);
+        return this.debuggingSessionManager.stopDebugging(projectId, executionContext.getUserId());
     }
 
     @Nullable

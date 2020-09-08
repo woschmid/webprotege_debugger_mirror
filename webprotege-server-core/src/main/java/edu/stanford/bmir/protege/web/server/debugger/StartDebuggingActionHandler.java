@@ -42,7 +42,7 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
     @Nonnull
     @Override
     public DebuggingResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return debuggingSessionManager.startDebugging(projectId);
+        return debuggingSessionManager.startDebugging(projectId, executionContext.getUserId());
     }
 
     @Nullable
