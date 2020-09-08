@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Author: Matthew Horridge<br> Stanford University<br> Bio-Medical Informatics Research Group<br> Date: 12/09/2013
@@ -68,6 +69,7 @@ public class DebuggerPresenter{
         this.queriesPresenter = queriesPresenter;
         this.repairsPresenter = repairsPresenter;
         this.testcasesPresenter = testcasesPresenter;
+        GWT.log("[DebuggerPresenter] Started DebuggerPresenter");
     }
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
@@ -76,7 +78,7 @@ public class DebuggerPresenter{
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());
         container.setWidget(view.asWidget());
-//        stopDebugging();
+//        reload();
     }
 
     private void startDebugging() {
@@ -125,17 +127,18 @@ public class DebuggerPresenter{
                         changeSessionState(stopDebuggingResult.getSessionState());
                     }
                 });
-//        this.dsm.execute(new StopDebuggingAction(projectId), new Consumer<DebuggingResult>() {
-//
-//            @Override
-//            public void accept(DebuggingResult stopDebuggingResult) {
-//                clearAxiomtabel();
-//                changeSessionState(stopDebuggingResult.getSessionState());
-//            }
-//        });
 
     }
 
+    private void reload(){
+        GWT.log("[QueriesPresenter]reload Debugging!!!!!");
+        this.dsm.execute(new ReloadDebuggerAction(projectId), new Consumer<DebuggerStateResult>() {
+            @Override
+            public void accept(DebuggerStateResult debuggerStateResult) {
+//                changeSessionState(debuggerStateResult.getSessionState());
+            }
+        });
+    }
     private void submitDebugging() {
         GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
 
@@ -209,6 +212,8 @@ public class DebuggerPresenter{
             queriesPresenter.setEnabledButton("start");
         }else if (state == SessionState.STOPPED){
             queriesPresenter.setEnabledButton("stop");
+        }else if (state == SessionState.INIT){
+            queriesPresenter.setEnabledButton("start");
         }
     }
 

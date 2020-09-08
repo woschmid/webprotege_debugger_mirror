@@ -15,6 +15,7 @@ import edu.stanford.bmir.protege.web.server.crud.GetEntityCrudKitSettingsActionH
 import edu.stanford.bmir.protege.web.server.crud.GetEntityCrudKitsActionHandler;
 import edu.stanford.bmir.protege.web.server.crud.SetEntityCrudKitSettingsActionHandler;
 import edu.stanford.bmir.protege.web.server.csv.ImportCSVFileActionHandler;
+import edu.stanford.bmir.protege.web.server.debugger.ReloadDebuggerActionHandler;
 import edu.stanford.bmir.protege.web.server.debugger.StartDebuggingActionHandler;
 import edu.stanford.bmir.protege.web.server.debugger.StopDebuggingActionHandler;
 import edu.stanford.bmir.protege.web.server.debugger.SubmitDebuggingActionHandler;
@@ -60,9 +61,6 @@ import edu.stanford.bmir.protege.web.server.watches.AddWatchActionHandler;
 import edu.stanford.bmir.protege.web.server.watches.GetWatchesActionHandler;
 import edu.stanford.bmir.protege.web.server.watches.RemoveWatchActionHandler;
 import edu.stanford.bmir.protege.web.server.watches.SetEntityWatchesActionHandler;
-import edu.stanford.bmir.protege.web.shared.crud.GetEntityCrudKitsAction;
-import edu.stanford.bmir.protege.web.shared.crud.GetEntityCrudKitsResult;
-import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.issues.DeleteEntityCommentAction;
 import edu.stanford.bmir.protege.web.shared.issues.DeleteEntityCommentResult;
 
@@ -629,6 +627,11 @@ public class ProjectActionHandlersModule {
 
     @Provides @IntoSet
     public ProjectActionHandler provideSubmitDebuggingActionHandler(SubmitDebuggingActionHandler handler) {
+        return handler;
+    }
+
+    @Provides @IntoSet
+    public ProjectActionHandler provideReloadDebuggerActionHandler(ReloadDebuggerActionHandler handler) {
         return handler;
     }
 }

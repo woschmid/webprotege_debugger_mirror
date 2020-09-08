@@ -4,8 +4,8 @@ import edu.stanford.bmir.protege.web.server.access.AccessManager;
 import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.access.BuiltInAction;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
-import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggerStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.ReloadDebuggerAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
@@ -14,7 +14,7 @@ import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class StartDebuggingActionHandler extends AbstractProjectActionHandler<StartDebuggingAction, DebuggingResult> {
+public class ReloadDebuggerActionHandler extends AbstractProjectActionHandler<ReloadDebuggerAction, DebuggerStateResult> {
 
     @Nonnull
     private final ProjectId projectId;
@@ -24,10 +24,10 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
 
 
     @Inject
-    public StartDebuggingActionHandler(@Nonnull ProjectId projectId,
+    public ReloadDebuggerActionHandler(@Nonnull ProjectId projectId,
                                        @Nonnull AccessManager accessManager,
                                        @Nonnull DebuggingSessionManager debuggingSessionManager
-                                       ) {
+                                        ) {
         super(accessManager);
         this.projectId = checkNotNull(projectId);
         this.debuggingSessionManager = checkNotNull(debuggingSessionManager);
@@ -35,14 +35,14 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
 
     @Nonnull
     @Override
-    public Class<StartDebuggingAction> getActionClass() {
-        return StartDebuggingAction.class;
+    public Class<ReloadDebuggerAction> getActionClass() {
+        return ReloadDebuggerAction.class;
     }
 
     @Nonnull
     @Override
-    public DebuggingResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return debuggingSessionManager.startDebugging(projectId);
+    public DebuggerStateResult execute(@Nonnull ReloadDebuggerAction action, @Nonnull ExecutionContext executionContext) {
+        return debuggingSessionManager.getDebuggingState(projectId);
     }
 
     @Nullable

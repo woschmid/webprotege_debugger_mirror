@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.semanticweb.owlapi.model.EntityType.NAMED_INDIVIDUAL;
 
 @Portlet(id = "portlet.Debugger", title = "Debugger")
 public class DebuggerPortletPresenter extends AbstractWebProtegePortletPresenter {
@@ -61,21 +60,13 @@ public class DebuggerPortletPresenter extends AbstractWebProtegePortletPresenter
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-//        portletUi.setFilterView(filterView);
-//        tagVisibilityPresenter.start(filterView, portletUi);
-//        portletUi.addAction(new PortletAction(messages.search(), "wp-btn-g--search", this::handleSearch));
         presenter.start(portletUi, eventBus);
-        handleAfterSetEntity(getSelectedEntity());
+//        handleAfterSetEntity(getSelectedEntity());
     }
 
     @Override
     protected void handleAfterSetEntity(Optional<OWLEntity> entity) {
         Optional<OWLNamedIndividual> sel = entity.filter(OWLEntity::isOWLNamedIndividual)
                 .map(e -> (OWLNamedIndividual) e);
-    }
-
-    private void handleSearch() {
-        searchModal.setEntityTypes(NAMED_INDIVIDUAL);
-        searchModal.showModal();
     }
 }

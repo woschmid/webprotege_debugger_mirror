@@ -2,7 +2,9 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggerStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
+import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -75,6 +77,18 @@ public class DebuggingSessionManager {
         if (!isRemoved)
             throw new ActionExecutionException(new RuntimeException("The debugging session could not be stopped appropriately"));
         return DebuggingResultFactory.getDebuggingResult(null,null,null, session.getState());
+    }
+
+    /**
+     * Stops the runnning debugging session of the project.
+     *
+     * @param projectId The project.
+     * @return A result representing the current state of the debugging session.
+     */
+    public DebuggerStateResult getDebuggingState(ProjectId projectId) {
+//        logger.info("getDebuggingState created for project {}", projectId);
+        final DebuggingSession session = getDebuggingSession(projectId);
+        return new DebuggerStateResult(SessionState.INIT);
     }
 
     /**
