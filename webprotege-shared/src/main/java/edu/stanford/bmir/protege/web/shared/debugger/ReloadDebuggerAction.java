@@ -10,19 +10,20 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ReloadDebuggerAction implements ProjectAction<DebuggerStateResult> {
+
     private ProjectId projectId;
 
-    public ReloadDebuggerAction(@Nonnull ProjectId projectId) {
-        this.projectId = checkNotNull(projectId);
-    }
+    public ReloadDebuggerAction(@Nonnull ProjectId projectId) { this.projectId = checkNotNull(projectId);}
 
     @GwtSerializationConstructor
     private ReloadDebuggerAction() {}
+
     @Nonnull
     @Override
     public ProjectId getProjectId() {
-        return null;
+        return projectId;
     }
+
     @Override
     public int hashCode() {
         return projectId.hashCode();
