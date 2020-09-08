@@ -61,6 +61,7 @@ public class DebuggerPortletPresenter extends AbstractWebProtegePortletPresenter
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
         presenter.start(portletUi, eventBus);
+        presenter.setHasBusy(portletUi);
 //        handleAfterSetEntity(getSelectedEntity());
     }
 

@@ -16,6 +16,7 @@ import edu.stanford.bmir.protege.web.client.entity.EntityNodeUpdater;
 import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
+import edu.stanford.bmir.protege.web.client.progress.HasBusy;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
 import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Author: Matthew Horridge<br> Stanford University<br> Bio-Medical Informatics Research Group<br> Date: 12/09/2013
@@ -51,6 +54,9 @@ public class DebuggerPresenter{
 
     private TestcasesPresenter testcasesPresenter;
 
+    private HasBusy hasBusy = busy -> {
+    };
+
     @Inject
     public DebuggerPresenter(DebuggerViewImpl view,
                              @Nonnull ProjectId projectId,
@@ -72,6 +78,10 @@ public class DebuggerPresenter{
         GWT.log("[DebuggerPresenter] Started DebuggerPresenter");
     }
 
+    public void setHasBusy(@Nonnull HasBusy hasBusy) {
+        this.hasBusy = checkNotNull(hasBusy);
+    }
+
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         GWT.log("[DebuggerPresenter] Started Debugger");
         queriesPresenter.start(view.getQueriesContainer(), this::startDebugging, this::stopDebugging,this::submitDebugging);
@@ -83,20 +93,9 @@ public class DebuggerPresenter{
 
     private void startDebugging() {
         GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!");
-        this.dsm.execute(new StartDebuggingAction(projectId),
-                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
-                                                                                progressDisplay) {
+        this.dsm.execute(new StartDebuggingAction(projectId),hasBusy, new Consumer<DebuggingResult>() {
             @Override
-            public String getProgressDisplayTitle() {
-                return "Start Debugging";
-            }
-
-            @Override
-            public String getProgressDisplayMessage() {
-                return "Please wait";
-            }
-
-            public void handleSuccess(DebuggingResult debuggingResult) {
+            public void accept(DebuggingResult debuggingResult) {
                 clearAxiomtabel();
                 DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
                 DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
@@ -104,6 +103,27 @@ public class DebuggerPresenter{
                 changeSessionState(debuggingResult.getSessionState());
             }
         });
+//        this.dsm.execute(new StartDebuggingAction(projectId),
+//                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
+//                                                                                progressDisplay) {
+//            @Override
+//            public String getProgressDisplayTitle() {
+//                return "Start Debugging";
+//            }
+//
+//            @Override
+//            public String getProgressDisplayMessage() {
+//                return "Please wait";
+//            }
+//
+//            public void handleSuccess(DebuggingResult debuggingResult) {
+//                clearAxiomtabel();
+//                DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
+//                DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
+//                DebuggerPresenter.this.setTestCasesStatement(debuggingResult.getPositiveTestCases(),debuggingResult.getNegativeTestCases());
+//                changeSessionState(debuggingResult.getSessionState());
+//            }
+//        });
     }
 
     private void stopDebugging() {
