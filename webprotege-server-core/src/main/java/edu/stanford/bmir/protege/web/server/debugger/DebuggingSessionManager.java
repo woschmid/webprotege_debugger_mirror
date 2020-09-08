@@ -84,11 +84,12 @@ public class DebuggingSessionManager {
      * Stops the runnning debugging session of the project.
      *
      * @param projectId The project.
+     * @param userId
      * @return A result representing the current state of the debugging session.
      */
-    public DebuggerStateResult getDebuggingState(ProjectId projectId) {
+    public DebuggerStateResult getDebuggingState(ProjectId projectId, UserId userId) {
 //        logger.info("getDebuggingState created for project {}", projectId);
-        final DebuggingSession session = getDebuggingSession(projectId);
+        final DebuggingSession session = getDebuggingSession(projectId, userId);
         return new DebuggerStateResult(SessionState.INIT);
     }
 
