@@ -1,9 +1,12 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
+import edu.stanford.bmir.protege.web.shared.project.ProjectId;
+import edu.stanford.bmir.protege.web.shared.user.UserId;
 import org.exquisite.core.DiagnosisException;
 import org.exquisite.core.engines.AbstractDiagnosisEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
@@ -20,42 +23,85 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class DebuggingSession {
 
     private static final Logger logger = LoggerFactory.getLogger(DebuggingSession.class);
 
+    /** Debugging session id */
     final private String id;
 
+    /** The project the debugging session belongs to */
+    final ProjectId projectId;
+
+    /** The owner of this debugging session */
+    final private UserId userId;
+
+    /** The current state of the debugging session */
     private SessionState state;
 
+    /** The diagnosis engine used for this debugging session*/
     final private IDiagnosisEngine<OWLLogicalAxiom> engine;
 
-    /** Remember the query for the answering process in the next step */
+    /** Remember the query generated because of some diagnoses */
     private Query<OWLLogicalAxiom> query;
+
+    /** Remember the diagnoses that were the base for the generated query */
+    private Set<Diagnosis<OWLLogicalAxiom>> diagnoses;
 
     private LoggingQueryProgressMonitor monitor;
 
-    protected DebuggingSession(IDiagnosisEngine<OWLLogicalAxiom> engine) {
-        id = UUID.randomUUID().toString();
+    /**
+     * @param projectId The project the debugging session belongs to.
+     * @param userId The owner/creator of the debugging session.
+     * @param engine The diagnosis engine used during the debugging session.
+     */
+    protected DebuggingSession(ProjectId projectId, UserId userId, IDiagnosisEngine<OWLLogicalAxiom> engine) {
+        id = projectId.getId() + "-" + userId.getUserName();
+        this.projectId = projectId;
+        this.userId = userId;
         this.engine = engine;
         this.state = SessionState.INIT;
         this.query = null;
+        this.diagnoses = null;
     }
 
     @Override
-    public String toString() { return "DebuggingSession{" + id + '}'; }
+    public String toString() {
+        return MoreObjects.toStringHelper("DebuggingSession").addValue(id).toString();
+    }
 
+    /**
+     * @return the owner of this debugging session.
+     */
+    protected UserId getUserId() {
+        return userId;
+    }
+
+    /**
+     * @return the current state the debugging session is in
+     */
     protected SessionState getState() {
         return state;
+    }
+
+    protected Query<OWLLogicalAxiom> getQuery() {
+        return query;
+    }
+
+    protected Set<Diagnosis<OWLLogicalAxiom>> getDiagnoses() {
+        return diagnoses;
+    }
+
+    protected DiagnosisModel<OWLLogicalAxiom> getDiagnosisModel() {
+        return engine.getSolver().getDiagnosisModel();
     }
 
     /**
      * Starts a new debugging session.
      */
     protected void start() {
-        // guarantee that the session state is either in INIT, STOPPED or FAILED
+        // guarantee that the session state is either in INIT or STOPPED state
         // let's not allow to start an already started session
         if (state == SessionState.STARTED) {
             stop();
@@ -91,7 +137,7 @@ public class DebuggingSession {
             query = null;
 
             // calculate diagnoses
-            final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = engine.calculateDiagnoses();
+            diagnoses = engine.calculateDiagnoses();
             logger.info("{} got {} diagnoses: {}", this, diagnoses.size(), diagnoses);
 
             if (diagnoses.size() >= 2) {
@@ -109,18 +155,23 @@ public class DebuggingSession {
                 if (queryComputation.hasNext()) {
                     query = queryComputation.next();
                     logger.info("{} calculated query {}", this, query);
-                    return DebuggingResultFactory.getDebuggingResult(query, diagnoses, engine.getSolver().getDiagnosisModel(), getState());
+                    return DebuggingResultFactory.getDebuggingResult(this);
                 } else {
                     throw new RuntimeException("No query could be calculated.");
                 }
             } else if (diagnoses.size() == 1) {
                 // we found the diagnosis with the faulty axioms
+                // therefore there is no query generation necessary anymore
+
                 logger.info("{} found final diagnosis! {}", this, diagnoses);
-                return DebuggingResultFactory.getDebuggingResult(null, diagnoses, engine.getSolver().getDiagnosisModel(), getState());
+                query = null;
+                return DebuggingResultFactory.getDebuggingResult(this);
             } else {
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
                 // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
-                return DebuggingResultFactory.getDebuggingResult(null, null, engine.getSolver().getDiagnosisModel(), getState());
+                query = null;
+                diagnoses = null;
+                return DebuggingResultFactory.getDebuggingResult(this);
             }
         } catch (RuntimeException | DiagnosisException e) {
             stop();
@@ -137,6 +188,7 @@ public class DebuggingSession {
         state = SessionState.STOPPED;
         engine.dispose();
         query = null;
+        diagnoses = null;
         monitor = null;
     }
 

@@ -7,7 +7,6 @@ import org.exquisite.core.query.Query;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,12 +14,17 @@ import java.util.Set;
 public class DebuggingResultFactory {
 
     @Nonnull
-    protected static edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult getDebuggingResult(@Nullable Query<OWLLogicalAxiom> query, @Nullable Set<Diagnosis<OWLLogicalAxiom>> diagnoses, @Nullable DiagnosisModel<OWLLogicalAxiom> diagnosisModel, @Nonnull SessionState sessionState) {
-
+    protected static edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult getDebuggingResult(@Nonnull DebuggingSession debuggingSession) {
         edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
         List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> p = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> n = new ArrayList<>();
+
+        // get the state of the debuggingSession
+        final Query<OWLLogicalAxiom> query = debuggingSession.getQuery();
+        final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = debuggingSession.getDiagnoses();
+        final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = debuggingSession.getDiagnosisModel();
+        final SessionState sessionState = debuggingSession.getState();
 
         if (query != null)
             q = new edu.stanford.bmir.protege.web.shared.debugger.Query(ManchesterSyntaxRenderer.renderAxioms(query.formulas));
