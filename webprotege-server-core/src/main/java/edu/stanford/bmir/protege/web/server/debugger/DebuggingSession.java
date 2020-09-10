@@ -2,7 +2,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -118,7 +118,7 @@ public class DebuggingSession {
      * @param answers String representations of axioms from previous queris and their answers (true or false).
      * @return A result for the front end representing the current state of the backend.
      */
-    protected DebuggingResult calculateQuery(@Nullable ImmutableMap<String, Boolean> answers) {
+    protected DebuggingSessionStateResult calculateQuery(@Nullable ImmutableMap<String, Boolean> answers) {
         try {
             // verify that the session state in STARTED state
             if (state != SessionState.STARTED)
@@ -133,14 +133,12 @@ public class DebuggingSession {
             if (answers != null && !answers.isEmpty())
                 addAnswersToDiagnosisModel(answers);
 
-            // delete the previous query - we do not need them anymore for answer lookup now
-            query = null;
-
+            state = SessionState.COMPUTING;
             // calculate diagnoses
-            diagnoses = engine.calculateDiagnoses();
-            logger.info("{} got {} diagnoses: {}", this, diagnoses.size(), diagnoses);
+            Set<Diagnosis<OWLLogicalAxiom>> newDiagnoses = engine.calculateDiagnoses();
+            logger.info("{} got {} diagnoses: {}", this, newDiagnoses.size(), newDiagnoses);
 
-            if (diagnoses.size() >= 2) {
+            if (newDiagnoses.size() >= 2) {
                 // there are more than one diagnoses, therefore we need to create a query for the user to narrow down the problem.
 
                 // configure and calculate the query
@@ -148,30 +146,35 @@ public class DebuggingSession {
                         new HeuristicQueryComputation<>(
                                 new HeuristicConfiguration<>((AbstractDiagnosisEngine<OWLLogicalAxiom>) engine, monitor));
 
-                logger.info("{} calculating query from {} diagnoses ...", this, diagnoses.size());
-                queryComputation.initialize(diagnoses);
+                logger.info("{} calculating query from {} diagnoses ...", this, newDiagnoses.size());
+                queryComputation.initialize(newDiagnoses);
 
                 // get the calculated query
                 if (queryComputation.hasNext()) {
                     query = queryComputation.next();
+                    diagnoses = newDiagnoses;
+                    state = SessionState.STARTED;
                     logger.info("{} calculated query {}", this, query);
-                    return DebuggingResultFactory.getDebuggingResult(this);
+                    return DebuggingResultFactory.getDebuggingSessionStateResult(this);
                 } else {
                     throw new RuntimeException("No query could be calculated.");
                 }
-            } else if (diagnoses.size() == 1) {
+            } else if (newDiagnoses.size() == 1) {
                 // we found the diagnosis with the faulty axioms
                 // therefore there is no query generation necessary anymore
 
-                logger.info("{} found final diagnosis! {}", this, diagnoses);
+                logger.info("{} found final diagnosis! {}", this, newDiagnoses);
                 query = null;
-                return DebuggingResultFactory.getDebuggingResult(this);
+                diagnoses = newDiagnoses;
+                state = SessionState.STARTED;
+                return DebuggingResultFactory.getDebuggingSessionStateResult(this);
             } else {
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
                 // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
                 query = null;
                 diagnoses = null;
-                return DebuggingResultFactory.getDebuggingResult(this);
+                state = SessionState.STARTED;
+                return DebuggingResultFactory.getDebuggingSessionStateResult(this);
             }
         } catch (RuntimeException | DiagnosisException e) {
             stop();
