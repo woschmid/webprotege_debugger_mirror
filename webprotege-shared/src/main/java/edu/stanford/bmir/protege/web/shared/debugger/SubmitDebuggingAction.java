@@ -11,7 +11,7 @@ import java.util.Objects;
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class SubmitDebuggingAction implements ProjectAction<DebuggingResult> {
+public class SubmitDebuggingAction implements ProjectAction<DebuggingSessionStateResult> {
     private ProjectId projectId;
     private ImmutableMap<String, Boolean> answers;
 

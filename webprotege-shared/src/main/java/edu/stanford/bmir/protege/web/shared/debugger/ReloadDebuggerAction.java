@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class ReloadDebuggerAction implements ProjectAction<DebuggerStateResult> {
+public class ReloadDebuggerAction implements ProjectAction<DebuggingSessionStateResult> {
 
     private ProjectId projectId;
 

@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
@@ -7,6 +8,7 @@ import org.exquisite.core.query.Query;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +16,11 @@ import java.util.Set;
 public class DebuggingResultFactory {
 
     @Nonnull
-    protected static edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult getDebuggingResult(@Nonnull DebuggingSession debuggingSession) {
+    protected static DebuggingSessionStateResult getDebuggingSessionStateResult(@Nullable DebuggingSession debuggingSession) {
+
+        if (debuggingSession == null)
+            return new DebuggingSessionStateResult(null,null,null,null, null, null);
+
         edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
         List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> p = new ArrayList<>();
@@ -41,7 +47,7 @@ public class DebuggingResultFactory {
                 n.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(ManchesterSyntaxRenderer.renderAxiom(a)));
         }
 
-        return new edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult(q, d, p, n, sessionState);
+        return new DebuggingSessionStateResult(debuggingSession.getUserId(), q, d, p, n, sessionState);
     }
 
 }

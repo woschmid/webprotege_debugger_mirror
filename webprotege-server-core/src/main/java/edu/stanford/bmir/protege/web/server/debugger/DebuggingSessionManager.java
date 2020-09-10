@@ -2,9 +2,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggerStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingResult;
-import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -20,7 +18,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -46,7 +46,7 @@ public class DebuggingSessionManager {
      * @param userId The user who wants to start a debugging session.
      * @return A result representing the current state of the debugging session.
      */
-    @Nonnull public DebuggingResult startDebugging(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
+    @Nonnull public DebuggingSessionStateResult startDebugging(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
         final DebuggingSession session = getAuthorizedDebuggingSession(projectId, userId);
         session.start();
         return session.calculateQuery(null);
@@ -60,7 +60,7 @@ public class DebuggingSessionManager {
      * @param answers Map containing answers to the previously given query.
      * @return A result representing the current state of the debugging session.
      */
-    @Nonnull public DebuggingResult submitQuery(@Nonnull ProjectId projectId, @Nonnull UserId userId, @Nullable ImmutableMap<String, Boolean> answers) {
+    @Nonnull public DebuggingSessionStateResult submitQuery(@Nonnull ProjectId projectId, @Nonnull UserId userId, @Nullable ImmutableMap<String, Boolean> answers) {
         final DebuggingSession session = getAuthorizedDebuggingSession(projectId, userId);
         return session.calculateQuery(answers);
     }
@@ -72,13 +72,13 @@ public class DebuggingSessionManager {
      * @param userId The user who wants to stop a debugging session.
      * @return A result representing the current state of the debugging session.
      */
-    @Nonnull public DebuggingResult stopDebugging(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
+    @Nonnull public DebuggingSessionStateResult stopDebugging(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
         final DebuggingSession session = getAuthorizedDebuggingSession(projectId, userId);
         session.stop();
         final boolean isRemoved = debuggingSessions.remove(projectId, session);
         if (!isRemoved)
             throw new ActionExecutionException(new RuntimeException("The debugging session could not be stopped appropriately"));
-        return DebuggingResultFactory.getDebuggingResult(session);
+        return DebuggingResultFactory.getDebuggingSessionStateResult(session);
     }
 
     /**
@@ -88,9 +88,9 @@ public class DebuggingSessionManager {
      * @param userId The user who wants to get the state of the debugging session.
      * @return A result representing the current state of the debugging session.
      */
-    public DebuggerStateResult getDebuggingState(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
+    public DebuggingSessionStateResult getDebuggingState(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
         final DebuggingSession session = getDebuggingSession(projectId);
-        return new DebuggerStateResult(SessionState.INIT);
+        return DebuggingResultFactory.getDebuggingSessionStateResult(session);
     }
 
     /**

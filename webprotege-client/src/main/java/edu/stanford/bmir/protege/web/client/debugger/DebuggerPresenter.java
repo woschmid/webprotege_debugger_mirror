@@ -88,49 +88,39 @@ public class DebuggerPresenter{
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());
         container.setWidget(view.asWidget());
-//        reload();
+        reload();
     }
 
     private void startDebugging() {
         GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!");
-        this.dsm.execute(new StartDebuggingAction(projectId),hasBusy, new Consumer<DebuggingResult>() {
+        this.dsm.execute(new StartDebuggingAction(projectId),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                                                                                progressDisplay) {
             @Override
-            public void accept(DebuggingResult debuggingResult) {
+            public String getProgressDisplayTitle() {
+                return "Start Debugging";
+            }
+
+            @Override
+            public String getProgressDisplayMessage() {
+                return "Please wait";
+            }
+
+            public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                 clearAxiomtabel();
-                DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
-                DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
-                DebuggerPresenter.this.setTestCasesStatement(debuggingResult.getPositiveTestCases(),debuggingResult.getNegativeTestCases());
-                changeSessionState(debuggingResult.getSessionState());
+                DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
+                DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
+                DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
+                changeSessionState(debuggingSessionStateResult.getSessionState());
             }
         });
-//        this.dsm.execute(new StartDebuggingAction(projectId),
-//                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
-//                                                                                progressDisplay) {
-//            @Override
-//            public String getProgressDisplayTitle() {
-//                return "Start Debugging";
-//            }
-//
-//            @Override
-//            public String getProgressDisplayMessage() {
-//                return "Please wait";
-//            }
-//
-//            public void handleSuccess(DebuggingResult debuggingResult) {
-//                clearAxiomtabel();
-//                DebuggerPresenter.this.setQueriesStatement(debuggingResult.getQuery());
-//                DebuggerPresenter.this.setReqairsStatement(debuggingResult.getDiagnoses());
-//                DebuggerPresenter.this.setTestCasesStatement(debuggingResult.getPositiveTestCases(),debuggingResult.getNegativeTestCases());
-//                changeSessionState(debuggingResult.getSessionState());
-//            }
-//        });
     }
 
     private void stopDebugging() {
         GWT.log("[QueriesPresenter]Stop Debugging Button pressed!!!!!");
 
         this.dsm.execute(new StopDebuggingAction(projectId),
-                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {
                     @Override
                     public String getProgressDisplayTitle() {
@@ -142,9 +132,9 @@ public class DebuggerPresenter{
                         return "Please wait";
                     }
 
-                    public void handleSuccess(DebuggingResult stopDebuggingResult) {
+                    public void handleSuccess(DebuggingSessionStateResult stopDebuggingSessionStateResult) {
                         clearAxiomtabel();
-                        changeSessionState(stopDebuggingResult.getSessionState());
+                        changeSessionState(stopDebuggingSessionStateResult.getSessionState());
                     }
                 });
 
@@ -152,10 +142,14 @@ public class DebuggerPresenter{
 
     private void reload(){
         GWT.log("[QueriesPresenter]reload Debugging!!!!!");
-        this.dsm.execute(new ReloadDebuggerAction(projectId), new Consumer<DebuggerStateResult>() {
+        this.dsm.execute(new ReloadDebuggerAction(projectId), new Consumer<DebuggingSessionStateResult>() {
             @Override
-            public void accept(DebuggerStateResult debuggerStateResult) {
-//                changeSessionState(debuggerStateResult.getSessionState());
+            public void accept(DebuggingSessionStateResult debuggingSessionStateResult) {
+                clearAxiomtabel();
+                DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
+                DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
+                DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
+                changeSessionState(debuggingSessionStateResult.getSessionState());
             }
         });
     }
@@ -163,7 +157,7 @@ public class DebuggerPresenter{
         GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
 
         this.dsm.execute(new SubmitDebuggingAction(projectId, getAnswers()),
-                new DispatchServiceCallbackWithProgressDisplay<DebuggingResult>(errorDisplay,
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {
                     @Override
                     public String getProgressDisplayTitle() {
@@ -175,12 +169,12 @@ public class DebuggerPresenter{
                         return "Please wait";
                     }
 
-                    public void handleSuccess(DebuggingResult submitDebuggingResult) {
+                    public void handleSuccess(DebuggingSessionStateResult submitDebuggingSessionStateResult) {
                         clearAxiomtabel();
-                        DebuggerPresenter.this.setQueriesStatement(submitDebuggingResult.getQuery());
-                        DebuggerPresenter.this.setReqairsStatement(submitDebuggingResult.getDiagnoses());
-                        DebuggerPresenter.this.setTestCasesStatement(submitDebuggingResult.getPositiveTestCases(),submitDebuggingResult.getNegativeTestCases());
-                        changeSessionState(submitDebuggingResult.getSessionState());
+                        DebuggerPresenter.this.setQueriesStatement(submitDebuggingSessionStateResult.getQuery());
+                        DebuggerPresenter.this.setReqairsStatement(submitDebuggingSessionStateResult.getDiagnoses());
+                        DebuggerPresenter.this.setTestCasesStatement(submitDebuggingSessionStateResult.getPositiveTestCases(), submitDebuggingSessionStateResult.getNegativeTestCases());
+                        changeSessionState(submitDebuggingSessionStateResult.getSessionState());
                     }
                 });
     }
@@ -228,7 +222,7 @@ public class DebuggerPresenter{
     }
 
     private void changeSessionState(SessionState state){
-        if(state == SessionState.STARTED){
+        if(state == SessionState.STARTED || state == SessionState.COMPUTING){
             queriesPresenter.setEnabledButton("start");
         }else if (state == SessionState.STOPPED){
             queriesPresenter.setEnabledButton("stop");
