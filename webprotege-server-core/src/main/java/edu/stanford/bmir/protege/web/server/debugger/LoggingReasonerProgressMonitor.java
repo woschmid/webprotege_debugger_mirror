@@ -16,38 +16,34 @@ public class LoggingReasonerProgressMonitor implements ReasonerProgressMonitor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingReasonerProgressMonitor.class);
 
-    // private long lastTime; // last time a task has started in nanoseconds
-
     private long beginTime; // time in nanoseconds
 
     private String taskName;
 
+    private DebuggingSession debuggingSession;
+
+    public LoggingReasonerProgressMonitor(DebuggingSession session) {
+        this.debuggingSession = session;
+    }
+
     @Override
     public void reasonerTaskStarted(String taskName) {
-        logger.info("{} ...", taskName);
+        logger.info("{} Reasoner: {} ...", debuggingSession, taskName);
         this.beginTime = System.nanoTime();
         this.taskName = taskName;
     }
 
     @Override
     public void reasonerTaskStopped() {
-        logger.info("{} finished in {} ms.", taskName, (double)(System.nanoTime() - this.beginTime) / 1000000.0D);
+        logger.info("{} Reasoner: {} finished in {} ms.", debuggingSession, taskName, ((double)(System.nanoTime() - this.beginTime) / 1000000.0D));
     }
 
     @Override
     public void reasonerTaskProgressChanged(int value, int max) {
-        /*
-        final long time = System.nanoTime();
-        if (max > 0) {
-            final int percent = value * 100 / max;
-            logger.info("    {}", ("" + percent + "%\t" + (time - this.lastTime) / 1000000L) + "ms");
-            this.lastTime = time;
-        }
-        */
     }
 
     @Override
     public void reasonerTaskBusy() {
-        logger.info("{} busy ...", taskName);
+        logger.info("{} Reasoner: {} busy ...", debuggingSession, taskName);
     }
 }

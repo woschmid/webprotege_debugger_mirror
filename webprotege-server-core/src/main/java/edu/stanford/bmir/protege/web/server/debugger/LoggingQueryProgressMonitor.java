@@ -12,33 +12,37 @@ public class LoggingQueryProgressMonitor implements IExquisiteProgressMonitor {
 
     private long beginTime; // time in nanoseconds
 
+    private DebuggingSession debuggingSession;
+
+    public LoggingQueryProgressMonitor(DebuggingSession session) {
+        this.debuggingSession = session;
+    }
+
     @Override
     public void taskStarted(String taskName) {
-        logger.info("{}", taskName);
+        logger.info("{} {}", debuggingSession, taskName);
         this.taskName = taskName;
         this.beginTime = System.nanoTime();
     }
 
     @Override
     public void taskBusy(String message) {
-        logger.info("\t{}", message);
+        logger.info("{}\t{}",debuggingSession, message);
     }
 
     @Override
     public void taskProgressChanged(String message, int value, int max) {
-        logger.info("\t{} {} {}", message, value, max);
+        logger.info("{}\t{} {} {}", debuggingSession, message, value, max);
     }
 
     @Override
     public void taskStopped() {
-        logger.info("\t... query generation finished.");
-        logger.info("{} finished after {} ms.", taskName, (double)(System.nanoTime() - this.beginTime) / 1000000.0D);
+        logger.info("{} \t... query generation finished.", debuggingSession);
+        logger.info("{} {} finished after {} ms.", debuggingSession, taskName, (double)(System.nanoTime() - this.beginTime) / 1000000.0D);
     }
 
     @Override
-    public void setCancel(boolean b) {
-
-    }
+    public void setCancel(boolean b) {}
 
     @Override
     public boolean isCancelled() {
@@ -46,9 +50,7 @@ public class LoggingQueryProgressMonitor implements IExquisiteProgressMonitor {
     }
 
     @Override
-    public void setVerbose(boolean b) {
-
-    }
+    public void setVerbose(boolean b) {}
 
     @Override
     public boolean isVerbose() {

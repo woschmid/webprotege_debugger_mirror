@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
  */
 public class SolverFactory {
 
-    public static ISolver<OWLLogicalAxiom> getSolver(OWLOntology ontology) throws ActionExecutionException {
+    public static ISolver<OWLLogicalAxiom> getSolver(OWLOntology ontology, DebuggingSession debuggingSession) throws ActionExecutionException {
 
         // choose between the available reasoners below!
         @Nonnull
@@ -43,7 +43,7 @@ public class SolverFactory {
         try {
 
             // check the consistency and coherency of the ontology
-            final ConsistencyCheckResult consistency = ConsistencyChecker.checkConsistency(ontology, diagnosisModel, reasonerFactory, true, true, null, new LoggingReasonerProgressMonitor());
+            final ConsistencyCheckResult consistency = ConsistencyChecker.checkConsistency(ontology, diagnosisModel, reasonerFactory, true, true, null, new LoggingReasonerProgressMonitor(debuggingSession));
 
             // when not debugging is necessary, we tell it the user with an exception (only when used as non test-driven debugging)
             // if (consistency.isCoherent() == Boolean.TRUE && consistency.isCoherent() == Boolean.TRUE)
@@ -53,7 +53,7 @@ public class SolverFactory {
             diagnosisModel = consistency.getDiagnosisModel();
 
             // create a reasoner using a reasoner factory and the diagnosis model from the ontology provided
-            final ExquisiteOWLReasoner solver = new ExquisiteOWLReasoner(diagnosisModel, reasonerFactory, new LoggingReasonerProgressMonitor());
+            final ExquisiteOWLReasoner solver = new ExquisiteOWLReasoner(diagnosisModel, reasonerFactory, new LoggingReasonerProgressMonitor(debuggingSession));
 
             // define the entailment types
             solver.setEntailmentTypes(InferenceType.CLASS_HIERARCHY, InferenceType.DISJOINT_CLASSES);

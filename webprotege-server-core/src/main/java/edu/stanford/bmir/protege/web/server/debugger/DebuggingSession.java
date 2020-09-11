@@ -116,7 +116,7 @@ public class DebuggingSession {
         }
         this.state = SessionState.STARTED;
         this.query = null;
-        this.monitor = new LoggingQueryProgressMonitor();
+        this.monitor = new LoggingQueryProgressMonitor(this);
     }
 
     /**

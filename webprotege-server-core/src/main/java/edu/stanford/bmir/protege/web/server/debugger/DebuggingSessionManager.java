@@ -148,21 +148,21 @@ public class DebuggingSessionManager {
 
         final DebuggingSession debuggingSession = new DebuggingSession(projectId, userId);
         this.debuggingSessions.put(projectId, debuggingSession);
-        logger.info("{} initiated for {} in {}", debuggingSession, userId, projectId);
+        logger.info("{} initiating for {} in {} ...", debuggingSession, userId, projectId);
 
         // creating a solver includes a possibly long-lasting consistency and coherency check
         debuggingSession.setState(SessionState.COMPUTING);
 
         // creates a solver instance  using the ontology
-        final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology);
-        logger.info("Solver created: {}", solver);
+        final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology, debuggingSession);
+        logger.info("{} Solver created: {}", debuggingSession, solver);
 
         // let's go back to init state after the solver has been created and a consistency and coherency check are done
         debuggingSession.setState(SessionState.INIT);
 
         // create diagnosis engine using the solver
         IDiagnosisEngine<OWLLogicalAxiom> diagnosisEngine = DiagnosisEngineFactory.getDiagnosisEngine(solver);
-        logger.info("Diagnosis engine created: {}", diagnosisEngine);
+        logger.info("{} Diagnosis engine created: {}", debuggingSession, diagnosisEngine);
 
         debuggingSession.setEngine(diagnosisEngine);
 
