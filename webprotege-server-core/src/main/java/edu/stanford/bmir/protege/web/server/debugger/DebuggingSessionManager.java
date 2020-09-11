@@ -3,6 +3,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -112,8 +113,6 @@ public class DebuggingSessionManager {
         // only a single debugging session is allowed per project
         if (debuggingSession == null) { // the project yet has no debugging session
             debuggingSession = createDebuggingSession(projectId, userId);
-            this.debuggingSessions.put(projectId, debuggingSession);
-            logger.info("{} created for {} in {}", debuggingSession, userId, projectId);
         } else { // there exists a debugging session for this project
             // check if the user is it's owner
             if (!debuggingSession.getUserId().equals(userId))
@@ -147,15 +146,29 @@ public class DebuggingSessionManager {
         final OWLOntology ontology = ontologies.get(0);
         logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
 
+        final DebuggingSession debuggingSession = new DebuggingSession(projectId, userId);
+        this.debuggingSessions.put(projectId, debuggingSession);
+        logger.info("{} initiated for {} in {}", debuggingSession, userId, projectId);
+
+        // creating a solver includes a possibly long-lasting consistency and coherency check
+        debuggingSession.setState(SessionState.COMPUTING);
+
         // creates a solver instance  using the ontology
         final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology);
         logger.info("Solver created: {}", solver);
+
+        // let's go back to init state after the solver has been created and a consistency and coherency check are done
+        debuggingSession.setState(SessionState.INIT);
 
         // create diagnosis engine using the solver
         IDiagnosisEngine<OWLLogicalAxiom> diagnosisEngine = DiagnosisEngineFactory.getDiagnosisEngine(solver);
         logger.info("Diagnosis engine created: {}", diagnosisEngine);
 
-        return new DebuggingSession(projectId, userId, diagnosisEngine);
+        debuggingSession.setEngine(diagnosisEngine);
+
+        logger.info("{} created for {} in {}", debuggingSession, userId, projectId);
+
+        return debuggingSession;
     }
 
 }

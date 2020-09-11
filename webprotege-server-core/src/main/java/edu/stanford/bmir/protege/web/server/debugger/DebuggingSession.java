@@ -8,6 +8,7 @@ import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import edu.stanford.bmir.protege.web.shared.user.UserId;
 import org.exquisite.core.DiagnosisException;
+import org.exquisite.core.IExquisiteProgressMonitor;
 import org.exquisite.core.engines.AbstractDiagnosisEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
 import org.exquisite.core.model.Diagnosis;
@@ -41,7 +42,7 @@ public class DebuggingSession {
     private SessionState state;
 
     /** The diagnosis engine used for this debugging session*/
-    final private IDiagnosisEngine<OWLLogicalAxiom> engine;
+    private IDiagnosisEngine<OWLLogicalAxiom> engine;
 
     /** Remember the query generated because of some diagnoses */
     private Query<OWLLogicalAxiom> query;
@@ -49,18 +50,16 @@ public class DebuggingSession {
     /** Remember the diagnoses that were the base for the generated query */
     private Set<Diagnosis<OWLLogicalAxiom>> diagnoses;
 
-    private LoggingQueryProgressMonitor monitor;
+    private IExquisiteProgressMonitor monitor;
 
     /**
      * @param projectId The project the debugging session belongs to.
      * @param userId The owner/creator of the debugging session.
-     * @param engine The diagnosis engine used during the debugging session.
      */
-    protected DebuggingSession(ProjectId projectId, UserId userId, IDiagnosisEngine<OWLLogicalAxiom> engine) {
+    protected DebuggingSession(ProjectId projectId, UserId userId) {
         id = projectId.getId() + "-" + userId.getUserName();
         this.projectId = projectId;
         this.userId = userId;
-        this.engine = engine;
         this.state = SessionState.INIT;
         this.query = null;
         this.diagnoses = null;
@@ -85,6 +84,10 @@ public class DebuggingSession {
         return state;
     }
 
+    public void setState(SessionState state) {
+        this.state = state;
+    }
+
     protected Query<OWLLogicalAxiom> getQuery() {
         return query;
     }
@@ -95,6 +98,10 @@ public class DebuggingSession {
 
     protected DiagnosisModel<OWLLogicalAxiom> getDiagnosisModel() {
         return engine.getSolver().getDiagnosisModel();
+    }
+
+    public void setEngine(IDiagnosisEngine<OWLLogicalAxiom> engine) {
+        this.engine = engine;
     }
 
     /**
