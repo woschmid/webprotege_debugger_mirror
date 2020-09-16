@@ -1,8 +1,8 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -11,17 +11,17 @@ import java.util.Set;
 
 public class Query implements IsSerializable {
 
-    private Set<String> axioms;
+    private Set<SafeHtml> axioms;
 
     @GwtSerializationConstructor
     private Query() {}
 
-    public Query(@Nonnull Set<String> axioms) {
+    public Query(@Nonnull Set<SafeHtml> axioms) {
         this.axioms = new HashSet<>(axioms);
     }
 
     @Nonnull
-    public Set<String> getAxioms() {
+    public Set<SafeHtml> getAxioms() {
         return axioms;
     }
 

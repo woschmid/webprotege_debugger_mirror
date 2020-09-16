@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.client.debugger.statement;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -43,7 +44,7 @@ public class StatementPresenter {
         widgets.add(view);
     }
 
-    public void addQueriesStatement(Set<String> msg){
+    public void addQueriesStatement(Set<SafeHtml> msg){
         view.addQueriesStatement(msg);
     }
 
@@ -51,7 +52,7 @@ public class StatementPresenter {
         view.addRepairsStatement(msg);
     }
 
-    public void addTestCasesStatement(Set<String> msg){
+    public void addTestCasesStatement(Set<SafeHtml> msg){
         view.addTestcasesStatement(msg);
     }
 

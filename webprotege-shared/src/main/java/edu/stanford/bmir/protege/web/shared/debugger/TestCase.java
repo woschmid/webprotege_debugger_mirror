@@ -1,8 +1,8 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;
@@ -10,17 +10,17 @@ import java.util.Objects;
 
 public class TestCase implements IsSerializable, Serializable {
 
-    private String axiom;
+    private SafeHtml axiom;
 
     @GwtSerializationConstructor
     public TestCase() {}
 
-    public TestCase(@Nonnull String a) {
+    public TestCase(@Nonnull SafeHtml a) {
         this.axiom = a;
     }
 
     @Nonnull
-    public String getAxiom() {
+    public SafeHtml getAxiom() {
         return axiom;
     }
 

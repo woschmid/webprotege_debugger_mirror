@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
@@ -50,19 +51,23 @@ public class DebuggingSession {
     /** Remember the diagnoses that were the base for the generated query */
     private Set<Diagnosis<OWLLogicalAxiom>> diagnoses;
 
+    private RenderingManager renderingManager;
+
     private IExquisiteProgressMonitor monitor;
 
     /**
      * @param projectId The project the debugging session belongs to.
      * @param userId The owner/creator of the debugging session.
+     * @param renderingManager
      */
-    protected DebuggingSession(ProjectId projectId, UserId userId) {
+    protected DebuggingSession(ProjectId projectId, UserId userId, RenderingManager renderingManager) {
         id = projectId.getId() + "-" + userId.getUserName();
         this.projectId = projectId;
         this.userId = userId;
         this.state = SessionState.INIT;
         this.query = null;
         this.diagnoses = null;
+        this.renderingManager = renderingManager;
     }
 
     @Override
@@ -162,7 +167,7 @@ public class DebuggingSession {
                     diagnoses = newDiagnoses;
                     state = SessionState.STARTED;
                     logger.info("{} calculated query {}", this, query);
-                    return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+                    return DebuggingResultFactory.getDebuggingSessionStateResult(this, renderingManager);
                 } else {
                     throw new RuntimeException("No query could be calculated.");
                 }
@@ -174,14 +179,14 @@ public class DebuggingSession {
                 query = null;
                 diagnoses = newDiagnoses;
                 state = SessionState.STARTED;
-                return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+                return DebuggingResultFactory.getDebuggingSessionStateResult(this, renderingManager);
             } else {
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
                 // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
                 query = null;
                 diagnoses = null;
                 state = SessionState.STARTED;
-                return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+                return DebuggingResultFactory.getDebuggingSessionStateResult(this, renderingManager);
             }
         } catch (RuntimeException | DiagnosisException e) {
             stop();

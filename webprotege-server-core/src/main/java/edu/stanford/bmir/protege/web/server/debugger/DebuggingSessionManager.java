@@ -1,6 +1,7 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.collect.ImmutableMap;
+import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
@@ -32,11 +33,14 @@ public class DebuggingSessionManager {
 
     private final RevisionManager revisionManager;
 
+    private final RenderingManager renderingManager;
+
     private final Map<ProjectId, DebuggingSession> debuggingSessions;
 
     @Inject
-    public DebuggingSessionManager(@Nonnull RevisionManager revisionManager) {
+    public DebuggingSessionManager(@Nonnull RevisionManager revisionManager, @Nonnull RenderingManager renderingManager) {
         this.revisionManager = revisionManager;
+        this.renderingManager = renderingManager;
         this.debuggingSessions = new ConcurrentHashMap<>();
     }
 
@@ -79,7 +83,7 @@ public class DebuggingSessionManager {
         final boolean isRemoved = debuggingSessions.remove(projectId, session);
         if (!isRemoved)
             throw new ActionExecutionException(new RuntimeException("The debugging session could not be stopped appropriately"));
-        return DebuggingResultFactory.getDebuggingSessionStateResult(session);
+        return DebuggingResultFactory.getDebuggingSessionStateResult(session, renderingManager);
     }
 
     /**
@@ -91,7 +95,7 @@ public class DebuggingSessionManager {
      */
     public DebuggingSessionStateResult getDebuggingState(@Nonnull ProjectId projectId, @Nonnull UserId userId) {
         final DebuggingSession session = getDebuggingSession(projectId);
-        return DebuggingResultFactory.getDebuggingSessionStateResult(session);
+        return DebuggingResultFactory.getDebuggingSessionStateResult(session, renderingManager);
     }
 
     /**
@@ -146,7 +150,7 @@ public class DebuggingSessionManager {
         final OWLOntology ontology = ontologies.get(0);
         logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
 
-        final DebuggingSession debuggingSession = new DebuggingSession(projectId, userId);
+        final DebuggingSession debuggingSession = new DebuggingSession(projectId, userId, renderingManager);
         this.debuggingSessions.put(projectId, debuggingSession);
         logger.info("{} initiating for {} in {} ...", debuggingSession, userId, projectId);
 

@@ -3,6 +3,9 @@ package edu.stanford.bmir.protege.web.client.debugger.statement;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.OnlyToBeUsedInGeneratedCodeStringBlessedAsSafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
@@ -43,12 +46,12 @@ public class StatementViewImpl extends Composite{
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 
-    public void addQueriesStatement(Set<String> axiomStatement){
+    public void addQueriesStatement(Set<SafeHtml> axiomStatement){
         List<CheckBox> listcheckbox= new ArrayList<>();
-        for (String axiom :
+        for (SafeHtml axiom :
                 axiomStatement) {
             int row = table.getRowCount();
-            Label statement = new Label(axiom);
+            Label statement = new HTML(axiom);
             CheckBox checkBoxP = new CheckBox();
             setCheckboxStyle(checkBoxP, true);
             CheckBox checkBoxN = new CheckBox();
@@ -88,42 +91,42 @@ public class StatementViewImpl extends Composite{
 
     public void addRepairsStatement(List<Diagnosis> diagnoseStatement){
         int numOfRepairs = 1;
-
         for (Diagnosis diagnosis :
                 diagnoseStatement) {
-            String diagnosisString = "";
-            for (String axiom:
+            SafeHtmlBuilder diagnosisString = new SafeHtmlBuilder();
+            for (SafeHtml axiom:
                  diagnosis.getAxioms()) {
-                String axioms = "";
-                axioms = changeAxoimsStyle(axiom);
-                diagnosisString += axioms +"</br>";
+//                axioms = changeAxoimsStyle(axiom);
+                diagnosisString.append(axiom);
+                diagnosisString.append(new OnlyToBeUsedInGeneratedCodeStringBlessedAsSafeHtml("<br/>"));
+
 
             }
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
             repair.getElement().getStyle().setColor("blue");
-            Label statement = new HTML( diagnosisString );
+            Label statement = new HTML( diagnosisString.toSafeHtml() );
             table.setWidget(row,0,repair);
             table.setWidget(row+1,0,statement);
         }
     }
 
-    public void addTestcasesStatement(Set<String> axiomStatement){
-        for (String axiom :
+    public void addTestcasesStatement(Set<SafeHtml> axiomStatement){
+        for (SafeHtml axiom :
                 axiomStatement) {
             int row = table.getRowCount();
-            Label statement = new Label(axiom);
+            Label statement =new HTML(axiom);
             table.setWidget(row, 0, statement);
         }
     }
 
-    private String changeAxoimsStyle(String axiom){
-        DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();;
-        if(!axiom.equals("")) {
-            return ("<span class=\"")+(style.lineElement())+("\">[")+(axiom)+("]</span>");
-        }
-        return "";
-    }
+//    private String changeAxoimsStyle(String axiom){
+//        DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();;
+//        if(!axiom.equals("")) {
+//            return ("<span class=\"")+(style.lineElement())+("\">[")+(axiom)+("]</span>");
+//        }
+//        return "";
+//    }
 
     public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {
         this.checkCheckBox = checkCheckBox;

@@ -10,10 +10,7 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -82,10 +79,10 @@ public class QueriesPresenter {
         }
     }
 
-    public void setQueriesStatement(String msg){
-        Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
-        statementPresenter.addQueriesStatement(items);
-    }
+//    public void setQueriesStatement(SafeHtml msg){
+//        Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
+//        statementPresenter.addQueriesStatement(items);
+//    }
 
     public void clearAxiomtable(){
         statementPresenter.clearAxoim();

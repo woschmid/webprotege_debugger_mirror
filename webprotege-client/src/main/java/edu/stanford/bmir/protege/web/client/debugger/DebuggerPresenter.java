@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.client.debugger;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.Messages;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesPresenter;
@@ -180,7 +181,7 @@ public class DebuggerPresenter{
     }
 
     private ImmutableMap<String, Boolean> getAnswers() {
-        Map allSelectQueries = queriesPresenter.getStatementPresenter().getTableInfo();
+        Map<String, Boolean> allSelectQueries = queriesPresenter.getStatementPresenter().getTableInfo();
         GWT.log("[QueriesPresenter] Selected Queries are "+ allSelectQueries.toString());
         ImmutableMap<String, Boolean> answers = new ImmutableMap.Builder<String, Boolean>().putAll(allSelectQueries).build();
         return answers;
@@ -188,7 +189,7 @@ public class DebuggerPresenter{
 
     private void setQueriesStatement(Query msg){
         if (msg != null) {
-            Set<String> items = msg.getAxioms();
+            Set<SafeHtml> items = msg.getAxioms();
             queriesPresenter.getStatementPresenter().addQueriesStatement(items);
         }
     }
@@ -201,12 +202,12 @@ public class DebuggerPresenter{
     }
 
     private void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
-        Set<String> itemsP = new HashSet<>();
+        Set<SafeHtml> itemsP = new HashSet<>();
         if (msgP != null) {
             for (TestCase p : msgP) itemsP.add(p.getAxiom());
         }
 
-        Set<String> itemsN = new HashSet<>();
+        Set<SafeHtml> itemsN = new HashSet<>();
         if (msgN != null) {
             for (TestCase n : msgN) itemsN.add(n.getAxiom());
         }
