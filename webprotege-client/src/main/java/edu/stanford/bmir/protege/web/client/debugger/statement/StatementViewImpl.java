@@ -120,14 +120,6 @@ public class StatementViewImpl extends Composite{
         }
     }
 
-//    private String changeAxoimsStyle(String axiom){
-//        DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();;
-//        if(!axiom.equals("")) {
-//            return ("<span class=\"")+(style.lineElement())+("\">[")+(axiom)+("]</span>");
-//        }
-//        return "";
-//    }
-
     public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {
         this.checkCheckBox = checkCheckBox;
     }

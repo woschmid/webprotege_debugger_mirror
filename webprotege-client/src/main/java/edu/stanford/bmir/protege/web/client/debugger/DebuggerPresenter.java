@@ -19,6 +19,7 @@ import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
 import edu.stanford.bmir.protege.web.client.progress.HasBusy;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
+import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -55,6 +56,10 @@ public class DebuggerPresenter{
 
     private TestcasesPresenter testcasesPresenter;
 
+    private MessageBox messageBox;
+
+    private final LoggedInUserProvider loggedInUserProvider;
+
     private HasBusy hasBusy = busy -> {
     };
 
@@ -67,7 +72,7 @@ public class DebuggerPresenter{
                              HierarchyFieldPresenter hierarchyFieldPresenter,
                              Messages messages,
                              @Nonnull CreateEntityPresenter createEntityPresenter, EntityNodeUpdater entityNodeUpdater, MessageBox messageBox,
-                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, QueriesPresenter queriesPresenter, RepairsPresenter repairsPresenter, TestcasesPresenter testcasesPresenter) {
+                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, QueriesPresenter queriesPresenter, RepairsPresenter repairsPresenter, TestcasesPresenter testcasesPresenter, LoggedInUserProvider loggedInUserProvider) {
         this.projectId = projectId;
         this.view = view;
         this.dsm = dispatchServiceManager;
@@ -76,12 +81,15 @@ public class DebuggerPresenter{
         this.queriesPresenter = queriesPresenter;
         this.repairsPresenter = repairsPresenter;
         this.testcasesPresenter = testcasesPresenter;
+        this.messageBox = messageBox;
+        this.loggedInUserProvider = loggedInUserProvider;
         GWT.log("[DebuggerPresenter] Started DebuggerPresenter");
     }
 
     public void setHasBusy(@Nonnull HasBusy hasBusy) {
         this.hasBusy = checkNotNull(hasBusy);
     }
+
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         GWT.log("[DebuggerPresenter] Started Debugger");
@@ -109,10 +117,16 @@ public class DebuggerPresenter{
 
             public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                 clearAxiomtabel();
-                DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
-                DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
-                DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
-                changeSessionState(debuggingSessionStateResult.getSessionState());
+                if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
+                    messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
+                    queriesPresenter.setEnabledButton("locked");
+                }else {
+                    DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
+                    DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
+                    DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
+                    changeSessionState(debuggingSessionStateResult.getSessionState());
+                }
+
             }
         });
     }
@@ -147,10 +161,15 @@ public class DebuggerPresenter{
             @Override
             public void accept(DebuggingSessionStateResult debuggingSessionStateResult) {
                 clearAxiomtabel();
-                DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
-                DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
-                DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
-                changeSessionState(debuggingSessionStateResult.getSessionState());
+                if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
+                    messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
+                    queriesPresenter.setEnabledButton("locked");
+                }else {
+                    DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
+                    DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
+                    DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
+                    changeSessionState(debuggingSessionStateResult.getSessionState());
+                }
             }
         });
     }
@@ -172,10 +191,15 @@ public class DebuggerPresenter{
 
                     public void handleSuccess(DebuggingSessionStateResult submitDebuggingSessionStateResult) {
                         clearAxiomtabel();
-                        DebuggerPresenter.this.setQueriesStatement(submitDebuggingSessionStateResult.getQuery());
-                        DebuggerPresenter.this.setReqairsStatement(submitDebuggingSessionStateResult.getDiagnoses());
-                        DebuggerPresenter.this.setTestCasesStatement(submitDebuggingSessionStateResult.getPositiveTestCases(), submitDebuggingSessionStateResult.getNegativeTestCases());
-                        changeSessionState(submitDebuggingSessionStateResult.getSessionState());
+                        if (!submitDebuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
+                            messageBox.showAlert("Can not start!","This session is started by other user: " + submitDebuggingSessionStateResult.getUserId().getUserName());
+                            queriesPresenter.setEnabledButton("locked");
+                        }else {
+                            DebuggerPresenter.this.setQueriesStatement(submitDebuggingSessionStateResult.getQuery());
+                            DebuggerPresenter.this.setReqairsStatement(submitDebuggingSessionStateResult.getDiagnoses());
+                            DebuggerPresenter.this.setTestCasesStatement(submitDebuggingSessionStateResult.getPositiveTestCases(), submitDebuggingSessionStateResult.getNegativeTestCases());
+                            changeSessionState(submitDebuggingSessionStateResult.getSessionState());
+                        }
                     }
                 });
     }

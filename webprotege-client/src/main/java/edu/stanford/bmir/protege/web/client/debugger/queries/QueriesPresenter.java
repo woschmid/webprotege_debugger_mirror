@@ -101,6 +101,10 @@ public class QueriesPresenter {
             view.enablebutton("submit");
         }else if (buttonTyp.equals("unsubmit")){
             view.disablebutton("submit");
+        }else if (buttonTyp.equals("locked")){
+            view.disablebutton("start");
+            view.disablebutton("stop");
+            view.disablebutton("submit");
         }
     }
 
