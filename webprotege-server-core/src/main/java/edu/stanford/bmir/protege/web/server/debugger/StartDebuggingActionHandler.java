@@ -6,7 +6,6 @@ import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.access.BuiltInAction;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.StartDebuggingAction;
-import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,20 +16,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StartDebuggingActionHandler extends AbstractProjectActionHandler<StartDebuggingAction, DebuggingSessionStateResult> {
 
     @Nonnull
-    private final ProjectId projectId;
-
-    @Nonnull
-    private final DebuggingSessionManager debuggingSessionManager;
-
+    private final DebuggingSession session;
 
     @Inject
-    public StartDebuggingActionHandler(@Nonnull ProjectId projectId,
-                                       @Nonnull AccessManager accessManager,
-                                       @Nonnull DebuggingSessionManager debuggingSessionManager
-                                       ) {
+    public StartDebuggingActionHandler(@Nonnull DebuggingSession debuggingSession,
+                                       @Nonnull AccessManager accessManager) {
         super(accessManager);
-        this.projectId = checkNotNull(projectId);
-        this.debuggingSessionManager = checkNotNull(debuggingSessionManager);
+        this.session = checkNotNull(debuggingSession);
     }
 
     @Nonnull
@@ -42,7 +34,7 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
     @Nonnull
     @Override
     public DebuggingSessionStateResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return debuggingSessionManager.startDebugging(projectId, executionContext.getUserId());
+        return session.start(executionContext.getUserId());
     }
 
     @Nullable
