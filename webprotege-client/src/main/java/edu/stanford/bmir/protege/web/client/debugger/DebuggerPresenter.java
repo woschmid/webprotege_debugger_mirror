@@ -15,8 +15,14 @@ import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.entity.CreateEntityPresenter;
 import edu.stanford.bmir.protege.web.client.entity.EntityNodeUpdater;
 import edu.stanford.bmir.protege.web.client.hierarchy.HierarchyFieldPresenter;
+import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
+import edu.stanford.bmir.protege.web.client.portlet.HasPortletActions;
+import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
 import edu.stanford.bmir.protege.web.client.progress.HasBusy;
 import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
@@ -58,6 +64,12 @@ public class DebuggerPresenter{
 
     private MessageBox messageBox;
 
+    @Nonnull
+    private final ConfigureDebuggerView configureDebuggerView;
+
+    @Nonnull
+    private final ModalManager modalManager;
+
     private final LoggedInUserProvider loggedInUserProvider;
 
     private HasBusy hasBusy = busy -> {
@@ -72,7 +84,7 @@ public class DebuggerPresenter{
                              HierarchyFieldPresenter hierarchyFieldPresenter,
                              Messages messages,
                              @Nonnull CreateEntityPresenter createEntityPresenter, EntityNodeUpdater entityNodeUpdater, MessageBox messageBox,
-                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, QueriesPresenter queriesPresenter, RepairsPresenter repairsPresenter, TestcasesPresenter testcasesPresenter, LoggedInUserProvider loggedInUserProvider) {
+                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, QueriesPresenter queriesPresenter, RepairsPresenter repairsPresenter, TestcasesPresenter testcasesPresenter, @Nonnull ConfigureDebuggerView configureDebuggerView, @Nonnull ModalManager modalManager, LoggedInUserProvider loggedInUserProvider) {
         this.projectId = projectId;
         this.view = view;
         this.dsm = dispatchServiceManager;
@@ -82,6 +94,8 @@ public class DebuggerPresenter{
         this.repairsPresenter = repairsPresenter;
         this.testcasesPresenter = testcasesPresenter;
         this.messageBox = messageBox;
+        this.configureDebuggerView = configureDebuggerView;
+        this.modalManager = modalManager;
         this.loggedInUserProvider = loggedInUserProvider;
         GWT.log("[DebuggerPresenter] Started DebuggerPresenter");
     }
@@ -256,4 +270,26 @@ public class DebuggerPresenter{
         }
     }
 
+    public void installActions(HasPortletActions hasPortletActions) {
+        PortletAction createClassAction = new PortletAction("Setting",
+                "wp-btn-g--editor",
+                this::ConfigureTimeout);
+        hasPortletActions.addAction(createClassAction);
+    }
+
+    public void ConfigureTimeout() {
+        ModalPresenter modalPresenter = modalManager.createPresenter();
+        modalPresenter.setTitle("Configure Timeout");
+        modalPresenter.setView(configureDebuggerView);
+        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK,
+                this::handleModalButton);
+        modalManager.showModal(modalPresenter);
+
+    }
+
+    private void handleModalButton(ModalCloser closer) {
+        closer.closeModal();
+    }
 }
