@@ -3,6 +3,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
+import edu.stanford.bmir.protege.web.server.project.ProjectManager;
 import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
@@ -33,6 +34,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @ProjectSingleton
 public class DebuggingSession implements HasDispose {
@@ -68,8 +72,10 @@ public class DebuggingSession implements HasDispose {
 
     private OWLObjectRenderer owlObjectRenderer;
 
+    ScheduledExecutorService service;
+
     @Inject
-    public DebuggingSession(@Nonnull ProjectId projectId, @Nonnull RevisionManager revisionManager, @Nonnull RenderingManager renderingManager, @Nonnull OWLObjectRenderer renderer, @Nonnull ProjectDisposablesManager disposablesManager) {
+    public DebuggingSession(@Nonnull ProjectId projectId, @Nonnull RevisionManager revisionManager, @Nonnull RenderingManager renderingManager, @Nonnull OWLObjectRenderer renderer, @Nonnull ProjectDisposablesManager disposablesManager, @Nonnull ProjectManager projectManager) {
         id = UUID.randomUUID().toString();
 
         this.projectId = projectId;
@@ -82,6 +88,27 @@ public class DebuggingSession implements HasDispose {
         this.diagnoses = null;
 
         disposablesManager.register(this);
+        this.service = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+            thread.setName(thread.getName().replace("thread", "debuggingsession-purge-service-thread"));
+            return thread;
+        });
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if (getUserId() != null && (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING)) {
+                    logger.info("keeping project alive");
+                    projectManager.ensureProjectIsLoaded(projectId, getUserId());
+                }
+            }
+        };
+
+        service.scheduleAtFixedRate(r,
+                10000,
+                30000,
+                TimeUnit.MILLISECONDS);
+
         logger.info("{} created", this);
     }
 
@@ -278,6 +305,7 @@ public class DebuggingSession implements HasDispose {
         owlObjectRenderer = null;
         revisionManager = null;
         engine = null;
+        service.shutdown();
     }
 
     /**
