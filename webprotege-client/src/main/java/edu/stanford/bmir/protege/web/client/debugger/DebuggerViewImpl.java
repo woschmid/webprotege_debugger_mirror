@@ -36,11 +36,11 @@ public class DebuggerViewImpl extends Composite implements DebuggerView {
 
     private EntityNodeListCellRenderer renderer;
 
-    interface IndividualsListViewImplUiBinder extends UiBinder<HTMLPanel, DebuggerViewImpl> {
+    interface DebuggerViewImplUiBinder extends UiBinder<HTMLPanel, DebuggerViewImpl> {
 
     }
 
-    private static IndividualsListViewImplUiBinder ourUiBinder = GWT.create(IndividualsListViewImplUiBinder.class);
+    private static DebuggerViewImplUiBinder ourUiBinder = GWT.create(DebuggerViewImplUiBinder.class);
 
     @UiField
     SimplePanel queriesContainer;

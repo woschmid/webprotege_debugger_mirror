@@ -18,6 +18,12 @@ import edu.stanford.bmir.protege.web.client.chgpwd.ChangePasswordViewImpl;
 import edu.stanford.bmir.protege.web.client.chgpwd.ResetPasswordView;
 import edu.stanford.bmir.protege.web.client.chgpwd.ResetPasswordViewImpl;
 import edu.stanford.bmir.protege.web.client.collection.*;
+import edu.stanford.bmir.protege.web.client.color.ColorSwatchView;
+import edu.stanford.bmir.protege.web.client.color.ColorSwatchViewImpl;
+import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellView;
+import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellViewImpl;
+import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
+import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
 import edu.stanford.bmir.protege.web.client.dispatch.*;
@@ -30,15 +36,12 @@ import edu.stanford.bmir.protege.web.client.filter.FilterViewImpl;
 import edu.stanford.bmir.protege.web.client.form.FormElementView;
 import edu.stanford.bmir.protege.web.client.form.FormElementViewImpl;
 import edu.stanford.bmir.protege.web.client.help.*;
-import edu.stanford.bmir.protege.web.client.issues.CommentEditorView;
-import edu.stanford.bmir.protege.web.client.issues.CommentEditorViewImpl;
 import edu.stanford.bmir.protege.web.client.issues.CommentedEntitiesView;
 import edu.stanford.bmir.protege.web.client.issues.CommentedEntitiesViewImpl;
 import edu.stanford.bmir.protege.web.client.lang.LangCodesProvider;
 import edu.stanford.bmir.protege.web.client.lang.LanguageCodes;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalView;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalViewImpl;
-import edu.stanford.bmir.protege.web.client.library.msgbox.InputBox;
 import edu.stanford.bmir.protege.web.client.library.msgbox.InputBoxView;
 import edu.stanford.bmir.protege.web.client.library.msgbox.InputBoxViewImpl;
 import edu.stanford.bmir.protege.web.client.login.LoginView;
@@ -49,7 +52,6 @@ import edu.stanford.bmir.protege.web.client.logout.LogoutView;
 import edu.stanford.bmir.protege.web.client.logout.LogoutViewImpl;
 import edu.stanford.bmir.protege.web.client.mail.EmailAddressEditor;
 import edu.stanford.bmir.protege.web.client.mail.EmailAddressEditorImpl;
-import edu.stanford.bmir.protege.web.client.match.*;
 import edu.stanford.bmir.protege.web.client.pagination.PaginatorView;
 import edu.stanford.bmir.protege.web.client.pagination.PaginatorViewImpl;
 import edu.stanford.bmir.protege.web.client.perspective.*;
@@ -60,14 +62,12 @@ import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
 import edu.stanford.bmir.protege.web.client.portlet.PortletUiImpl;
 import edu.stanford.bmir.protege.web.client.primitive.PrimitiveDataEditorImageView;
 import edu.stanford.bmir.protege.web.client.primitive.PrimitiveDataEditorImageViewImpl;
-import edu.stanford.bmir.protege.web.client.primitive.PrimitiveDataEditorView;
 import edu.stanford.bmir.protege.web.client.progress.BusyView;
 import edu.stanford.bmir.protege.web.client.progress.BusyViewImpl;
 import edu.stanford.bmir.protege.web.client.project.*;
 import edu.stanford.bmir.protege.web.client.projectlist.AvailableProjectView;
 import edu.stanford.bmir.protege.web.client.projectlist.AvailableProjectViewImpl;
 import edu.stanford.bmir.protege.web.client.projectmanager.*;
-import edu.stanford.bmir.protege.web.client.renderer.PrimitiveDataIconProvider;
 import edu.stanford.bmir.protege.web.client.search.SearchView;
 import edu.stanford.bmir.protege.web.client.search.SearchViewImpl;
 import edu.stanford.bmir.protege.web.client.settings.SettingsSectionViewContainer;
@@ -81,16 +81,11 @@ import edu.stanford.bmir.protege.web.client.topbar.GoToHomeView;
 import edu.stanford.bmir.protege.web.client.topbar.GoToToHomeViewImpl;
 import edu.stanford.bmir.protege.web.client.topbar.TopBarView;
 import edu.stanford.bmir.protege.web.client.topbar.TopBarViewImpl;
-import edu.stanford.bmir.protege.web.client.color.ColorSwatchView;
-import edu.stanford.bmir.protege.web.client.color.ColorSwatchViewImpl;
-import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellView;
-import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellViewImpl;
 import edu.stanford.bmir.protege.web.client.user.*;
 import edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle;
 import edu.stanford.bmir.protege.web.shared.auth.Md5MessageDigestAlgorithm;
 import edu.stanford.bmir.protege.web.shared.auth.MessageDigestAlgorithm;
 import edu.stanford.bmir.protege.web.shared.inject.ApplicationSingleton;
-import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.lang.LanguageCode;
 
 import javax.annotation.Nonnull;
@@ -532,6 +527,11 @@ public class ClientApplicationModule {
 
     @Provides
     QueriesView provideQueriesView(QueriesViewImpl impl) {
+        return impl;
+    }
+
+    @Provides
+    ConfigureDebuggerView provideConfigureDebuggerView(ConfigureDebuggerViewImpl impl) {
         return impl;
     }
 

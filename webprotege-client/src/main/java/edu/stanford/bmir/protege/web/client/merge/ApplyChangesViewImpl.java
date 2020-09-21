@@ -66,6 +66,7 @@ public class ApplyChangesViewImpl extends Composite implements ApplyChangesView,
 
     @Override
     public void setDiff(List<DiffElement<String, SafeHtml>> diff) {
+        GWT.log("[ApplyChangesViewImpl] diff =  "+ diff.toString() +"!!!!!!!!!!!!!!!!!!!!!!!!!");
         diffView.setDiff(diff, new DiffLineElementRenderer<SafeHtml>() {
             @Override
             public SafeHtml getRendering(SafeHtml lineElement) {
