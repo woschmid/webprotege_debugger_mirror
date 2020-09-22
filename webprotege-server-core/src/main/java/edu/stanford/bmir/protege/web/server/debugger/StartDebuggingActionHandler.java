@@ -34,7 +34,12 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
     @Nonnull
     @Override
     public DebuggingSessionStateResult execute(@Nonnull StartDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return session.start(executionContext.getUserId());
+        try {
+            return session.start(executionContext.getUserId());
+        } catch (RuntimeException e) {
+            session.stop();
+            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(session, e.getMessage());
+        }
     }
 
     @Nullable

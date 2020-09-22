@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
 import edu.stanford.bmir.protege.web.server.project.ProjectManager;
 import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
@@ -155,7 +156,7 @@ public class DebuggingSession implements HasDispose {
     public DebuggingSessionStateResult start(@Nonnull UserId userId) {
         synchronized (this) {
             if (getUserId() != null)
-                throw new ActionExecutionException(new RuntimeException("A debugging session is already running for this project by user " + getUserId()));
+                return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
 
             // guarantee that the session state is either in INIT or STOPPED state
             // let's not allow to start an already started session
@@ -205,10 +206,10 @@ public class DebuggingSession implements HasDispose {
      * @param answers String representations of axioms from previous queries and their answers if given. Can be <code>null</code>.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<String, Boolean> answers) {
+    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) {
         try {
             if (!userId.equals(getUserId()))
-                throw new ActionExecutionException(new RuntimeException("A debugging session is already running for this project by user " + getUserId()));
+                return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
 
             // verify that the session state in STARTED state
             if (state != SessionState.STARTED)
@@ -278,7 +279,7 @@ public class DebuggingSession implements HasDispose {
      */
     public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
         if (!userId.equals(getUserId()))
-            throw new ActionExecutionException(new RuntimeException("A debugging session is already running for this project by user " + getUserId()));
+            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
         stop();
         return DebuggingResultFactory.getDebuggingSessionStateResult(this);
     }
@@ -286,7 +287,7 @@ public class DebuggingSession implements HasDispose {
     /**
      * Stops a debugging session, which can be restarted later.
      */
-    private void stop() {
+    protected void stop() {
         // dispose diagnosis engine, solver and everything else...
         // No check will be done on the session state beforehand.
         state = SessionState.STOPPED;
@@ -313,9 +314,9 @@ public class DebuggingSession implements HasDispose {
      *
      * @param answers String representations of axioms from the previous query and the answers (either true or false) given to them.
      */
-    private void addAnswersToDiagnosisModel(@Nonnull ImmutableMap<String, Boolean> answers) {
+    private void addAnswersToDiagnosisModel(@Nonnull ImmutableMap<SafeHtml, Boolean> answers) {
         final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = engine.getSolver().getDiagnosisModel();
-        for (Map.Entry<String, Boolean> answer : answers.entrySet()) {
+        for (Map.Entry<SafeHtml, Boolean> answer : answers.entrySet()) {
             // look up the axiom representing this string
             final OWLLogicalAxiom axiom = lookupAxiomFromPreviousQuery(answer.getKey());
             if (answer.getValue()) {
@@ -335,7 +336,7 @@ public class DebuggingSession implements HasDispose {
      * @return The OWLLogicalAxiom instance representing the string.
      * @throws ActionExecutionException if no axiom representing this string can be found from the previous query.
      */
-    private OWLLogicalAxiom lookupAxiomFromPreviousQuery(@Nonnull final String axiomAsString) {
+    private OWLLogicalAxiom lookupAxiomFromPreviousQuery(@Nonnull final SafeHtml axiomAsString) {
 
         // we expect that the query stated before does exist
         if (query == null) {
@@ -344,8 +345,10 @@ public class DebuggingSession implements HasDispose {
 
         // lookup the matching axiom
         for (OWLLogicalAxiom a : query.formulas)
-            if (axiomAsString.equals(owlObjectRenderer.render(a).trim())) // trimming is necessary for EquivalentClasses (sic)
+            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a)))
                 return a;
+//            if (axiomAsString.equals(owlObjectRenderer.render(a).trim())) // trimming is necessary for EquivalentClasses (sic)
+//                return a;
 
         // if no axiom could be found, we have to throw an exception
         throw new ActionExecutionException(new RuntimeException(axiomAsString + " could not be not found"));

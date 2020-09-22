@@ -46,11 +46,13 @@ public class StatementViewImpl extends Composite{
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 
+    List<SafeHtml> queryAxioms = new ArrayList<>();
     public void addQueriesStatement(Set<SafeHtml> axiomStatement){
         List<CheckBox> listcheckbox= new ArrayList<>();
         for (SafeHtml axiom :
                 axiomStatement) {
             int row = table.getRowCount();
+            queryAxioms.add(axiom);
             Label statement = new HTML(axiom);
             CheckBox checkBoxP = new CheckBox();
             setCheckboxStyle(checkBoxP, true);

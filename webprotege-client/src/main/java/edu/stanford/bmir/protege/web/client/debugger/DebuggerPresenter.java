@@ -205,10 +205,10 @@ public class DebuggerPresenter{
 
                     public void handleSuccess(DebuggingSessionStateResult submitDebuggingSessionStateResult) {
                         clearAxiomtabel();
-                        if (!submitDebuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
-                            messageBox.showAlert("Can not start!","This session is started by other user: " + submitDebuggingSessionStateResult.getUserId().getUserName());
+                        if (!submitDebuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())) {
+                            messageBox.showAlert("Can not start!", "This session is started by other user: " + submitDebuggingSessionStateResult.getUserId().getUserName());
                             queriesPresenter.setEnabledButton("locked");
-                        }else {
+                        } else {
                             DebuggerPresenter.this.setQueriesStatement(submitDebuggingSessionStateResult.getQuery());
                             DebuggerPresenter.this.setReqairsStatement(submitDebuggingSessionStateResult.getDiagnoses());
                             DebuggerPresenter.this.setTestCasesStatement(submitDebuggingSessionStateResult.getPositiveTestCases(), submitDebuggingSessionStateResult.getNegativeTestCases());
@@ -216,12 +216,13 @@ public class DebuggerPresenter{
                         }
                     }
                 });
+
     }
 
-    private ImmutableMap<String, Boolean> getAnswers() {
-        Map<String, Boolean> allSelectQueries = queriesPresenter.getStatementPresenter().getTableInfo();
+    private ImmutableMap<SafeHtml, Boolean> getAnswers() {
+        Map<SafeHtml, Boolean> allSelectQueries = queriesPresenter.getStatementPresenter().getTableInfo();
         GWT.log("[QueriesPresenter] Selected Queries are "+ allSelectQueries.toString());
-        ImmutableMap<String, Boolean> answers = new ImmutableMap.Builder<String, Boolean>().putAll(allSelectQueries).build();
+        ImmutableMap<SafeHtml, Boolean> answers = new ImmutableMap.Builder<SafeHtml, Boolean>().putAll(allSelectQueries).build();
         return answers;
     }
 

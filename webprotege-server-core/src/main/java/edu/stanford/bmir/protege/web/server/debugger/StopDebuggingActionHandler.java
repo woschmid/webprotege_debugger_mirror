@@ -34,7 +34,12 @@ public class StopDebuggingActionHandler extends AbstractProjectActionHandler<Sto
     @Nonnull
     @Override
     public DebuggingSessionStateResult execute(@Nonnull StopDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return session.stop(executionContext.getUserId());
+        try {
+            return session.stop(executionContext.getUserId());
+        } catch (RuntimeException e) {
+            session.stop();
+            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(session, e.getMessage());
+        }
     }
 
     @Nullable

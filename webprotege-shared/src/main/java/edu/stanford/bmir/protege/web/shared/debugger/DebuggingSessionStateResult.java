@@ -4,6 +4,7 @@ import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstruc
 import edu.stanford.bmir.protege.web.shared.dispatch.Result;
 import edu.stanford.bmir.protege.web.shared.user.UserId;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -41,16 +42,39 @@ public class DebuggingSessionStateResult implements Result {
      */
     @Nullable private SessionState sessionState;
 
+    /**
+     * Flag for errors in the backend. If isOk is <code>true</code> then the backend is in an OK state, otherwise
+     * an exception has occurred and the errorMessage should be not null.
+     */
+    @Nonnull private Boolean isOk = Boolean.TRUE;
+
+    /**
+     * If isOk is <code>false</code> then this errorMessage contains details about the error reason in the backend.
+     */
+    @Nullable private String errorMessage;
+
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
-    public DebuggingSessionStateResult(@Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable SessionState sessionState) {
+    public DebuggingSessionStateResult(@Nonnull Boolean isOk, @Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable SessionState sessionState, @Nullable String errorMsg) {
+        this.isOk = isOk;
         this.userId = userId;
         this.query = query;
         this.diagnoses = diagnoses;
         this.positiveTestCases = positiveTestCases;
         this.negativeTestCases = negativeTestCases;
         this.sessionState = sessionState;
+        this.errorMessage = errorMsg;
+    }
+
+    @Nonnull
+    public Boolean isOk() {
+        return isOk;
+    }
+
+    @Nullable
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     @Nullable

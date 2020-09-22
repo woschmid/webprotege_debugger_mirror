@@ -34,7 +34,12 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
     @Nonnull
     @Override
     public DebuggingSessionStateResult execute(@Nonnull SubmitDebuggingAction action, @Nonnull ExecutionContext executionContext) {
-        return session.calculateQuery(executionContext.getUserId(), action.getAnswers());
+        try {
+            return session.calculateQuery(executionContext.getUserId(), action.getAnswers());
+        } catch (RuntimeException e) {
+            session.stop();
+            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(session, e.getMessage());
+        }
     }
 
     @Nullable

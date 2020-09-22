@@ -60,12 +60,14 @@ public class StatementPresenter {
     public void clearAxoim(){
         view.table.clear();
         view.table.removeAllRows();
+        view.queryAxioms.clear();
     }
 
-    public Map<String, Boolean> getTableInfo() {
-        Map<String, Boolean> answers = new HashMap<>();
+    public Map<SafeHtml, Boolean> getTableInfo() {
+        Map<SafeHtml, Boolean> answers = new HashMap<>();
         for(int i  = 0; i < view.table.getRowCount(); i++ ){
-            String axiom = view.table.getText(i,0);
+            //String axiom = view.table.getHTML(i,0);
+            SafeHtml axiom = view.queryAxioms.get(i);
             CheckBox flagTrue = (CheckBox) view.table.getWidget(i,1);
             CheckBox flagFalse = (CheckBox) view.table.getWidget(i,2);
             if (flagTrue.getValue() == true){
@@ -75,7 +77,9 @@ public class StatementPresenter {
                 answers.put(axiom,false);
             }
         }
+
         return answers;
 
     }
+
 }

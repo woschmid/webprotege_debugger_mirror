@@ -1,6 +1,7 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -13,10 +14,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SubmitDebuggingAction implements ProjectAction<DebuggingSessionStateResult> {
     private ProjectId projectId;
-    private ImmutableMap<String, Boolean> answers;
+    private ImmutableMap<SafeHtml, Boolean> answers;
 
     public SubmitDebuggingAction(@Nonnull ProjectId projectId,
-                                 @Nonnull ImmutableMap<String, Boolean> answers
+                                 @Nonnull ImmutableMap<SafeHtml, Boolean> answers
                                  ) {
         this.projectId = checkNotNull(projectId);
         this.answers = checkNotNull(answers);
@@ -33,7 +34,7 @@ public class SubmitDebuggingAction implements ProjectAction<DebuggingSessionStat
     }
 
     @Nonnull
-    public ImmutableMap<String, Boolean> getAnswers() {
+    public ImmutableMap<SafeHtml, Boolean> getAnswers() {
         return answers;
     }
 
