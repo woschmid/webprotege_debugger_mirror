@@ -3,6 +3,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import edu.stanford.bmir.protege.web.server.app.WebProtegeProperties;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
 import edu.stanford.bmir.protege.web.server.project.ProjectManager;
 import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
@@ -24,7 +25,6 @@ import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
 import org.exquisite.core.solver.ISolver;
-import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -34,7 +34,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -71,43 +74,66 @@ public class DebuggingSession implements HasDispose {
 
     private IExquisiteProgressMonitor monitor;
 
-    private OWLObjectRenderer owlObjectRenderer;
+    private ScheduledExecutorService purgePreventionService;
 
-    ScheduledExecutorService service;
+    /**
+     * Timestamp when the session has been actively used the last time.
+     */
+    private long lastActivityTimeInMillis;
+
+    /**
+     * Keep alive time span of a debugging session from it's last activity.
+     * If this time span is exceeded the project (and it's debugging session) can be purged.
+     */
+    private static final Long SESSION_KEEPALIVE_IN_MILLIS = 10L * 60L * 1000L; // 10 minutes
 
     @Inject
-    public DebuggingSession(@Nonnull ProjectId projectId, @Nonnull RevisionManager revisionManager, @Nonnull RenderingManager renderingManager, @Nonnull OWLObjectRenderer renderer, @Nonnull ProjectDisposablesManager disposablesManager, @Nonnull ProjectManager projectManager) {
-        id = UUID.randomUUID().toString();
+    public DebuggingSession(@Nonnull ProjectId projectId,
+                            @Nonnull RevisionManager revisionManager,
+                            @Nonnull RenderingManager renderingManager,
+                            @Nonnull ProjectDisposablesManager disposablesManager,
+                            @Nonnull ProjectManager projectManager,
+                            @Nonnull WebProtegeProperties webProtegeProperties) {
+        id = projectId.getId();
 
         this.projectId = projectId;
         this.revisionManager = revisionManager;
         this.renderingManager = renderingManager;
-        this.owlObjectRenderer = renderer;
 
         this.state = SessionState.INIT;
         this.query = null;
         this.diagnoses = null;
 
+        this.lastActivityTimeInMillis = System.currentTimeMillis();
+
+        // register this Debugging session to the DisposablesManager to free resources when project gets purged
         disposablesManager.register(this);
-        this.service = Executors.newSingleThreadScheduledExecutor(runnable -> {
+
+        // a service to prevent an active (defined by MAX_SESSION_KEEPALIVE_IN_MILLIS) debugging session and it's project
+        // from being purged
+        this.purgePreventionService = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-            thread.setName(thread.getName().replace("thread", "debuggingsession-purge-service-thread"));
+            thread.setName(thread.getName().replace("thread", "debuggingsession-purgeprevention-service-thread"));
             return thread;
         });
 
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                if (getUserId() != null && (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING)) {
-                    logger.info("keeping project alive");
-                    projectManager.ensureProjectIsLoaded(projectId, getUserId());
-                }
+        // this Thread's responsibility is to keep a running Debugging session alive if certain conditions are fulfilled
+        Runnable r = () -> {
+            if (getUserId() != null // a debugging session has to be started ...
+                    &&
+                    (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING) // .. it must be running
+                    &&
+                    // .. and must have been used within a certain time slot
+                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < SESSION_KEEPALIVE_IN_MILLIS)) {
+
+                logger.info("keeping project {} alive ...", projectId);
+                projectManager.ensureProjectIsLoaded(projectId, getUserId());
             }
         };
 
-        service.scheduleAtFixedRate(r,
-                10000,
-                30000,
+        purgePreventionService.scheduleAtFixedRate(r,
+                0,
+                webProtegeProperties.getProjectDormantTime() * 90L / 100L, // check interval is 90% of the project dormant time
                 TimeUnit.MILLISECONDS);
 
         logger.info("{} created", this);
@@ -215,6 +241,8 @@ public class DebuggingSession implements HasDispose {
             if (state != SessionState.STARTED)
                 throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
 
+            this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
             // reset the engine
             engine.resetEngine();
 
@@ -280,6 +308,8 @@ public class DebuggingSession implements HasDispose {
     public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
+
+        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
         stop();
         return DebuggingResultFactory.getDebuggingSessionStateResult(this);
     }
@@ -303,10 +333,9 @@ public class DebuggingSession implements HasDispose {
         logger.info("{} disposing ...", this);
         stop();
         renderingManager = null;
-        owlObjectRenderer = null;
         revisionManager = null;
         engine = null;
-        service.shutdown();
+        purgePreventionService.shutdown();
     }
 
     /**
@@ -347,8 +376,6 @@ public class DebuggingSession implements HasDispose {
         for (OWLLogicalAxiom a : query.formulas)
             if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a)))
                 return a;
-//            if (axiomAsString.equals(owlObjectRenderer.render(a).trim())) // trimming is necessary for EquivalentClasses (sic)
-//                return a;
 
         // if no axiom could be found, we have to throw an exception
         throw new ActionExecutionException(new RuntimeException(axiomAsString + " could not be not found"));
