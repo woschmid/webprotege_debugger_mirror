@@ -4,6 +4,9 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.app.WebProtegeProperties;
+import edu.stanford.bmir.protege.web.server.change.*;
+import edu.stanford.bmir.protege.web.server.events.EventManager;
+import edu.stanford.bmir.protege.web.server.owlapi.RenameMap;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
 import edu.stanford.bmir.protege.web.server.project.ProjectManager;
 import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
@@ -12,6 +15,9 @@ import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
+import edu.stanford.bmir.protege.web.shared.event.EventList;
+import edu.stanford.bmir.protege.web.shared.event.EventTag;
+import edu.stanford.bmir.protege.web.shared.event.ProjectEvent;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import edu.stanford.bmir.protege.web.shared.user.UserId;
@@ -27,6 +33,7 @@ import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputa
 import org.exquisite.core.solver.ISolver;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +62,8 @@ public class DebuggingSession implements HasDispose {
 
     /** The owner of this debugging session */
     private UserId userId;
+
+    private OWLOntologyID ontologyID;
 
     /** The current state of the debugging session */
     private SessionState state;
@@ -200,6 +209,7 @@ public class DebuggingSession implements HasDispose {
                 throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
 
             final OWLOntology ontology = ontologies.get(0);
+            OWLOntologyID ontologyID = ontology.getOntologyID();
             logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
 
 
@@ -304,6 +314,7 @@ public class DebuggingSession implements HasDispose {
      * Stops the running debugging session.
      *
      * @param userId The user who wants to stop a debugging session.
+     * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
         if (!userId.equals(getUserId()))
@@ -311,6 +322,62 @@ public class DebuggingSession implements HasDispose {
 
         this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
         stop();
+        return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+    }
+
+    /**
+     * Repairs the final diagnosis.
+     *
+     * @param userId The user who wants to repair the debugging session.
+     * @param eventManager
+     * @param applyChanges
+     * @return A result for the front end representing the current state of the backend.
+     */
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, EventManager<ProjectEvent<?>> eventManager, HasApplyChanges applyChanges) {
+        if (!userId.equals(getUserId()))
+            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
+
+        // verify that the session state in STARTED state
+        if (state != SessionState.STARTED)
+            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
+
+        if (!(query == null && diagnoses != null && diagnoses.size() == 1))
+            throw new RuntimeException("A repair is not allowed!");
+
+        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
+        EventTag tag = eventManager.getCurrentTag();
+
+        final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
+
+        ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
+
+            @Override
+            public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
+
+                var changeList = new OntologyChangeList.Builder<Boolean>();
+                diagnosis.getFormulas().forEach(axiom -> {
+                    changeList.removeAxiom(ontologyID, axiom);
+                });
+                return changeList.build(true);
+            }
+
+            @Override
+            public Boolean getRenamedResult(Boolean result, RenameMap renameMap) {
+                return true;
+            }
+
+            @Nonnull
+            @Override
+            public String getMessage(ChangeApplicationResult<Boolean> result) {
+                return "";
+            }
+        };
+
+        ChangeApplicationResult<Boolean> r = applyChanges.applyChanges(getUserId(), changeListGenerator);
+        EventList<ProjectEvent<?>> eventList = eventManager.getEventsFromTag(tag);
+
+        this.diagnoses = null;
         return DebuggingResultFactory.getDebuggingSessionStateResult(this);
     }
 
