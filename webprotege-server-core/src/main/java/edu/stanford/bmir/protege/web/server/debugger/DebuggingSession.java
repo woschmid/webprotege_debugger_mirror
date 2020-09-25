@@ -157,27 +157,29 @@ public class DebuggingSession implements HasDispose {
     /**
      * @return the owner of this debugging session.
      */
-    public UserId getUserId() {
+    @Nullable public UserId getUserId() {
         return userId;
     }
 
     /**
      * @return the current state the debugging session is in
      */
-    public SessionState getState() {
+    @Nonnull public SessionState getState() {
         return state;
     }
 
-    public Query<OWLLogicalAxiom> getQuery() {
+    @Nullable public Query<OWLLogicalAxiom> getQuery() {
         return query;
     }
 
-    public Set<Diagnosis<OWLLogicalAxiom>> getDiagnoses() {
+    @Nullable public Set<Diagnosis<OWLLogicalAxiom>> getDiagnoses() {
         return diagnoses;
     }
 
-    public DiagnosisModel<OWLLogicalAxiom> getDiagnosisModel() {
-        return engine.getSolver().getDiagnosisModel();
+    @Nullable public DiagnosisModel<OWLLogicalAxiom> getDiagnosisModel() {
+        if (engine != null)
+            return engine.getSolver().getDiagnosisModel();
+        return null;
     }
 
     public RenderingManager getRenderingManager() {
@@ -418,13 +420,10 @@ public class DebuggingSession implements HasDispose {
         for (Map.Entry<SafeHtml, Boolean> answer : answers.entrySet()) {
             // look up the axiom representing this string
             final OWLLogicalAxiom axiom = lookupAxiomFromPreviousQuery(answer.getKey());
-            if (answer.getValue()) {
+            if (answer.getValue())
                 diagnosisModel.getEntailedExamples().add(axiom);
-                logger.info("{} got positive answer for {}", this, axiom);
-            } else {
+            else
                 diagnosisModel.getNotEntailedExamples().add(axiom);
-                logger.info("{} got negative answer for {}", this, axiom);
-            }
         }
     }
 
