@@ -24,6 +24,8 @@ public interface QueriesView extends IsWidget  {
 
     void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler);
 
+    void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler);
+
     AcceptsOneWidget getCriteriaContainer();
 
     void disablebutton(String s);

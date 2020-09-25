@@ -64,6 +64,8 @@ public class DebuggerPresenter{
 
     private MessageBox messageBox;
 
+    private boolean isFinal = false;
+
     @Nonnull
     private final ConfigureDebuggerView configureDebuggerView;
 
@@ -107,7 +109,8 @@ public class DebuggerPresenter{
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         GWT.log("[DebuggerPresenter] Started Debugger");
-        queriesPresenter.start(view.getQueriesContainer(), this::startDebugging, this::stopDebugging,this::submitDebugging);
+        queriesPresenter.start(view.getQueriesContainer(), this::startDebugging,
+                this::stopDebugging,this::submitDebugging,this::RepairDebugging);
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());
         container.setWidget(view.asWidget());
@@ -116,6 +119,7 @@ public class DebuggerPresenter{
 
     private void startDebugging() {
         GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!");
+        isFinal = false;
         this.dsm.execute(new StartDebuggingAction(projectId),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                                                                                 progressDisplay) {
@@ -135,14 +139,19 @@ public class DebuggerPresenter{
                     messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
                     queriesPresenter.setEnabledButton("locked");
                 }else {
-                    DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
-                    DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
-                    DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
-                    changeSessionState(debuggingSessionStateResult.getSessionState());
+                    showResults(debuggingSessionStateResult);
+                    checkFinal(debuggingSessionStateResult);
                 }
 
             }
         });
+    }
+
+    private void showResults(DebuggingSessionStateResult debuggingSessionStateResult) {
+        DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
+        DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
+        DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
+        changeSessionState(debuggingSessionStateResult.getSessionState());
     }
 
     private void stopDebugging() {
@@ -164,6 +173,7 @@ public class DebuggerPresenter{
                     public void handleSuccess(DebuggingSessionStateResult stopDebuggingSessionStateResult) {
                         clearAxiomtabel();
                         changeSessionState(stopDebuggingSessionStateResult.getSessionState());
+                        checkFinal(stopDebuggingSessionStateResult);
                     }
                 });
 
@@ -171,19 +181,14 @@ public class DebuggerPresenter{
 
     private void reload(){
         GWT.log("[QueriesPresenter]reload Debugging!!!!!");
-        this.dsm.execute(new ReloadDebuggerAction(projectId), new Consumer<DebuggingSessionStateResult>() {
-            @Override
-            public void accept(DebuggingSessionStateResult debuggingSessionStateResult) {
-                clearAxiomtabel();
-                if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
-                    messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
-                    queriesPresenter.setEnabledButton("locked");
-                }else {
-                    DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
-                    DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
-                    DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
-                    changeSessionState(debuggingSessionStateResult.getSessionState());
-                }
+        this.dsm.execute(new ReloadDebuggerAction(projectId), debuggingSessionStateResult -> {
+            clearAxiomtabel();
+            if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
+                messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
+                queriesPresenter.setEnabledButton("locked");
+            }else {
+                showResults(debuggingSessionStateResult);
+                checkFinal(debuggingSessionStateResult);
             }
         });
     }
@@ -209,21 +214,64 @@ public class DebuggerPresenter{
                             messageBox.showAlert("Can not start!", "This session is started by other user: " + submitDebuggingSessionStateResult.getUserId().getUserName());
                             queriesPresenter.setEnabledButton("locked");
                         } else {
-                            DebuggerPresenter.this.setQueriesStatement(submitDebuggingSessionStateResult.getQuery());
-                            DebuggerPresenter.this.setReqairsStatement(submitDebuggingSessionStateResult.getDiagnoses());
-                            DebuggerPresenter.this.setTestCasesStatement(submitDebuggingSessionStateResult.getPositiveTestCases(), submitDebuggingSessionStateResult.getNegativeTestCases());
-                            changeSessionState(submitDebuggingSessionStateResult.getSessionState());
+                            showResults(submitDebuggingSessionStateResult);
+                            checkFinal(submitDebuggingSessionStateResult);
                         }
                     }
                 });
 
     }
 
+    private void RepairDebugging() {
+        GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
+
+        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
+
+    }
+
+    private void runRepair(){
+        this.dsm.execute(new RepairAction(projectId),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Repairing";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        clearAxiomtabel();
+                        if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())) {
+                            messageBox.showAlert("Can not start!", "This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
+                            queriesPresenter.setEnabledButton("locked");
+                        } else {
+                            showResults(debuggingSessionStateResult);
+                            checkFinal(debuggingSessionStateResult);
+                        }
+                    }
+                });
+    }
+
+    private void checkFinal(DebuggingSessionStateResult result){
+        if (result.getSessionState() == SessionState.STARTED &&
+                (result.getQuery() == null && result.getDiagnoses() != null &&
+                        result.getDiagnoses().size() == 1)){
+            isFinal = true;
+            queriesPresenter.setEnabledButton("repair");
+        }else{
+            changeSessionState(result.getSessionState());
+        }
+
+    }
+
     private ImmutableMap<SafeHtml, Boolean> getAnswers() {
         Map<SafeHtml, Boolean> allSelectQueries = queriesPresenter.getStatementPresenter().getTableInfo();
         GWT.log("[QueriesPresenter] Selected Queries are "+ allSelectQueries.toString());
-        ImmutableMap<SafeHtml, Boolean> answers = new ImmutableMap.Builder<SafeHtml, Boolean>().putAll(allSelectQueries).build();
-        return answers;
+        return new ImmutableMap.Builder<SafeHtml, Boolean>().putAll(allSelectQueries).build();
     }
 
     private void setQueriesStatement(Query msg){

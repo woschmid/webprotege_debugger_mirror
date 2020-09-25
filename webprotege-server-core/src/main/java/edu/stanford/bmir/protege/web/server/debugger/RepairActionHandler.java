@@ -10,6 +10,7 @@ import edu.stanford.bmir.protege.web.shared.debugger.RepairAction;
 import edu.stanford.bmir.protege.web.shared.event.ProjectEvent;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,6 +25,7 @@ public class RepairActionHandler extends AbstractProjectActionHandler<RepairActi
     @Nonnull
     private final HasApplyChanges applyChanges;
 
+    @Inject
     public RepairActionHandler(@Nonnull DebuggingSession session,
                                @Nonnull AccessManager accessManager,
                                @Nonnull EventManager<ProjectEvent<?>> eventManager,

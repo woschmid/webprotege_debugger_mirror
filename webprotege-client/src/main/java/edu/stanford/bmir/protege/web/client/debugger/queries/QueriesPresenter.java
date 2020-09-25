@@ -46,12 +46,13 @@ public class QueriesPresenter {
 
 
 
-    public void start(AcceptsOneWidget container, StartDebuggingHandler starthandler, StopDebuggingHandler stophandler, SubmitDebuggingHandler submithandler) {
+    public void start(AcceptsOneWidget container, StartDebuggingHandler starthandler, StopDebuggingHandler stophandler, SubmitDebuggingHandler submithandler, RepairDebuggingHandler repairDebuggingHandler) {
         GWT.log("[QueriesPresenter]Start queries presenter");
         this.container = container;
         this.view.setStartDebuggingHandler(starthandler);
         this.view.setStopDebuggingHandler(stophandler);
         this.view.setSubmitDebuggingHandler(submithandler);
+        this.view.setRepairDebuggingHandler(repairDebuggingHandler);
         container.setWidget(view.asWidget());
         statementPresenter.start(view.getCriteriaContainer());
         setEnabledButton("stop");
@@ -89,22 +90,38 @@ public class QueriesPresenter {
     }
 
     public void setEnabledButton(String buttonTyp){
-        if(buttonTyp.equals("stop")){
-            view.disablebutton("stop");
-            view.disablebutton("submit");
-            view.enablebutton("start");
-        }else if (buttonTyp.equals("start")){
-            view.enablebutton("stop");
-            view.disablebutton("submit");
-            view.disablebutton("start");
-        }else if (buttonTyp.equals("submit")){
-            view.enablebutton("submit");
-        }else if (buttonTyp.equals("unsubmit")){
-            view.disablebutton("submit");
-        }else if (buttonTyp.equals("locked")){
-            view.disablebutton("start");
-            view.disablebutton("stop");
-            view.disablebutton("submit");
+        switch (buttonTyp) {
+            case "stop":
+                view.disablebutton("stop");
+                view.disablebutton("submit");
+                view.enablebutton("start");
+                view.disablebutton("repair");
+                break;
+            case "start":
+                view.enablebutton("stop");
+                view.disablebutton("submit");
+                view.disablebutton("start");
+                view.disablebutton("repair");
+                break;
+            case "submit":
+                view.enablebutton("submit");
+                view.disablebutton("repair");
+                break;
+            case "unsubmit":
+                view.disablebutton("submit");
+                break;
+            case "locked":
+                view.disablebutton("start");
+                view.disablebutton("stop");
+                view.disablebutton("submit");
+                view.disablebutton("repair");
+                break;
+            case "repair":
+                view.disablebutton("start");
+                view.enablebutton("stop");
+                view.disablebutton("submit");
+                view.enablebutton("repair");
+                break;
         }
     }
 

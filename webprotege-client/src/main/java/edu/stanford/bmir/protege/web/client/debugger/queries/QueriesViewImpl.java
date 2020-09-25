@@ -40,6 +40,9 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     protected Button submitButton;
 
     @UiField
+    protected Button repairButton;
+
+    @UiField
     protected Button stopButton;
 
     interface QeriesViewImplUiBinder extends UiBinder<HTMLPanel, QueriesViewImpl> {
@@ -48,22 +51,18 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     private static QeriesViewImplUiBinder ourUiBinder = GWT.create(QeriesViewImplUiBinder.class);
 
-    private StartDebuggingHandler startDebuggingHandler = new StartDebuggingHandler() {
-        @Override
-        public void handleStartDebugging() {
-        }
+    private StartDebuggingHandler startDebuggingHandler = () -> {
     };
 
-    private StopDebuggingHandler stopDebuggingHandler = new StopDebuggingHandler() {
-        @Override
-        public void handleStopDebugging() {
-        }
+    private StopDebuggingHandler stopDebuggingHandler = () -> {
     };
 
-    private SubmitDebuggingHandler submitDebuggingHandler = new SubmitDebuggingHandler() {
-        @Override
-        public void handleSubmitDebugging() {
-        }
+    private SubmitDebuggingHandler submitDebuggingHandler = () -> {
+    };
+
+
+    private RepairDebuggingHandler repairDebuggingHandler = () -> {
+
     };
 
     @Inject
@@ -80,6 +79,9 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @UiHandler("submitButton")
     protected void submitButtonClick(ClickEvent event) { submitDebuggingHandler.handleSubmitDebugging(); }
 
+    @UiHandler("repairButton")
+    protected void RepairButtonClick(ClickEvent event) { repairDebuggingHandler.handleRepairDebugging(); }
+
     @Override
     public void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler) { this.startDebuggingHandler = checkNotNull(handler); }
 
@@ -88,6 +90,11 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     @Override
     public void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler){ this.submitDebuggingHandler = checkNotNull(handler);}
+
+    @Override
+    public void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler) {
+        this.repairDebuggingHandler = checkNotNull(handler);
+    }
 
     @Nonnull
     public AcceptsOneWidget getCriteriaContainer() {
@@ -106,6 +113,9 @@ public class QueriesViewImpl extends Composite implements QueriesView {
             case "submit":
                 submitButton.setEnabled(false);
                 break;
+            case "repair":
+                repairButton.setEnabled(false);
+                break;
         }
     }
 
@@ -119,6 +129,9 @@ public class QueriesViewImpl extends Composite implements QueriesView {
                 break;
             case "submit":
                 submitButton.setEnabled(true);
+                break;
+            case "repair":
+                repairButton.setEnabled(true);
                 break;
         }
     }
