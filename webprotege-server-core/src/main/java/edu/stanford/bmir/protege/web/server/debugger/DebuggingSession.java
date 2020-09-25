@@ -83,7 +83,7 @@ public class DebuggingSession implements HasDispose {
 
     private IExquisiteProgressMonitor monitor;
 
-    private ScheduledExecutorService purgePreventionService;
+    private final ScheduledExecutorService purgePreventionService;
 
     /**
      * Timestamp when the session has been actively used the last time.
@@ -127,7 +127,7 @@ public class DebuggingSession implements HasDispose {
         });
 
         // this Thread's responsibility is to keep a running Debugging session alive if certain conditions are fulfilled
-        Runnable r = () -> {
+        final Runnable r = () -> {
             if (getUserId() != null // a debugging session has to be started ...
                     &&
                     (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING) // .. it must be running
@@ -140,9 +140,10 @@ public class DebuggingSession implements HasDispose {
             }
         };
 
+        // check interval is 90% of the project dormant time
         purgePreventionService.scheduleAtFixedRate(r,
                 0,
-                webProtegeProperties.getProjectDormantTime() * 90L / 100L, // check interval is 90% of the project dormant time
+                webProtegeProperties.getProjectDormantTime() * 90L / 100L,
                 TimeUnit.MILLISECONDS);
 
         logger.info("{} created", this);
@@ -209,7 +210,7 @@ public class DebuggingSession implements HasDispose {
                 throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
 
             final OWLOntology ontology = ontologies.get(0);
-            OWLOntologyID ontologyID = ontology.getOntologyID();
+            this.ontologyID = ontology.getOntologyID();
             logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
 
 
@@ -329,8 +330,8 @@ public class DebuggingSession implements HasDispose {
      * Repairs the final diagnosis.
      *
      * @param userId The user who wants to repair the debugging session.
-     * @param eventManager
-     * @param applyChanges
+     * @param eventManager The event manager.
+     * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult repair(@Nonnull UserId userId, EventManager<ProjectEvent<?>> eventManager, HasApplyChanges applyChanges) {
@@ -341,24 +342,23 @@ public class DebuggingSession implements HasDispose {
         if (state != SessionState.STARTED)
             throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
 
-        if (!(query == null && diagnoses != null && diagnoses.size() == 1))
+        // check the preconditions for a repair action
+        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
             throw new RuntimeException("A repair is not allowed!");
 
         this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
 
-        EventTag tag = eventManager.getCurrentTag();
-
+        // get the final diagnosis and apply are remove axioms change operation for them
         final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
 
-        ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
+        final DebuggingSession debuggingSession = this;
+
+        final ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
 
             @Override
             public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
-
-                var changeList = new OntologyChangeList.Builder<Boolean>();
-                diagnosis.getFormulas().forEach(axiom -> {
-                    changeList.removeAxiom(ontologyID, axiom);
-                });
+                final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
+                diagnosis.getFormulas().forEach(axiom -> changeList.removeAxiom(ontologyID, axiom));
                 return changeList.build(true);
             }
 
@@ -370,12 +370,14 @@ public class DebuggingSession implements HasDispose {
             @Nonnull
             @Override
             public String getMessage(ChangeApplicationResult<Boolean> result) {
-                return "";
+                return "Repair action for " + debuggingSession;
             }
         };
 
-        ChangeApplicationResult<Boolean> r = applyChanges.applyChanges(getUserId(), changeListGenerator);
-        EventList<ProjectEvent<?>> eventList = eventManager.getEventsFromTag(tag);
+        // TODO what to return for positive applyChange?
+        final ChangeApplicationResult<Boolean> r = applyChanges.applyChanges(getUserId(), changeListGenerator);
+        final EventTag tag = eventManager.getCurrentTag();
+        final EventList<ProjectEvent<?>> eventList = eventManager.getEventsFromTag(tag);
 
         this.diagnoses = null;
         return DebuggingResultFactory.getDebuggingSessionStateResult(this);
@@ -393,6 +395,7 @@ public class DebuggingSession implements HasDispose {
         monitor = null;
         query = null;
         diagnoses = null;
+        ontologyID = null;
     }
 
     @Override
