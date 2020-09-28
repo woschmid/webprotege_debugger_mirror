@@ -135,7 +135,7 @@ public class DebuggingSession implements HasDispose {
                     // .. and must have been used within a certain time slot
                     ((System.currentTimeMillis() - lastActivityTimeInMillis) < SESSION_KEEPALIVE_IN_MILLIS)) {
 
-                logger.info("keeping project {} alive ...", projectId);
+                logger.info("Keeping project {} loaded for {} ...", projectId, this);
                 projectManager.ensureProjectIsLoaded(projectId, getUserId());
             }
         };
@@ -372,7 +372,7 @@ public class DebuggingSession implements HasDispose {
             @Nonnull
             @Override
             public String getMessage(ChangeApplicationResult<Boolean> result) {
-                return "Repair action for " + debuggingSession;
+                return "Repair action of " + debuggingSession;
             }
         };
 
@@ -393,7 +393,8 @@ public class DebuggingSession implements HasDispose {
         // No check will be done on the session state beforehand.
         state = SessionState.STOPPED;
         userId = null;
-        engine.dispose();
+        if (engine!=null)
+            engine.dispose();
         monitor = null;
         query = null;
         diagnoses = null;
