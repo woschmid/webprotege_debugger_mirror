@@ -135,7 +135,7 @@ public class DebuggingSession implements HasDispose {
                     // .. and must have been used within a certain time slot
                     ((System.currentTimeMillis() - lastActivityTimeInMillis) < SESSION_KEEPALIVE_IN_MILLIS)) {
 
-                logger.info("Keeping project {} loaded for {} ...", projectId, this);
+                logger.info("Keeping project {} loaded for running {} ...", projectId, this);
                 projectManager.ensureProjectIsLoaded(projectId, getUserId());
             }
         };
@@ -403,7 +403,7 @@ public class DebuggingSession implements HasDispose {
 
     @Override
     public void dispose() {
-        logger.info("{} disposing ...", this);
+        logger.info("Disposing {}", this);
         stop();
         renderingManager = null;
         revisionManager = null;
