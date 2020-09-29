@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -134,24 +133,9 @@ public class DebuggerPresenter{
             }
 
             public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                clearAxiomtabel();
-                if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
-                    messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
-                    queriesPresenter.setEnabledButton("locked");
-                }else {
-                    showResults(debuggingSessionStateResult);
-                    checkFinal(debuggingSessionStateResult);
-                }
-
+                handlerDebugging(debuggingSessionStateResult);
             }
         });
-    }
-
-    private void showResults(DebuggingSessionStateResult debuggingSessionStateResult) {
-        DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
-        DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
-        DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
-        changeSessionState(debuggingSessionStateResult.getSessionState());
     }
 
     private void stopDebugging() {
@@ -170,10 +154,8 @@ public class DebuggerPresenter{
                         return "Please wait";
                     }
 
-                    public void handleSuccess(DebuggingSessionStateResult stopDebuggingSessionStateResult) {
-                        clearAxiomtabel();
-                        changeSessionState(stopDebuggingSessionStateResult.getSessionState());
-                        checkFinal(stopDebuggingSessionStateResult);
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
                     }
                 });
 
@@ -182,14 +164,13 @@ public class DebuggerPresenter{
     private void reload(){
         GWT.log("[QueriesPresenter]reload Debugging!!!!!");
         this.dsm.execute(new ReloadDebuggerAction(projectId), debuggingSessionStateResult -> {
-            clearAxiomtabel();
             if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
                 messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
                 queriesPresenter.setEnabledButton("locked");
             }else {
-                showResults(debuggingSessionStateResult);
-                checkFinal(debuggingSessionStateResult);
+                handlerDebugging(debuggingSessionStateResult);
             }
+
         });
     }
     private void submitDebugging() {
@@ -208,15 +189,8 @@ public class DebuggerPresenter{
                         return "Please wait";
                     }
 
-                    public void handleSuccess(DebuggingSessionStateResult submitDebuggingSessionStateResult) {
-                        clearAxiomtabel();
-                        if (!submitDebuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())) {
-                            messageBox.showAlert("Can not start!", "This session is started by other user: " + submitDebuggingSessionStateResult.getUserId().getUserName());
-                            queriesPresenter.setEnabledButton("locked");
-                        } else {
-                            showResults(submitDebuggingSessionStateResult);
-                            checkFinal(submitDebuggingSessionStateResult);
-                        }
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
                     }
                 });
 
@@ -244,16 +218,38 @@ public class DebuggerPresenter{
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        clearAxiomtabel();
-                        if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())) {
-                            messageBox.showAlert("Can not start!", "This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
-                            queriesPresenter.setEnabledButton("locked");
-                        } else {
-                            showResults(debuggingSessionStateResult);
-                            checkFinal(debuggingSessionStateResult);
-                        }
+                        handlerDebugging(debuggingSessionStateResult);
                     }
                 });
+    }
+
+
+    private void handlerDebugging(DebuggingSessionStateResult debuggingSessionStateResult) {
+        boolean isStop = false;
+        if (debuggingSessionStateResult.getSessionState() == SessionState.STOPPED) {
+            isStop = true;
+        }
+        clearAxiomtabel();
+        if (!debuggingSessionStateResult.isOk()) {
+            messageBox.showAlert("Can not start!", debuggingSessionStateResult.getMessage());
+            queriesPresenter.setEnabledButton("locked");
+        } else {
+            if (debuggingSessionStateResult.getMessage() != null) {
+                messageBox.showAlert("Information", debuggingSessionStateResult.getMessage());
+            }
+            showResults(debuggingSessionStateResult, isStop);
+            checkFinal(debuggingSessionStateResult);
+        }
+
+    }
+
+    private void showResults(DebuggingSessionStateResult debuggingSessionStateResult, boolean isStop) {
+        if(!isStop){
+            DebuggerPresenter.this.setQueriesStatement(debuggingSessionStateResult.getQuery());
+            DebuggerPresenter.this.setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
+            DebuggerPresenter.this.setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
+        }
+        changeSessionState(debuggingSessionStateResult.getSessionState());
     }
 
     private void checkFinal(DebuggingSessionStateResult result){
