@@ -49,14 +49,16 @@ public class DebuggingSessionStateResult implements Result {
     @Nonnull private Boolean isOk = Boolean.TRUE;
 
     /**
-     * If isOk is <code>false</code> then this errorMessage contains details about the error reason in the backend.
+     * If isOk is <code>false</code> then this message contains details about the error reason in the backend.
+     * If isOk is <code>true</code> then this message contains general information like consistency or other useful feedback
+     * for the user from the backend (for example that repair was successful).
      */
-    @Nullable private String errorMessage;
+    @Nullable private String message;
 
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
-    public DebuggingSessionStateResult(@Nonnull Boolean isOk, @Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable SessionState sessionState, @Nullable String errorMsg) {
+    public DebuggingSessionStateResult(@Nonnull Boolean isOk, @Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable SessionState sessionState, @Nullable String msg) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
@@ -64,7 +66,7 @@ public class DebuggingSessionStateResult implements Result {
         this.positiveTestCases = positiveTestCases;
         this.negativeTestCases = negativeTestCases;
         this.sessionState = sessionState;
-        this.errorMessage = errorMsg;
+        this.message = msg;
     }
 
     @Nonnull
@@ -73,8 +75,8 @@ public class DebuggingSessionStateResult implements Result {
     }
 
     @Nullable
-    public String getErrorMessage() {
-        return errorMessage;
+    public String getMessage() {
+        return message;
     }
 
     @Nullable
