@@ -38,7 +38,7 @@ public class StopDebuggingActionHandler extends AbstractProjectActionHandler<Sto
             return session.stop(executionContext.getUserId());
         } catch (RuntimeException e) {
             session.stop();
-            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(session, e.getMessage());
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
 

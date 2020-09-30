@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.app.WebProtegeProperties;
 import edu.stanford.bmir.protege.web.server.change.*;
-import edu.stanford.bmir.protege.web.server.events.EventManager;
 import edu.stanford.bmir.protege.web.server.owlapi.RenameMap;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
 import edu.stanford.bmir.protege.web.server.project.ProjectManager;
@@ -15,9 +14,6 @@ import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
-import edu.stanford.bmir.protege.web.shared.event.EventList;
-import edu.stanford.bmir.protege.web.shared.event.EventTag;
-import edu.stanford.bmir.protege.web.shared.event.ProjectEvent;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import edu.stanford.bmir.protege.web.shared.user.UserId;
@@ -194,7 +190,7 @@ public class DebuggingSession implements HasDispose {
     public DebuggingSessionStateResult start(@Nonnull UserId userId) {
         synchronized (this) {
             if (getUserId() != null)
-                return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
             // guarantee that the session state is either in INIT or STOPPED state
             // let's not allow to start an already started session
@@ -248,7 +244,7 @@ public class DebuggingSession implements HasDispose {
     public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) {
         try {
             if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
             // verify that the session state in STARTED state
             if (state != SessionState.STARTED)
@@ -287,7 +283,7 @@ public class DebuggingSession implements HasDispose {
                     diagnoses = newDiagnoses;
                     state = SessionState.STARTED;
                     logger.info("{} calculated query {}", this, query);
-                    return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
                 } else {
                     throw new RuntimeException("No query could be calculated.");
                 }
@@ -299,14 +295,19 @@ public class DebuggingSession implements HasDispose {
                 query = null;
                 diagnoses = newDiagnoses;
                 state = SessionState.STARTED;
-                return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+                final int size = newDiagnoses.iterator().next().getFormulas().size();
+                return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                                "The debugger identified <strong>" + size +
+                                " faulty " + (size > 1 ? "axioms" : "axiom") + "</strong>.<br/><br/>" +
+                                "Use the REPAIR button to remove " + (size > 1 ? "them" : "it") + " from the ontology.");
             } else {
+                // diagnoses.size() == 0: the ontology is consistent and coherent and has therefore no diagnoses
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
-                // diagnoses.size() == 0, the ontology is consistent and coherent and has therefore no diagnoses
                 query = null;
                 diagnoses = null;
                 state = SessionState.STARTED;
-                return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+                return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                        "The ontology is coherent and consistent!");
             }
         } catch (RuntimeException | DiagnosisException e) {
             throw new ActionExecutionException(e);
@@ -321,24 +322,25 @@ public class DebuggingSession implements HasDispose {
      */
     public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
         if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                    "A debugging session is already running for this project by user " + getUserId());
 
         this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
         stop();
-        return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
 
     /**
      * Repairs the final diagnosis.
      *
      * @param userId The user who wants to repair the debugging session.
-     * @param eventManager The event manager.
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, EventManager<ProjectEvent<?>> eventManager, HasApplyChanges applyChanges) {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, HasApplyChanges applyChanges) {
         if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(this, "A debugging session is already running for this project by user " + getUserId());
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                    "A debugging session is already running for this project by user " + getUserId());
 
         // verify that the session state in STARTED state
         if (state != SessionState.STARTED)
@@ -376,13 +378,11 @@ public class DebuggingSession implements HasDispose {
             }
         };
 
-        // TODO what to return for positive applyChange?
-        final ChangeApplicationResult<Boolean> r = applyChanges.applyChanges(getUserId(), changeListGenerator);
-        final EventTag tag = eventManager.getCurrentTag();
-        final EventList<ProjectEvent<?>> eventList = eventManager.getEventsFromTag(tag);
+        applyChanges.applyChanges(getUserId(), changeListGenerator);
 
         this.diagnoses = null;
-        return DebuggingResultFactory.getDebuggingSessionStateResult(this);
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                "The ontology has been successfully repaired!");
     }
 
     /**

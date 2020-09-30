@@ -34,7 +34,7 @@ public class ReloadDebuggerActionHandler extends AbstractProjectActionHandler<Re
     @Nonnull
     @Override
     public DebuggingSessionStateResult execute(@Nonnull ReloadDebuggerAction action, @Nonnull ExecutionContext executionContext) {
-        return DebuggingResultFactory.getDebuggingSessionStateResult(session);
+        return DebuggingResultFactory.generateResult(session, Boolean.TRUE, null);
     }
 
     @Nullable

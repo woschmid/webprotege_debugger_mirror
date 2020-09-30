@@ -38,7 +38,7 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
             return session.calculateQuery(executionContext.getUserId(), action.getAnswers());
         } catch (RuntimeException e) {
             session.stop();
-            return DebuggingResultFactory.getFailureDebuggingSessionStateResult(session, e.getMessage());
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
 
