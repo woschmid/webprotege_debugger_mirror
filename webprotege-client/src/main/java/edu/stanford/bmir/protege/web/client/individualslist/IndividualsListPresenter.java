@@ -115,7 +115,7 @@ public class IndividualsListPresenter implements EntityNodeIndex {
         this.messageBox = messageBox;
         this.view.addSelectionHandler(this::handleSelectionChangedInView);
         this.view.setSearchStringChangedHandler(this::handleSearchStringChangedInView);
-        this.view.setPageNumberChangedHandler(pageNumber -> updateList());
+        this.view.setPageNumberChangedHandler(this::handlePageNumberChanged);
         this.createAction = new PortletAction(messages.create(), "wp-btn-g--create-individual wp-btn-g--create", this::handleCreateIndividuals);
         this.deleteAction = new PortletAction(messages.delete(), "wp-btn-g--delete-individual wp-btn-g--delete", this::handleDeleteIndividuals);
     }
@@ -344,5 +344,9 @@ public class IndividualsListPresenter implements EntityNodeIndex {
 
     private boolean isIndividualContainedInView(@Nonnull OWLNamedIndividual individual) {
         return elementsMap.containsKey(individual);
+    }
+
+    private void handlePageNumberChanged(int pageNumber) {
+        updateList();
     }
 }

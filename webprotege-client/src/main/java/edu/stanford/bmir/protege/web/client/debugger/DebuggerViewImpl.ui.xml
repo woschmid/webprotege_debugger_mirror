@@ -6,6 +6,7 @@
     <ui:import field="edu.stanford.bmir.protege.web.shared.individuals.InstanceRetrievalMode.*"/>
     <ui:style>
         .main {
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: stretch;
