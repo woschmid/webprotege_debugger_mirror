@@ -108,8 +108,8 @@ public class DebuggerPresenter{
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         GWT.log("[DebuggerPresenter] Started Debugger");
-        queriesPresenter.start(view.getQueriesContainer(), this::startDebugging,
-                this::stopDebugging,this::submitDebugging,this::RepairDebugging);
+//        queriesPresenter.start(view.getQueriesContainer(), this::startDebugging,
+//                this::stopDebugging,this::submitDebugging,this::RepairDebugging);
         repairsPresenter.start(view.getRepairsContainer());
         testcasesPresenter.start(view.getTestcasesContainer());
         container.setWidget(view.asWidget());

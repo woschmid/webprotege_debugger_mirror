@@ -1,7 +1,7 @@
 package edu.stanford.bmir.protege.web.client.debugger.testcases;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.RootPanel;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 
 import javax.annotation.Nonnull;
@@ -16,20 +16,24 @@ import javax.inject.Inject;
 public class TestcasesPresenter {
 
     @Nonnull
-    private final TestcasesViewImpl view;
+    private TestcasesView view;
 
     AcceptsOneWidget container;
 
     StatementPresenter statementPresenter1;
     StatementPresenter statementPresenter2;
 
+    private final DebuggerResultManager debuggerResultManager;
+
     @Inject
     public TestcasesPresenter(StatementPresenter statementPresenter1,
-                              StatementPresenter statementPresenter2) {
+                              StatementPresenter statementPresenter2,
+                              TestcasesView testcasesView, DebuggerResultManager debuggerResultManager) {
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
-        this.view = new TestcasesViewImpl(this);
+        this.view = testcasesView;
 
+        this.debuggerResultManager = debuggerResultManager;
     }
 
 
@@ -37,6 +41,7 @@ public class TestcasesPresenter {
 
         this.container = container;
         container.setWidget(view.asWidget());
+        debuggerResultManager.setTestcasesPresenter(this);
         statementPresenter1 = new StatementPresenter();
         statementPresenter1.start(view.getEntailedCriteriaContainer());
 

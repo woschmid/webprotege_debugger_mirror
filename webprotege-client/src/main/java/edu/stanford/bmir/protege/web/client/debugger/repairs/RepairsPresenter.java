@@ -1,9 +1,8 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.RootPanel;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
-
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -17,17 +16,20 @@ import javax.inject.Inject;
 public class RepairsPresenter {
 
     @Nonnull
-    private final RepairsViewImpl view;
+    private RepairsView view;
 
     AcceptsOneWidget container;
 
     StatementPresenter statementPresenter;
 
+    private final DebuggerResultManager debuggerResultManager;
+
 
     @Inject
-    public RepairsPresenter(StatementPresenter statementPresenter) {
+    public RepairsPresenter(StatementPresenter statementPresenter, RepairsView repairsView, DebuggerResultManager debuggerResultManager) {
         this.statementPresenter = statementPresenter;
-        this.view = new RepairsViewImpl(this);
+        this.view =repairsView;
+        this.debuggerResultManager = debuggerResultManager;
     }
 
 
@@ -37,6 +39,7 @@ public class RepairsPresenter {
         this.container = container;
         container.setWidget(view.asWidget());
         statementPresenter.start(view.getCriteriaContainer());
+        debuggerResultManager.setRepairsPresenter(this);
     }
 
 

@@ -3,10 +3,6 @@ package edu.stanford.bmir.protege.web.client.debugger.testcases;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
-import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
-import edu.stanford.bmir.protege.web.shared.pagination.Page;
-
-import javax.annotation.Nonnull;
 
 /**
  * Matthew Horridge
@@ -14,19 +10,8 @@ import javax.annotation.Nonnull;
  * 14 Jun 2018
  */
 public interface TestcasesView extends IsWidget, HasPagination {
+    public AcceptsOneWidget getEntailedCriteriaContainer();
 
-    interface ExecuteQueryHandler {
-        void handleExecute();
-    }
+    public AcceptsOneWidget getNonEntailedcriteriaContainer();
 
-    void setExecuteHandler(@Nonnull ExecuteQueryHandler handler);
-
-    void setExecuteEnabled(boolean enabled);
-
-    @Nonnull
-    AcceptsOneWidget getCriteriaContainer();
-
-    void clearResults();
-
-    void setResult(@Nonnull Page<EntityNode> result);
 }

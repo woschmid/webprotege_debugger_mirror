@@ -16,6 +16,7 @@ import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.permissions.LoggedInUserProjectPermissionChecker;
 import edu.stanford.bmir.protege.web.client.portlet.HasPortletActions;
 import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
+import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
 import edu.stanford.bmir.protege.web.shared.DataFactory;
 import edu.stanford.bmir.protege.web.shared.PrimitiveType;
 import edu.stanford.bmir.protege.web.shared.dispatch.actions.CreateNamedIndividualsAction;
@@ -29,7 +30,6 @@ import edu.stanford.bmir.protege.web.shared.lang.DisplayNameSettings;
 import edu.stanford.bmir.protege.web.shared.pagination.Page;
 import edu.stanford.bmir.protege.web.shared.pagination.PageRequest;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
-import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
@@ -156,7 +156,7 @@ public class IndividualsListPresenter implements EntityNodeIndex {
     }
 
     private void handleSelectionChangedInView(SelectionEvent<List<EntityNode>> event) {
-        event.getSelectedItem().stream().findFirst().ifPresent(sel -> selectionModel.setSelection(sel.getEntity()));
+        event.getSelectedItem().stream().findFirst().ifPresent(this::accept);
     }
 
     private void handleRetrievalTypeChanged() {
@@ -348,5 +348,9 @@ public class IndividualsListPresenter implements EntityNodeIndex {
 
     private void handlePageNumberChanged(int pageNumber) {
         updateList();
+    }
+
+    private void accept(EntityNode sel) {
+        selectionModel.setSelection(sel.getEntity());
     }
 }

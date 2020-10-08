@@ -1,3 +1,32 @@
 {
-  "portlet": "portlet.Debugger"
+  "direction": "ROW",
+
+  "children": [
+    {
+      "weight": 0.5,
+      "node": {
+        "direction": "COLUMN",
+        "children": [
+          {
+            "weight": 0.5,
+            "node": {
+              "portlet": "portlet.Queries"
+            }
+          },
+          {
+            "weight": 0.5,
+            "node": {
+              "portlet": "portlet.Repairs"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "weight": 0.5,
+      "node": {
+              "portlet": "portlet.Testcases"
+      }
+    }
+  ]
 }

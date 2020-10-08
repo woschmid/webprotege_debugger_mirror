@@ -16,7 +16,7 @@ import javax.inject.Inject;
  * Stanford Center for Biomedical Informatics Research
  * 14 Jun 2018
  */
-public class TestcasesViewImpl extends Composite {
+public class TestcasesViewImpl extends Composite implements TestcasesView{
 
     @UiField
     SimplePanel EntailedcriteriaContainer;
@@ -24,7 +24,25 @@ public class TestcasesViewImpl extends Composite {
     @UiField
     SimplePanel NonEntailedcriteriaContainer;
 
-    TestcasesPresenter testcasesPresenter;
+    @Override
+    public void setPageCount(int pageCount) {
+
+    }
+
+    @Override
+    public void setPageNumber(int pageNumber) {
+
+    }
+
+    @Override
+    public int getPageNumber() {
+        return 0;
+    }
+
+    @Override
+    public void setPageNumberChangedHandler(PageNumberChangedHandler handler) {
+
+    }
 
     interface repairsViewImplUiBinder extends UiBinder<HTMLPanel, TestcasesViewImpl> {
 
@@ -34,8 +52,7 @@ public class TestcasesViewImpl extends Composite {
 
 
     @Inject
-    public TestcasesViewImpl( TestcasesPresenter testcasesPresenter) {
-        this.testcasesPresenter = testcasesPresenter;
+    public TestcasesViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 

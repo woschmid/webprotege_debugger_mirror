@@ -24,8 +24,6 @@ import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellView;
 import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerViewImpl;
-import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
-import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
 import edu.stanford.bmir.protege.web.client.dispatch.*;
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletView;
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletViewImpl;
@@ -90,6 +88,9 @@ import edu.stanford.bmir.protege.web.shared.lang.LanguageCode;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+
+//import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
+//import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
 
 /**
  * Author: Matthew Horridge<br>
@@ -525,10 +526,10 @@ public class ClientApplicationModule {
         return impl;
     }
 
-    @Provides
-    QueriesView provideQueriesView(QueriesViewImpl impl) {
-        return impl;
-    }
+//    @Provides
+//    QueriesView provideQueriesView(QueriesViewImpl impl) {
+//        return impl;
+//    }
 
     @Provides
     ConfigureDebuggerView provideConfigureDebuggerView(ConfigureDebuggerViewImpl impl) {

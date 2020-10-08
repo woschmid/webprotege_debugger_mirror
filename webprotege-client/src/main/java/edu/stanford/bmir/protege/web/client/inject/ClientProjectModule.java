@@ -12,6 +12,12 @@ import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditor;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditorImpl;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerViewImpl;
+import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
+import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
+import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsView;
+import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsViewImpl;
+import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesView;
+import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesViewImpl;
 import edu.stanford.bmir.protege.web.client.editor.EditorManagerSelector;
 import edu.stanford.bmir.protege.web.client.editor.EntityManagerSelectorImpl;
 import edu.stanford.bmir.protege.web.client.entity.CreateEntitiesDialogViewImpl;
@@ -39,7 +45,10 @@ import edu.stanford.bmir.protege.web.client.perspective.PerspectiveLinkManagerIm
 import edu.stanford.bmir.protege.web.client.portlet.PortletFactory;
 import edu.stanford.bmir.protege.web.client.portlet.PortletFactoryGenerated;
 import edu.stanford.bmir.protege.web.client.portlet.PortletModulesGenerated;
-import edu.stanford.bmir.protege.web.client.project.*;
+import edu.stanford.bmir.protege.web.client.project.ShowProjectDetailsHandler;
+import edu.stanford.bmir.protege.web.client.project.ShowProjectDetailsHandlerImpl;
+import edu.stanford.bmir.protege.web.client.project.UploadAndMergeHandler;
+import edu.stanford.bmir.protege.web.client.project.UploadAndMergeHandlerImpl;
 import edu.stanford.bmir.protege.web.client.projectsettings.*;
 import edu.stanford.bmir.protege.web.client.renderer.AnnotationPropertyIriRenderer;
 import edu.stanford.bmir.protege.web.client.renderer.AnnotationPropertyIriRendererImpl;
@@ -479,6 +488,15 @@ public class ClientProjectModule {
 
     @Provides
     DebuggerView provideDebuggerView(DebuggerViewImpl impl) { return impl; }
+
+    @Provides
+    QueriesView provideQeriesView(QueriesViewImpl impl) { return impl; }
+
+    @Provides
+    RepairsView provideRepairsView(RepairsViewImpl impl) { return impl; }
+
+    @Provides
+    TestcasesView provideTestcasesView(TestcasesViewImpl impl) { return impl; }
 
 }
 

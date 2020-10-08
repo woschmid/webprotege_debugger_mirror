@@ -1,17 +1,18 @@
 package edu.stanford.bmir.protege.web.client.usage;
 
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.filter.FilterView;
+import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
 import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
+import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
 import edu.stanford.bmir.protege.web.shared.axiom.AxiomTypeGroup;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.filter.FilterId;
 import edu.stanford.bmir.protege.web.shared.filter.FilterSet;
 import edu.stanford.bmir.protege.web.shared.filter.FilterSetting;
-import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
-import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
 import edu.stanford.bmir.protege.web.shared.usage.GetUsageAction;
 import edu.stanford.bmir.protege.web.shared.usage.UsageFilter;
 import edu.stanford.bmir.protege.web.shared.usage.UsageReference;
@@ -76,7 +77,7 @@ public class UsagePortletPresenter extends AbstractWebProtegePortletPresenter {
         for(AxiomTypeGroup axiomTypeGroup : AxiomTypeGroup.values()) {
             filterView.addFilter(new FilterId(axiomTypeGroup.getDisplayName()), FilterSetting.ON);
         }
-        filterView.addValueChangeHandler(event -> applyFilter(event.getValue()));
+        filterView.addValueChangeHandler(this::onValueChange);
     }
 
     @Override
@@ -144,5 +145,9 @@ public class UsagePortletPresenter extends AbstractWebProtegePortletPresenter {
             usageView.setData(entity, references);
             setDisplayedEntity(Optional.of(result.getEntityNode().getEntityData()));
         });
+    }
+
+    private void onValueChange(ValueChangeEvent<FilterSet> event) {
+        applyFilter(event.getValue());
     }
 }
