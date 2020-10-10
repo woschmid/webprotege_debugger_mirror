@@ -6,10 +6,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
-import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsProletPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
-import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesProletPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
@@ -17,60 +16,52 @@ import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.*;
+import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class QueriesPresenter {
+public class QueriesPresenter extends DebuggerPresenter {
 
     private StatementPresenter statementPresenter;
 
     private QueriesView view;
 
-    private final DispatchServiceManager dsm;
+    private DispatchServiceManager dsm;
 
-    private final DispatchErrorMessageDisplay errorDisplay;
+    private DispatchErrorMessageDisplay errorDisplay;
 
-    private final ProgressDisplay progressDisplay;
+    private ProgressDisplay progressDisplay;
 
-    private final LoggedInUserProvider loggedInUserProvider;
+    private LoggedInUserProvider loggedInUserProvider;
 
-    private RepairsProletPresenter repairsProletPresenter;
-
-    private TestcasesProletPresenter testcasesProletPresenter;
-
-    private final DebuggerResultManager debuggerResultManager;
+    private DebuggerResultManager debuggerResultManager;
 
     private MessageBox messageBox;
 
     @Nonnull
-    private final ProjectId projectId;
+    private ProjectId projectId;
 
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
                             DispatchServiceManager dispatchServiceManager,
-                            StatementPresenter statementPresenter, @Nonnull QueriesView queriesView,
-                            RepairsProletPresenter repairsProletPresenter, TestcasesProletPresenter testcasesProletPresenter,
-                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, LoggedInUserProvider loggedInUserProvider, DebuggerResultManager debuggerResultManager, MessageBox messageBox) {
-        this.statementPresenter = statementPresenter;
+                            MessageBox messageBox, StatementPresenter statementPresenter,
+                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider) {
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
         this.projectId = projectId;
-        this.dsm = dispatchServiceManager;
-        this.view = checkNotNull(queriesView);
-        this.errorDisplay = errorDisplay;
-        this.progressDisplay = progressDisplay;
         this.loggedInUserProvider = loggedInUserProvider;
-        this.debuggerResultManager = debuggerResultManager;
+        this.errorDisplay= errorDisplay;
+        this.progressDisplay = progressDisplay;
         this.messageBox = messageBox;
-//        this.repairsProletPresenter = repairsProletPresenter;
-//        this.testcasesProletPresenter = testcasesProletPresenter;
+        this.debuggerResultManager = debuggerResultManager;
+        this.dsm = dispatchServiceManager;
+        this.statementPresenter = statementPresenter;
+        this.view = view;
         statementPresenter.addCheckBoxClickhandler(this::CheckCheckBox);
     }
 
@@ -80,20 +71,19 @@ public class QueriesPresenter {
 
 
 
-    public void start(AcceptsOneWidget containe) {
-        GWT.log("[QueriesPresenter]Start queries presenter");
-        containe.setWidget(view.asWidget());
-        debuggerResultManager.setQueriesPresenter(this);
+    public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
+        super.start(container,eventBus);
+        setEnabledButton("stop");
         this.view.setStartDebuggingHandler(this::startDebugging);
         this.view.setStopDebuggingHandler(this::stopDebugging);
         this.view.setSubmitDebuggingHandler(this::submitDebugging);
         this.view.setRepairDebuggingHandler(this::RepairDebugging);
-        statementPresenter.start(view.getCriteriaContainer());
-        setEnabledButton("stop");
+        reload();
     }
 
     private void startDebugging() {
         GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!");
+        GWT.log("[DebuggerPresenter]dsm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+dsm);
         this.dsm.execute(new StartDebuggingAction(projectId),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {
@@ -132,6 +122,7 @@ public class QueriesPresenter {
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                         handlerDebugging(debuggingSessionStateResult);
+                        debuggerResultManager.clearAxioms();
                     }
                 });
 
@@ -224,9 +215,6 @@ public class QueriesPresenter {
     private void showResults(DebuggingSessionStateResult debuggingSessionStateResult, boolean isStop) {
         if(!isStop){
             debuggerResultManager.updateContent();
-//            setQueriesStatement(debuggingSessionStateResult.getQuery());
-//            setReqairsStatement(debuggingSessionStateResult.getDiagnoses());
-//            setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(), debuggingSessionStateResult.getNegativeTestCases());
         }
         changeSessionState(debuggingSessionStateResult.getSessionState());
     }
@@ -250,12 +238,6 @@ public class QueriesPresenter {
         }else if (state == SessionState.INIT){
             setEnabledButton("start");
         }
-    }
-
-    private void clearAxiomtabel(){
-        clearAxiomtable();
-        repairsProletPresenter.repairsPresenter.clearAxiomtable();
-        testcasesProletPresenter.testcasesPresenter.clearAxiomtable();
     }
 
     private ImmutableMap<SafeHtml, Boolean> getAnswers() {
@@ -282,39 +264,13 @@ public class QueriesPresenter {
         }
     }
 
-    public void setQueriesStatement(Query msg){
+    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
+        Query msg = debuggingSessionStateResult.getQuery();
         if (msg != null) {
             Set<SafeHtml> items = msg.getAxioms();
             getStatementPresenter().addQueriesStatement(items);
         }
     }
-
-    private void setReqairsStatement(List<Diagnosis> msg){
-        if (msg != null) {
-            repairsProletPresenter.repairsPresenter.getStatementPresenter().addRepairsStatement(msg);
-        }
-
-    }
-
-    private void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
-        Set<SafeHtml> itemsP = new HashSet<>();
-        if (msgP != null) {
-            for (TestCase p : msgP) itemsP.add(p.getAxiom());
-        }
-
-        Set<SafeHtml> itemsN = new HashSet<>();
-        if (msgN != null) {
-            for (TestCase n : msgN) itemsN.add(n.getAxiom());
-        }
-
-        testcasesProletPresenter.testcasesPresenter.getStatementPresenter1().addTestCasesStatement(itemsP);
-        testcasesProletPresenter.testcasesPresenter.getStatementPresenter2().addTestCasesStatement(itemsN);
-    }
-
-//    public void setQueriesStatement(SafeHtml msg){
-//        Set<String> items = new HashSet<String>(Arrays.asList(msg.split(", ")));
-//        statementPresenter.addQueriesStatement(items);
-//    }
 
     public void clearAxiomtable(){
         statementPresenter.clearAxoim();

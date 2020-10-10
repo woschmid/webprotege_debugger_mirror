@@ -19,6 +19,7 @@
             border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
         }
         .individualsList {
+            width: 100%;
             height : 100%;
             flex-grow: 1;
             flex-shrink: 1;

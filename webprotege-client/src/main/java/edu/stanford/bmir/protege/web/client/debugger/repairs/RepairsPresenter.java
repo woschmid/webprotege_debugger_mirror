@@ -1,8 +1,17 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
+import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
+import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
+import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -13,7 +22,7 @@ import javax.inject.Inject;
  * 12 Jun 2018
  */
 
-public class RepairsPresenter {
+public class RepairsPresenter extends DebuggerPresenter {
 
     @Nonnull
     private RepairsView view;
@@ -26,29 +35,23 @@ public class RepairsPresenter {
 
 
     @Inject
-    public RepairsPresenter(StatementPresenter statementPresenter, RepairsView repairsView, DebuggerResultManager debuggerResultManager) {
+    public RepairsPresenter(@Nonnull ProjectId projectId,
+                            DispatchServiceManager dispatchServiceManager,
+                            MessageBox messageBox, StatementPresenter statementPresenter,
+                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, RepairsView view, LoggedInUserProvider loggedInUserProvider) {
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
+        this.view = view;
         this.statementPresenter = statementPresenter;
-        this.view =repairsView;
         this.debuggerResultManager = debuggerResultManager;
     }
 
 
-    public void start(AcceptsOneWidget container) {
-//        GWT.log("Application initialization complete.  Starting UI Initialization.");
-//        GWT.log(view.toString());
-        this.container = container;
-        container.setWidget(view.asWidget());
-        statementPresenter.start(view.getCriteriaContainer());
-        debuggerResultManager.setRepairsPresenter(this);
+    public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
+        super.start(container,eventBus);
     }
 
-
-    public StatementPresenter getStatementPresenter() {
-        return statementPresenter;
-    }
-
-    public void setStatementPresenter(StatementPresenter statementPresenter) {
-        this.statementPresenter = statementPresenter;
+    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
+        statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
     }
 
     public void clearAxiomtable() {

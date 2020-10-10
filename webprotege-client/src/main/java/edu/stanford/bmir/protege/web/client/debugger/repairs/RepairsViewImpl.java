@@ -23,27 +23,6 @@ public class RepairsViewImpl extends Composite implements RepairsView{
     @UiField
     SimplePanel criteriaContainer;
 
-
-    @Override
-    public void setPageCount(int pageCount) {
-
-    }
-
-    @Override
-    public void setPageNumber(int pageNumber) {
-
-    }
-
-    @Override
-    public int getPageNumber() {
-        return 0;
-    }
-
-    @Override
-    public void setPageNumberChangedHandler(PageNumberChangedHandler handler) {
-
-    }
-
     interface repairsViewImplUiBinder extends UiBinder<HTMLPanel, RepairsViewImpl> {
 
     }

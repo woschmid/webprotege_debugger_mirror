@@ -25,6 +25,6 @@ public class RepairsProletPresenter  extends AbstractWebProtegePortletPresenter 
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        repairsPresenter.start(portletUi);
+        repairsPresenter.start(portletUi,eventBus);
     }
 }

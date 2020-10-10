@@ -1,14 +1,9 @@
 package edu.stanford.bmir.protege.web.client.debugger.queries;
 
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.IsWidget;
-import edu.stanford.bmir.protege.web.client.progress.HasBusy;
-import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
-import edu.stanford.bmir.protege.web.shared.individuals.InstanceRetrievalMode;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * Author: Matthew Horridge<br>
@@ -16,7 +11,7 @@ import java.util.List;
  * Bio-Medical Informatics Research Group<br>
  * Date: 12/09/2013
  */
-public interface QueriesView extends IsWidget  {
+public interface QueriesView extends DebuggerView {
 
     void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler);
 

@@ -17,10 +17,6 @@ import java.util.Set;
  */
 public class StatementPresenter {
 
-    private static final int SEARCH_DELAY = 700;
-
-    private static final int PAGE_SIZE = 200;
-
     public AcceptsOneWidget container;
 
 

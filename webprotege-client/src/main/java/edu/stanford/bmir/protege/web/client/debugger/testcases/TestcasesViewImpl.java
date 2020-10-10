@@ -25,23 +25,8 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     SimplePanel NonEntailedcriteriaContainer;
 
     @Override
-    public void setPageCount(int pageCount) {
-
-    }
-
-    @Override
-    public void setPageNumber(int pageNumber) {
-
-    }
-
-    @Override
-    public int getPageNumber() {
-        return 0;
-    }
-
-    @Override
-    public void setPageNumberChangedHandler(PageNumberChangedHandler handler) {
-
+    public AcceptsOneWidget getCriteriaContainer() {
+        return EntailedcriteriaContainer;
     }
 
     interface repairsViewImplUiBinder extends UiBinder<HTMLPanel, TestcasesViewImpl> {

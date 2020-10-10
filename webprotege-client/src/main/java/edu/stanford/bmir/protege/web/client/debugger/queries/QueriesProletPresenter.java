@@ -27,7 +27,7 @@ public class QueriesProletPresenter extends AbstractWebProtegePortletPresenter {
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
 //        queriesPresenter.installActions(portletUi);
-        queriesPresenter.start(portletUi);
+        queriesPresenter.start(portletUi, eventBus);
 //        queriesPresenter.setHasBusy(portletUi);
     }
 }

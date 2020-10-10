@@ -1,11 +1,24 @@
 package edu.stanford.bmir.protege.web.client.debugger.testcases;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
+import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
+import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
+import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Matthew Horridge
@@ -13,7 +26,7 @@ import javax.inject.Inject;
  * 12 Jun 2018
  */
 
-public class TestcasesPresenter {
+public class TestcasesPresenter extends DebuggerPresenter {
 
     @Nonnull
     private TestcasesView view;
@@ -26,35 +39,48 @@ public class TestcasesPresenter {
     private final DebuggerResultManager debuggerResultManager;
 
     @Inject
-    public TestcasesPresenter(StatementPresenter statementPresenter1,
-                              StatementPresenter statementPresenter2,
-                              TestcasesView testcasesView, DebuggerResultManager debuggerResultManager) {
+    public TestcasesPresenter(@Nonnull ProjectId projectId, StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
+                              DispatchServiceManager dispatchServiceManager,
+                              MessageBox messageBox, StatementPresenter statementPresenter,
+                              DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, TestcasesView view, LoggedInUserProvider loggedInUserProvider) {
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
-        this.view = testcasesView;
+        this.view = view;
 
         this.debuggerResultManager = debuggerResultManager;
     }
 
 
     public void start(AcceptsOneWidget container) {
-
-        this.container = container;
         container.setWidget(view.asWidget());
-        debuggerResultManager.setTestcasesPresenter(this);
+        debuggerResultManager.addToList(this);
+
         statementPresenter1 = new StatementPresenter();
         statementPresenter1.start(view.getEntailedCriteriaContainer());
 
         statementPresenter2 = new StatementPresenter();
         statementPresenter2.start(view.getNonEntailedcriteriaContainer());
+
     }
 
-    public StatementPresenter getStatementPresenter1() {
-        return statementPresenter1;
+    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
+        setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(),debuggingSessionStateResult.getNegativeTestCases());
     }
 
-    public StatementPresenter getStatementPresenter2() {
-        return statementPresenter2;
+    public void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
+        Set<SafeHtml> itemsP = new HashSet<>();
+        if (msgP != null) {
+            for (TestCase p : msgP) itemsP.add(p.getAxiom());
+        }
+
+        Set<SafeHtml> itemsN = new HashSet<>();
+        if (msgN != null) {
+            for (TestCase n : msgN) itemsN.add(n.getAxiom());
+        }
+
+        statementPresenter1.addTestCasesStatement(itemsP);
+        statementPresenter2.addTestCasesStatement(itemsN);
     }
 
     public void clearAxiomtable() {

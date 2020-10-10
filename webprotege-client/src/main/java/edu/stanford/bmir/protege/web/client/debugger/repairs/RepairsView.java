@@ -1,8 +1,7 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.IsWidget;
-import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
 import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
 import edu.stanford.bmir.protege.web.shared.pagination.Page;
 
@@ -13,7 +12,7 @@ import javax.annotation.Nonnull;
  * Stanford Center for Biomedical Informatics Research
  * 14 Jun 2018
  */
-public interface RepairsView extends IsWidget, HasPagination {
+public interface RepairsView extends DebuggerView {
 
     interface ExecuteQueryHandler {
         void handleExecute();
