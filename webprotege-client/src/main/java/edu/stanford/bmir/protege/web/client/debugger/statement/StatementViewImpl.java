@@ -55,9 +55,11 @@ public class StatementViewImpl extends Composite{
             queryAxioms.add(axiom);
             Label statement = new HTML(axiom);
             CheckBox checkBoxP = new CheckBox();
-            setCheckboxStyle(checkBoxP, true);
+            StringBuilder sbP = getStyle(true);
+            checkBoxP.setHTML(sbP.toString());
             CheckBox checkBoxN = new CheckBox();
-            setCheckboxStyle(checkBoxN, false);
+            StringBuilder sbN = getStyle(false);
+            checkBoxN.setHTML(sbN.toString());
             listcheckbox.add(checkBoxP);
             listcheckbox.add(checkBoxN);
 
@@ -80,7 +82,7 @@ public class StatementViewImpl extends Composite{
         }
     }
 
-    private void setCheckboxStyle( CheckBox checkBox , boolean b){
+    private StringBuilder getStyle(boolean b){
         DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();
         StringBuilder sb = new StringBuilder();
         if (b){
@@ -88,7 +90,7 @@ public class StatementViewImpl extends Composite{
         }else{
             sb.append("<div class=\"").append(style.removeBullet()).append(" \">").append("</div>");
         }
-        checkBox.setHTML(sb.toString());
+        return sb;
     }
 
     public void addRepairsStatement(List<Diagnosis> diagnoseStatement){
@@ -101,8 +103,6 @@ public class StatementViewImpl extends Composite{
 //                axioms = changeAxoimsStyle(axiom);
                 diagnosisString.append(axiom);
                 diagnosisString.append(new OnlyToBeUsedInGeneratedCodeStringBlessedAsSafeHtml("<br/>"));
-
-
             }
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
@@ -118,7 +118,17 @@ public class StatementViewImpl extends Composite{
                 axiomStatement) {
             int row = table.getRowCount();
             Label statement =new HTML(axiom);
+            Button button = new Button("X");
+            StringBuilder sbN = getStyle(false);
+            button.setHTML(sbN.toString());
             table.setWidget(row, 0, statement);
+            table.setWidget(row,1, button);
+//            button.addClickHandler(new ClickHandler() {
+//                @Override
+//                public void onClick(ClickEvent clickEvent) {
+//
+//                }
+//            });
         }
     }
 

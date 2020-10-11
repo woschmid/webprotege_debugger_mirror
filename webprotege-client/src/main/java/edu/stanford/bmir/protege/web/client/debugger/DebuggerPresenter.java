@@ -24,8 +24,6 @@ public abstract class DebuggerPresenter{
 
     private final DebuggerView view;
 
-    private MessageBox messageBox;
-
     private final LoggedInUserProvider loggedInUserProvider;
 
     private HasBusy hasBusy = busy -> {
@@ -53,10 +51,7 @@ public abstract class DebuggerPresenter{
         statementPresenter.start(view.getCriteriaContainer());
     }
 
-    public void clearAxiomtable(){
-        statementPresenter.clearAxoim();
-    }
+    public abstract void clearAxiomtable();
 
-    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult) {
-    }
+    public abstract void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult);
 }
