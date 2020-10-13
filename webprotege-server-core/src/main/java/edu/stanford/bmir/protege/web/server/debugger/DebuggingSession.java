@@ -19,6 +19,7 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import edu.stanford.bmir.protege.web.shared.user.UserId;
 import org.exquisite.core.DiagnosisException;
 import org.exquisite.core.IExquisiteProgressMonitor;
+import org.exquisite.core.costestimators.CardinalityCostEstimator;
 import org.exquisite.core.engines.AbstractDiagnosisEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
 import org.exquisite.core.model.Diagnosis;
@@ -37,10 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -255,6 +253,9 @@ public class DebuggingSession implements HasDispose {
             // reset the engine
             engine.resetEngine();
 
+            // sets the cost estimator
+            ((AbstractDiagnosisEngine) engine).setCostsEstimator(new CardinalityCostEstimator());
+
             // add possible answers
             // when we start a new session, then answers will be null,
             // otherwise this map should have at least one element
@@ -263,7 +264,8 @@ public class DebuggingSession implements HasDispose {
 
             state = SessionState.COMPUTING;
             // calculate diagnoses
-            Set<Diagnosis<OWLLogicalAxiom>> newDiagnoses = engine.calculateDiagnoses();
+            Set<Diagnosis<OWLLogicalAxiom>> newDiagnoses = new TreeSet<>(Comparator.reverseOrder());
+            newDiagnoses.addAll(engine.calculateDiagnoses());
             logger.info("{} got {} diagnoses: {}", this, newDiagnoses.size(), newDiagnoses);
 
             if (newDiagnoses.size() >= 2) {
