@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.debugger.testcases;
+package edu.stanford.bmir.protege.web.client.debugger.background;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
  * Stanford Center for Biomedical Informatics Research
  * 14 Jun 2018
  */
-public class TestcasesViewImpl extends Composite implements TestcasesView{
+public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     @UiField
     SimplePanel EntailedcriteriaContainer;
@@ -29,7 +29,7 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
         return EntailedcriteriaContainer;
     }
 
-    interface repairsViewImplUiBinder extends UiBinder<HTMLPanel, TestcasesViewImpl> {
+    interface repairsViewImplUiBinder extends UiBinder<HTMLPanel, BackgroundViewImpl> {
 
     }
 
@@ -37,7 +37,7 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
 
 
     @Inject
-    public TestcasesViewImpl() {
+    public BackgroundViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 

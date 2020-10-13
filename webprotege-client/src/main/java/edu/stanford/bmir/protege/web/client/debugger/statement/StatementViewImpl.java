@@ -31,6 +31,13 @@ public class StatementViewImpl extends Composite{
         }
     };
 
+    DeleteTestCasesHandler deleteTestCasesHandler= new DeleteTestCasesHandler() {
+        @Override
+        public void DeleteTestCases() {
+
+        }
+    };
+
     private static StatementViewImplUiBinder ourUiBinder = GWT.create(StatementViewImplUiBinder.class);
 
     @UiField
@@ -123,12 +130,12 @@ public class StatementViewImpl extends Composite{
             button.setHTML(sbN.toString());
             table.setWidget(row, 0, statement);
             table.setWidget(row,1, button);
-//            button.addClickHandler(new ClickHandler() {
-//                @Override
-//                public void onClick(ClickEvent clickEvent) {
-//
-//                }
-//            });
+            button.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent clickEvent) {
+                    deleteTestCasesHandler.DeleteTestCases();
+                }
+            });
         }
     }
 

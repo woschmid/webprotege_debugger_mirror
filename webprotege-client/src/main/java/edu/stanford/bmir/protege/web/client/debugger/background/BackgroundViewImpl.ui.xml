@@ -41,16 +41,19 @@
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main}">
+<!--        <div class="wp.style.formGroup} {style.typeGroup}">-->
+<!--            <g:Label text="Background Knowledge" addStyleNames="{wp.style.formLabel}"/>-->
+<!--        </div>-->
         <g:VerticalPanel addStyleNames="{style.individualsList}">
             <g:cell height="50%">
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Entailed Test Cases" addStyleNames="{style.searchBox}"/>
+                <g:Label text="Faulty Axioms" addStyleNames="{style.searchBox}"/>
                 <!--            <g:VerticalPanel ui:field="table" />-->
                 <g:SimplePanel ui:field="EntailedcriteriaContainer" />
             </g:FlowPanel>
             </g:cell>
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Non-Entailed Test Cases" addStyleNames="{style.searchBox}"/>
+                <g:Label text="Background" addStyleNames="{style.searchBox}"/>
                 <!--            <g:VerticalPanel ui:field="table" />-->
                 <g:SimplePanel ui:field="NonEntailedcriteriaContainer" />
             </g:FlowPanel>

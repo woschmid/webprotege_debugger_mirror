@@ -3,7 +3,7 @@
 
   "children": [
     {
-      "weight": 0.5,
+      "weight": 0.4,
       "node": {
         "direction": "COLUMN",
         "children": [
@@ -23,9 +23,15 @@
       }
     },
     {
-      "weight": 0.5,
+      "weight": 0.3,
       "node": {
               "portlet": "portlet.Testcases"
+      }
+    },
+    {
+      "weight": 0.3,
+      "node": {
+        "portlet": "portlet.Background"
       }
     }
   ]
