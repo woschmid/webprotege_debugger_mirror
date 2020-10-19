@@ -1,0 +1,457 @@
+Index: webprotege-server-core/src/main/resources/default-perspective-data/Debugger.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-server-core/src/main/resources/default-perspective-data/Debugger.json	(revision b519c563fdff55196567f9760db23509024e7c1b)
++++ webprotege-server-core/src/main/resources/default-perspective-data/Debugger.json	(date 1602594182115)
+@@ -3,7 +3,7 @@
+ 
+   "children": [
+     {
+-      "weight": 0.5,
++      "weight": 0.4,
+       "node": {
+         "direction": "COLUMN",
+         "children": [
+@@ -23,10 +23,16 @@
+       }
+     },
+     {
+-      "weight": 0.5,
++      "weight": 0.3,
+       "node": {
+               "portlet": "portlet.Testcases"
+       }
++    },
++    {
++      "weight": 0.3,
++      "node": {
++        "portlet": "portlet.Background"
++      }
+     }
+   ]
+ }
+\ No newline at end of file
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundViewImpl.ui.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundViewImpl.ui.xml	(date 1602596607940)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundViewImpl.ui.xml	(date 1602596607940)
+@@ -0,0 +1,62 @@
++<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
++             xmlns:g='urn:import:com.google.gwt.user.client.ui'
++>
++    <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
++    <ui:style>
++        .main {
++            display: flex;
++            flex-direction: column;
++            align-items: stretch;
++            padding: 2px;
++            box-sizing: border-box;
++        }
++        .searchBox {
++            flex-grow: 0;
++            flex-shrink: 0;
++            padding: 2px;
++            margin: 1px;
++            border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
++        }
++        .individualsList {
++            width: 100%;
++            height : 100%;
++            flex-grow: 1;
++            flex-shrink: 1;
++            overflow: auto;
++            background-color: literal("var(--primary--background-color)");
++            border: 1px solid literal("var(--alternate--separator--color)");
++            margin: 1px;
++        }
++        .typeGroup {
++            flex-grow: 0;
++            flex-shrink: 0;
++        }
++        .viewGroup {
++            <!--            position: absolute;-->
++            overflow: hidden;
++            left: 0px;
++            top: 0px;
++            width: 100%;
++            height: 100%;
++        }
++    </ui:style>
++    <g:HTMLPanel addStyleNames="{style.main}">
++<!--        <div class="wp.style.formGroup} {style.typeGroup}">-->
++<!--            <g:Label text="Background Knowledge" addStyleNames="{wp.style.formLabel}"/>-->
++<!--        </div>-->
++        <g:VerticalPanel addStyleNames="{style.individualsList}">
++            <g:cell height="50%">
++            <g:FlowPanel addStyleNames="{style.viewGroup}" >
++                <g:Label text="Faulty Axioms" addStyleNames="{style.searchBox}"/>
++                <!--            <g:VerticalPanel ui:field="table" />-->
++                <g:SimplePanel ui:field="EntailedcriteriaContainer" />
++            </g:FlowPanel>
++            </g:cell>
++            <g:FlowPanel addStyleNames="{style.viewGroup}" >
++                <g:Label text="Background" addStyleNames="{style.searchBox}"/>
++                <!--            <g:VerticalPanel ui:field="table" />-->
++                <g:SimplePanel ui:field="NonEntailedcriteriaContainer" />
++            </g:FlowPanel>
++        </g:VerticalPanel>
++    </g:HTMLPanel>
++</ui:UiBinder>
+\ No newline at end of file
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/testcases/TestcasesViewImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/testcases/TestcasesViewImpl.java	(revision b519c563fdff55196567f9760db23509024e7c1b)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/testcases/TestcasesViewImpl.java	(date 1602596725323)
+@@ -41,7 +41,6 @@
+         initWidget(ourUiBinder.createAndBindUi(this));
+     }
+ 
+-
+     @Nonnull
+     public AcceptsOneWidget getEntailedCriteriaContainer() {
+         return EntailedcriteriaContainer;
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/statement/DeleteTestCasesHandler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/statement/DeleteTestCasesHandler.java	(date 1602590456101)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/statement/DeleteTestCasesHandler.java	(date 1602590456101)
+@@ -0,0 +1,5 @@
++package edu.stanford.bmir.protege.web.client.debugger.statement;
++
++public interface DeleteTestCasesHandler {
++    void DeleteTestCases();
++}
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/testcases/TestcasesViewImpl.ui.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/testcases/TestcasesViewImpl.ui.xml	(revision b519c563fdff55196567f9760db23509024e7c1b)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/testcases/TestcasesViewImpl.ui.xml	(date 1602596607928)
+@@ -4,11 +4,10 @@
+     <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
+     <ui:style>
+         .main {
+-            height: 100%;
+             display: flex;
+             flex-direction: column;
+             align-items: stretch;
+-            padding: 1px;
++            padding: 2px;
+             box-sizing: border-box;
+         }
+         .searchBox {
+@@ -41,10 +40,7 @@
+             height: 100%;
+         }
+     </ui:style>
+-    <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
+-        <div class="wp.style.formGroup} {style.typeGroup}">
+-            <g:Label text="Acquired Test Cases" addStyleNames="{wp.style.formLabel}"/>
+-        </div>
++    <g:HTMLPanel addStyleNames="{style.main}">
+         <g:VerticalPanel addStyleNames="{style.individualsList}">
+             <g:cell height="50%">
+             <g:FlowPanel addStyleNames="{style.viewGroup}" >
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundViewImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundViewImpl.java	(date 1602594086662)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundViewImpl.java	(date 1602594086662)
+@@ -0,0 +1,54 @@
++package edu.stanford.bmir.protege.web.client.debugger.background;
++
++import com.google.gwt.core.client.GWT;
++import com.google.gwt.uibinder.client.UiBinder;
++import com.google.gwt.uibinder.client.UiField;
++import com.google.gwt.user.client.ui.AcceptsOneWidget;
++import com.google.gwt.user.client.ui.Composite;
++import com.google.gwt.user.client.ui.HTMLPanel;
++import com.google.gwt.user.client.ui.SimplePanel;
++
++import javax.annotation.Nonnull;
++import javax.inject.Inject;
++
++/**
++ * Matthew Horridge
++ * Stanford Center for Biomedical Informatics Research
++ * 14 Jun 2018
++ */
++public class BackgroundViewImpl extends Composite implements BackgroundView {
++
++    @UiField
++    SimplePanel EntailedcriteriaContainer;
++
++    @UiField
++    SimplePanel NonEntailedcriteriaContainer;
++
++    @Override
++    public AcceptsOneWidget getCriteriaContainer() {
++        return EntailedcriteriaContainer;
++    }
++
++    interface repairsViewImplUiBinder extends UiBinder<HTMLPanel, BackgroundViewImpl> {
++
++    }
++
++    private static repairsViewImplUiBinder ourUiBinder = GWT.create(repairsViewImplUiBinder.class);
++
++
++    @Inject
++    public BackgroundViewImpl() {
++        initWidget(ourUiBinder.createAndBindUi(this));
++    }
++
++    @Nonnull
++    public AcceptsOneWidget getEntailedCriteriaContainer() {
++        return EntailedcriteriaContainer;
++    }
++
++    @Nonnull
++    public AcceptsOneWidget getNonEntailedcriteriaContainer() {
++        return NonEntailedcriteriaContainer;
++    }
++
++}
+\ No newline at end of file
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/statement/StatementViewImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/statement/StatementViewImpl.java	(revision b519c563fdff55196567f9760db23509024e7c1b)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/statement/StatementViewImpl.java	(date 1602590456112)
+@@ -31,6 +31,13 @@
+         }
+     };
+ 
++    DeleteTestCasesHandler deleteTestCasesHandler= new DeleteTestCasesHandler() {
++        @Override
++        public void DeleteTestCases() {
++
++        }
++    };
++
+     private static StatementViewImplUiBinder ourUiBinder = GWT.create(StatementViewImplUiBinder.class);
+ 
+     @UiField
+@@ -123,12 +130,12 @@
+             button.setHTML(sbN.toString());
+             table.setWidget(row, 0, statement);
+             table.setWidget(row,1, button);
+-//            button.addClickHandler(new ClickHandler() {
+-//                @Override
+-//                public void onClick(ClickEvent clickEvent) {
+-//
+-//                }
+-//            });
++            button.addClickHandler(new ClickHandler() {
++                @Override
++                public void onClick(ClickEvent clickEvent) {
++                    deleteTestCasesHandler.DeleteTestCases();
++                }
++            });
+         }
+     }
+ 
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundView.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundView.java	(date 1602594086681)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundView.java	(date 1602594086681)
+@@ -0,0 +1,17 @@
++package edu.stanford.bmir.protege.web.client.debugger.background;
++
++import com.google.gwt.user.client.ui.AcceptsOneWidget;
++import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
++
++/**
++ * Matthew Horridge
++ * Stanford Center for Biomedical Informatics Research
++ * 14 Jun 2018
++ */
++public interface BackgroundView extends DebuggerView {
++
++    public AcceptsOneWidget getEntailedCriteriaContainer();
++
++    public AcceptsOneWidget getNonEntailedcriteriaContainer();
++
++}
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundProletPresenter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundProletPresenter.java	(date 1602594086648)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundProletPresenter.java	(date 1602594086648)
+@@ -0,0 +1,31 @@
++package edu.stanford.bmir.protege.web.client.debugger.background;
++
++import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
++import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
++import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
++import edu.stanford.bmir.protege.web.client.selection.SelectionModel;
++import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
++import edu.stanford.bmir.protege.web.shared.project.ProjectId;
++import edu.stanford.webprotege.shared.annotations.Portlet;
++
++import javax.annotation.Nonnull;
++import javax.inject.Inject;
++
++@Portlet(id = "portlet.Background", title = "Background")
++
++public class BackgroundProletPresenter extends AbstractWebProtegePortletPresenter {
++
++    @Nonnull
++    public BackgroundPresnter background;
++
++    @Inject
++    public BackgroundProletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull BackgroundPresnter presenter) {
++        super(selectionModel, projectId, displayNameRenderer);
++        this.background = presenter;
++    }
++
++    @Override
++    public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
++        background.start(portletUi);
++    }
++}
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/inject/ClientProjectModule.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/inject/ClientProjectModule.java	(revision b519c563fdff55196567f9760db23509024e7c1b)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/inject/ClientProjectModule.java	(date 1602594725618)
+@@ -10,6 +10,8 @@
+ import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditorImpl;
+ import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditor;
+ import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditorImpl;
++import edu.stanford.bmir.protege.web.client.debugger.background.BackgroundView;
++import edu.stanford.bmir.protege.web.client.debugger.background.BackgroundViewImpl;
+ import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
+ import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
+ import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsView;
+@@ -493,6 +495,9 @@
+     @Provides
+     TestcasesView provideTestcasesView(TestcasesViewImpl impl) { return impl; }
+ 
++    @Provides
++    BackgroundView provideTBackgroundView(BackgroundViewImpl impl) { return impl; }
++
+ }
+ 
+ 
+Index: webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundPresnter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundPresnter.java	(date 1602594435884)
++++ webprotege-client/src/main/java/edu/stanford/bmir/protege/web/client/debugger/background/BackgroundPresnter.java	(date 1602594435884)
+@@ -0,0 +1,90 @@
++package edu.stanford.bmir.protege.web.client.debugger.background;
++
++import com.google.gwt.safehtml.shared.SafeHtml;
++import com.google.gwt.user.client.ui.AcceptsOneWidget;
++import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
++import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
++import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
++import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
++import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
++import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
++import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
++import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
++import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
++import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
++import edu.stanford.bmir.protege.web.shared.project.ProjectId;
++
++import javax.annotation.Nonnull;
++import javax.inject.Inject;
++import java.util.HashSet;
++import java.util.List;
++import java.util.Set;
++
++/**
++ * Matthew Horridge
++ * Stanford Center for Biomedical Informatics Research
++ * 12 Jun 2018
++ */
++
++public class BackgroundPresnter extends DebuggerPresenter {
++
++    @Nonnull
++    private BackgroundView view;
++
++    AcceptsOneWidget container;
++
++    StatementPresenter statementPresenter1;
++    StatementPresenter statementPresenter2;
++
++    private final DebuggerResultManager debuggerResultManager;
++
++    @Inject
++    public BackgroundPresnter(@Nonnull ProjectId projectId, StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
++                              DispatchServiceManager dispatchServiceManager,
++                              MessageBox messageBox, StatementPresenter statementPresenter,
++                              DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider) {
++        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
++        this.statementPresenter1 = statementPresenter1;
++        this.statementPresenter2 = statementPresenter2;
++        this.view = view;
++
++        this.debuggerResultManager = debuggerResultManager;
++    }
++
++
++    public void start(AcceptsOneWidget container) {
++        container.setWidget(view.asWidget());
++        debuggerResultManager.addToList(this);
++
++        statementPresenter1 = new StatementPresenter();
++        statementPresenter1.start(view.getEntailedCriteriaContainer());
++
++        statementPresenter2 = new StatementPresenter();
++        statementPresenter2.start(view.getNonEntailedcriteriaContainer());
++
++    }
++
++    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
++//        setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(),debuggingSessionStateResult.getNegativeTestCases());
++    }
++
++    public void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
++        Set<SafeHtml> itemsP = new HashSet<>();
++        if (msgP != null) {
++            for (TestCase p : msgP) itemsP.add(p.getAxiom());
++        }
++
++        Set<SafeHtml> itemsN = new HashSet<>();
++        if (msgN != null) {
++            for (TestCase n : msgN) itemsN.add(n.getAxiom());
++        }
++
++        statementPresenter1.addTestCasesStatement(itemsP);
++        statementPresenter2.addTestCasesStatement(itemsN);
++    }
++
++    public void clearAxiomtable() {
++        statementPresenter1.clearAxoim();
++        statementPresenter2.clearAxoim();
++    }
++}

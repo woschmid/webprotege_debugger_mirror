@@ -18,8 +18,6 @@ import java.util.Set;
 
 public class StatementViewImpl extends Composite{
 
-
-
     interface StatementViewImplUiBinder extends UiBinder<HTMLPanel, StatementViewImpl> {
 
     }
@@ -27,6 +25,19 @@ public class StatementViewImpl extends Composite{
     private CheckCheckBoxHandler checkCheckBox = new CheckCheckBoxHandler() {
         @Override
         public void onClick(ClickEvent clickEvent, CheckBox checkBoxOther, List<CheckBox> list) {
+
+        }
+    };
+    FaultyAxiomRemoveHandler faultyAxiomRemoveHandler = new FaultyAxiomRemoveHandler() {
+        @Override
+        public void handlerFaultyAxiomRemove(SafeHtml axiom) {
+
+        }
+    };
+
+    BackgroundAxiomRemoveHandler backgroundAxiomRemoveHandler = new BackgroundAxiomRemoveHandler() {
+        @Override
+        public void handlerBackgroundAxiomRemove(SafeHtml axiom) {
 
         }
     };
@@ -62,10 +73,10 @@ public class StatementViewImpl extends Composite{
             queryAxioms.add(axiom);
             Label statement = new HTML(axiom);
             CheckBox checkBoxP = new CheckBox();
-            StringBuilder sbP = getStyle(true);
+            StringBuilder sbP = getStyle(Icon.TRUE);
             checkBoxP.setHTML(sbP.toString());
             CheckBox checkBoxN = new CheckBox();
-            StringBuilder sbN = getStyle(false);
+            StringBuilder sbN = getStyle(Icon.FALSE);
             checkBoxN.setHTML(sbN.toString());
             listcheckbox.add(checkBoxP);
             listcheckbox.add(checkBoxN);
@@ -89,13 +100,19 @@ public class StatementViewImpl extends Composite{
         }
     }
 
-    private StringBuilder getStyle(boolean b){
+    private StringBuilder getStyle(Icon b){
         DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();
         StringBuilder sb = new StringBuilder();
-        if (b){
+        if (b == Icon.TRUE){
             sb.append("<div class=\"").append( style.addBullet()).append(" \">").append("</div>");
-        }else{
+        }else if( b == Icon.FALSE){
             sb.append("<div class=\"").append(style.removeBullet()).append(" \">").append("</div>");
+        }else if ( b == Icon.BOTTOM){
+            sb.append("<div class=\"").append(style.goBottom()).append(" \">").append("</div>");
+        }else if (b == Icon.TOP){
+            sb.append("<div class=\"").append(style.goTop()).append(" \">").append("</div>");
+        }else if (b == Icon.CROSS){
+            sb.append("<div class=\"").append(style.cross()).append(" \">").append("</div>");
         }
         return sb;
     }
@@ -126,7 +143,7 @@ public class StatementViewImpl extends Composite{
             int row = table.getRowCount();
             Label statement =new HTML(axiom);
             Button button = new Button("X");
-            StringBuilder sbN = getStyle(false);
+            StringBuilder sbN = getStyle(Icon.CROSS);
             button.setHTML(sbN.toString());
             table.setWidget(row, 0, statement);
             table.setWidget(row,1, button);
@@ -137,6 +154,59 @@ public class StatementViewImpl extends Composite{
                 }
             });
         }
+    }
+
+//    List<SafeHtml> backgroundAxioms = new ArrayList<>();
+//    List<SafeHtml> possibleFaultyAxioms = new ArrayList<>();
+
+    public void updateBackground(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms) {
+        table.clear();
+        table.removeAllRows();
+        if (!backgroundAxioms.isEmpty()) {
+            for (SafeHtml axiom : backgroundAxioms) {
+                int row = table.getRowCount();
+                Label statement = new HTML(axiom);
+                Button button = new Button("remove");
+                StringBuilder sbN = getStyle(Icon.TOP);
+                button.setHTML(sbN.toString());
+                table.setWidget(row, 0, statement);
+                table.setWidget(row, 1, button);
+
+                button.addClickHandler(new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent clickEvent) {
+                        backgroundAxiomRemoveHandler.handlerBackgroundAxiomRemove(axiom);
+                    }
+                });
+            }
+        }
+
+        if (!possibleFaultyAxioms.isEmpty()) {
+            for (SafeHtml axiom : possibleFaultyAxioms) {
+                int row = table.getRowCount();
+                Label statement = new HTML(axiom);
+                Button button = new Button("remove");
+                StringBuilder sbN = getStyle(Icon.BOTTOM);
+                button.setHTML(sbN.toString());
+                table.setWidget(row, 0, statement);
+                table.setWidget(row, 1, button);
+
+                button.addClickHandler(new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent clickEvent) {
+                        faultyAxiomRemoveHandler.handlerFaultyAxiomRemove(axiom);
+                    }
+                });
+            }
+        }
+    }
+
+    public void setFaultyAxiomRemoveHandler(FaultyAxiomRemoveHandler faultyAxiomRemoveHandler) {
+        this.faultyAxiomRemoveHandler = faultyAxiomRemoveHandler;
+    }
+
+    public void setBackgroundAxiomRemoveHandler(BackgroundAxiomRemoveHandler backgroundAxiomRemoveHandler) {
+        this.backgroundAxiomRemoveHandler = backgroundAxiomRemoveHandler;
     }
 
     public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {

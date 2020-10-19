@@ -1,6 +1,11 @@
 @url changeOpAddIconUrl changeOpAddIcon;
 @url changeOpRemoveIconUrl changeOpRemoveIcon;
 
+@url moveToChildIconUrl moveToChildIcon;
+@url moveToParentIconUrl moveToParentIcon;
+
+@url crossIconUrl crossIcon;
+
 .line {
     border-bottom: 1px solid literal("var(--separator--color)");
     padding-right: 5px;
@@ -24,6 +29,43 @@
     height: 16px;
     margin-right: 4px;
     background-color: literal("var(--create--color)");
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.goBottom {
+    mask-image: moveToChildIconUrl;
+    -webkit-mask-image: moveToChildIconUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-color: literal("var(--create--color)");
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.goTop {
+    mask-image: moveToParentIconUrl;
+    -webkit-mask-image: moveToParentIconUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-color: literal("var(--delete--color)");
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.cross {
+    mask-image: crossIconUrl;
+    -webkit-mask-image: crossIconUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-color: literal("var(--delete--color)");
     flex-grow: 0;
     flex-shrink: 0;
 }

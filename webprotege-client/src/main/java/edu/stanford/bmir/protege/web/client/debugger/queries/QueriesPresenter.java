@@ -264,7 +264,7 @@ public class QueriesPresenter extends DebuggerPresenter {
         }
     }
 
-    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
+    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         Query msg = debuggingSessionStateResult.getQuery();
         if (msg != null) {
             Set<SafeHtml> items = msg.getAxioms();

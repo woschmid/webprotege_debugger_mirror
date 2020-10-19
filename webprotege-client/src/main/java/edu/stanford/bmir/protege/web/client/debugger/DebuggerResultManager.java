@@ -31,7 +31,7 @@ public class DebuggerResultManager {
         clearAxioms();
         for (DebuggerPresenter debuggerpresenter:
              presenterList) {
-            debuggerpresenter.setAxoims(debuggingSessionStateResult);
+            debuggerpresenter.setAxioms(debuggingSessionStateResult);
         }
     }
     public void clearAxioms(){

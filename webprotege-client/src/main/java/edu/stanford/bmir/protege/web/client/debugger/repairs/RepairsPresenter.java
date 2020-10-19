@@ -50,7 +50,7 @@ public class RepairsPresenter extends DebuggerPresenter {
         super.start(container,eventBus);
     }
 
-    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
+    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
     }
 

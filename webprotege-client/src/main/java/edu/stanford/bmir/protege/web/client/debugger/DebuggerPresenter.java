@@ -3,7 +3,6 @@ package edu.stanford.bmir.protege.web.client.debugger;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
-import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.progress.HasBusy;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
@@ -53,5 +52,5 @@ public abstract class DebuggerPresenter{
 
     public abstract void clearAxiomtable();
 
-    public abstract void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult);
+    public abstract void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult);
 }

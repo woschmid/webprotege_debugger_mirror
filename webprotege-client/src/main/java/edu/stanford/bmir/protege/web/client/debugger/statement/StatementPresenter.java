@@ -31,6 +31,15 @@ public class StatementPresenter {
         view.setCheckCheckBox(checkCheckBox);
     }
 
+    public void addFaultyAxiomRemoveHandler(FaultyAxiomRemoveHandler faultyAxiomRemoveHandler){
+        view.setFaultyAxiomRemoveHandler(faultyAxiomRemoveHandler);
+    }
+
+    public void addBackgroundAxiomRemoveHandler(BackgroundAxiomRemoveHandler backgroundAxiomRemoveHandler){
+        view.setBackgroundAxiomRemoveHandler(backgroundAxiomRemoveHandler);
+    }
+
+
     public void start(AcceptsOneWidget container) {
         this.container = container;
         container.setWidget(view);
@@ -48,9 +57,13 @@ public class StatementPresenter {
         view.addRepairsStatement(msg);
     }
 
-    public void addTestCasesStatement(Set<SafeHtml> msg){
-        view.addTestcasesStatement(msg);
-    }
+    public void addTestCasesStatement(Set<SafeHtml> msg){ view.addTestcasesStatement(msg);}
+
+    public void addPossibleFaultyAxioms(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms) {  view.updateBackground(backgroundAxioms, possibleFaultyAxioms);}
+
+//    public void addSinglePossibleFaultyAxiom(SafeHtml msg) {  view.addSinglePossibleFaultyAxiom(msg);}
+//
+//    public void addSingleBackgroundAxioms(SafeHtml msg) {  view.addSingleBackgroundAxioms(msg);}
 
 
     public void clearAxoim(){
@@ -77,5 +90,6 @@ public class StatementPresenter {
         return answers;
 
     }
+
 
 }

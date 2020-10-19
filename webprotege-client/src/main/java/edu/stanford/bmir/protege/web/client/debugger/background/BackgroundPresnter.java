@@ -11,12 +11,12 @@ import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
+import edu.stanford.bmir.protege.web.shared.debugger.Query;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -62,28 +62,52 @@ public class BackgroundPresnter extends DebuggerPresenter {
         statementPresenter2 = new StatementPresenter();
         statementPresenter2.start(view.getNonEntailedcriteriaContainer());
 
+        statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerFaultyAxiomRemove);
+        statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerBackgroundAxiomRemove);
+
     }
 
-    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
-//        setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(),debuggingSessionStateResult.getNegativeTestCases());
+    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
+        setPossibleFaultyAxioms(debuggingSessionStateResult.getQuery());
     }
 
-    public void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
-        Set<SafeHtml> itemsP = new HashSet<>();
-        if (msgP != null) {
-            for (TestCase p : msgP) itemsP.add(p.getAxiom());
-        }
+    List<SafeHtml> backgroundAxioms = new ArrayList<>();
+    List<SafeHtml> possibleFaultyAxioms = new ArrayList<>();
 
-        Set<SafeHtml> itemsN = new HashSet<>();
-        if (msgN != null) {
-            for (TestCase n : msgN) itemsN.add(n.getAxiom());
+    public void setPossibleFaultyAxioms(Query query){
+        if (query != null) {
+            Set<SafeHtml> items = query.getAxioms();
+            for (SafeHtml axiom:items
+                 ) {
+                possibleFaultyAxioms.add(axiom);
+            }
+            setAxiomsToViews();
         }
+    }
 
-        statementPresenter1.addTestCasesStatement(itemsP);
-        statementPresenter2.addTestCasesStatement(itemsN);
+    private void setAxiomsToViews() {
+        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possibleFaultyAxioms);
+        statementPresenter2.addPossibleFaultyAxioms( backgroundAxioms, new ArrayList<>());
+    }
+
+    public void handlerFaultyAxiomRemove(SafeHtml axiom){
+        if (axiom != null) {
+            backgroundAxioms.add(axiom);
+            possibleFaultyAxioms.remove(axiom);
+            setAxiomsToViews();
+        }
+    }
+    public void handlerBackgroundAxiomRemove(SafeHtml axiom){
+        if (axiom != null) {
+            backgroundAxioms.remove((axiom));
+            possibleFaultyAxioms.add(axiom);
+            setAxiomsToViews();
+        }
     }
 
     public void clearAxiomtable() {
+        backgroundAxioms.clear();
+        possibleFaultyAxioms.clear();
         statementPresenter1.clearAxoim();
         statementPresenter2.clearAxoim();
     }

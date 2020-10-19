@@ -64,7 +64,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
 
     }
 
-    public void setAxoims(DebuggingSessionStateResult debuggingSessionStateResult){
+    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(),debuggingSessionStateResult.getNegativeTestCases());
     }
 
