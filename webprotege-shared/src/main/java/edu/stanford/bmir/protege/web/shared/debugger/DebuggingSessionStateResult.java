@@ -36,6 +36,10 @@ public class DebuggingSessionStateResult implements Result {
      */
     @Nullable private List<TestCase> negativeTestCases;
 
+    @Nullable private PossiblyFaultyAxioms possiblyFaultyAxioms;
+
+    @Nullable private CorrectAxioms correctAxioms;
+
     /**
      * Represents the current state of a debugging session of this project.
      * If state is <code>null</code> then there exists no debugging session for this project.
@@ -58,13 +62,15 @@ public class DebuggingSessionStateResult implements Result {
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
-    public DebuggingSessionStateResult(@Nonnull Boolean isOk, @Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable SessionState sessionState, @Nullable String msg) {
+    public DebuggingSessionStateResult(@Nonnull Boolean isOk, @Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable PossiblyFaultyAxioms possiblyFaultyAxioms, @Nullable CorrectAxioms correctAxioms, @Nullable SessionState sessionState, @Nullable String msg) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
         this.diagnoses = diagnoses;
         this.positiveTestCases = positiveTestCases;
         this.negativeTestCases = negativeTestCases;
+        this.possiblyFaultyAxioms = possiblyFaultyAxioms;
+        this.correctAxioms = correctAxioms;
         this.sessionState = sessionState;
         this.message = msg;
     }
@@ -102,6 +108,16 @@ public class DebuggingSessionStateResult implements Result {
     @Nullable
     public List<TestCase> getNegativeTestCases() {
         return negativeTestCases;
+    }
+
+    @Nullable
+    public PossiblyFaultyAxioms getPossiblyFaultyAxioms() {
+        return possiblyFaultyAxioms;
+    }
+
+    @Nullable
+    public CorrectAxioms getCorrectAxioms() {
+        return correctAxioms;
     }
 
     @Nullable

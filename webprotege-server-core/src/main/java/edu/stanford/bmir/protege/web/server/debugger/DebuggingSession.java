@@ -387,6 +387,36 @@ public class DebuggingSession implements HasDispose {
                 "The ontology has been successfully repaired!");
     }
 
+    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) {
+        if (!userId.equals(getUserId()))
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                    "A debugging session is already running for this project by user " + getUserId());
+
+        boolean hasMoved = moveTo(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
+        if (!hasMoved)
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+    }
+
+    private boolean moveTo(SafeHtml axiomAsString, List<OWLLogicalAxiom> list1, List<OWLLogicalAxiom> list2) {
+        // lookup the matching axiom
+        for (OWLLogicalAxiom a : list1) {
+            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a))) {
+                list1.remove(a);
+                list2.add(a);
+                return true;
+            }
+        }
+        for (OWLLogicalAxiom a : list2) {
+            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a))) {
+                list2.remove(a);
+                list1.add(a);
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Stops a debugging session, which can be restarted later.
      */

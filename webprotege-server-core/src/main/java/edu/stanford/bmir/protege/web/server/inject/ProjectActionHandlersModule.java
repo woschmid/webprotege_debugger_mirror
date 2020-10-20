@@ -636,4 +636,7 @@ public class ProjectActionHandlersModule {
     public ProjectActionHandler provideRepairDebuggerActionHandler(RepairActionHandler handler) {
         return handler;
     }
+
+    @Provides @IntoSet
+    public ProjectActionHandler provideMoveToActionHandler(MoveToActionHandler handler) { return handler; }
 }

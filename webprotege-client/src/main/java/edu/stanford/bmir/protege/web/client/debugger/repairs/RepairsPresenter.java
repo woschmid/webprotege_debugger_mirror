@@ -54,6 +54,8 @@ public class RepairsPresenter extends DebuggerPresenter {
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
     }
 
+//    public void remove
+
     public void clearAxiomtable() {
         statementPresenter.clearAxoim();
     }

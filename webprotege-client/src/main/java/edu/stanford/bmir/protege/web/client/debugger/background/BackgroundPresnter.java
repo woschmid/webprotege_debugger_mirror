@@ -1,24 +1,27 @@
 package edu.stanford.bmir.protege.web.client.debugger.background;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
+import edu.stanford.bmir.protege.web.shared.debugger.CorrectAxioms;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.Query;
+import edu.stanford.bmir.protege.web.shared.debugger.MoveToAction;
+import edu.stanford.bmir.protege.web.shared.debugger.PossiblyFaultyAxioms;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Matthew Horridge
@@ -31,6 +34,8 @@ public class BackgroundPresnter extends DebuggerPresenter {
     @Nonnull
     private BackgroundView view;
 
+    private DispatchServiceManager dsm;
+
     AcceptsOneWidget container;
 
     StatementPresenter statementPresenter1;
@@ -38,12 +43,24 @@ public class BackgroundPresnter extends DebuggerPresenter {
 
     private final DebuggerResultManager debuggerResultManager;
 
+    DispatchErrorMessageDisplay errorDisplay;
+
+    ProgressDisplay progressDisplay;
+
+    @Nonnull
+    private ProjectId projectId;
+
     @Inject
-    public BackgroundPresnter(@Nonnull ProjectId projectId, StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
+    public BackgroundPresnter(@Nonnull ProjectId projectId,
+                              StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
                               DispatchServiceManager dispatchServiceManager,
                               MessageBox messageBox, StatementPresenter statementPresenter,
                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
+        this.projectId = projectId;
+        this.errorDisplay = errorDisplay;
+        this.progressDisplay = progressDisplay;
+        this.dsm = dispatchServiceManager;
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
         this.view = view;
@@ -62,24 +79,38 @@ public class BackgroundPresnter extends DebuggerPresenter {
         statementPresenter2 = new StatementPresenter();
         statementPresenter2.start(view.getNonEntailedcriteriaContainer());
 
-        statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerFaultyAxiomRemove);
-        statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerBackgroundAxiomRemove);
+//        statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerFaultyAxiomRemove);
+//        statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerBackgroundAxiomRemove);
+        statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerReplaceAxiom);
+        statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerReplaceAxiom);
 
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
-        setPossibleFaultyAxioms(debuggingSessionStateResult.getQuery());
+        setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
+        setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
 
     List<SafeHtml> backgroundAxioms = new ArrayList<>();
     List<SafeHtml> possibleFaultyAxioms = new ArrayList<>();
 
-    public void setPossibleFaultyAxioms(Query query){
-        if (query != null) {
-            Set<SafeHtml> items = query.getAxioms();
+    public void setPossibleFaultyAxioms(PossiblyFaultyAxioms axioms){
+        if (axioms != null) {
+            List<SafeHtml> items = axioms.getAxioms();
             for (SafeHtml axiom:items
                  ) {
                 possibleFaultyAxioms.add(axiom);
+            }
+            setAxiomsToViews();
+        }
+    }
+
+    public void setBackgroundAxioms(CorrectAxioms axioms){
+        if (axioms != null) {
+            List<SafeHtml> items = axioms.getAxioms();
+            for (SafeHtml axiom:items
+            ) {
+                backgroundAxioms.add(axiom);
             }
             setAxiomsToViews();
         }
@@ -90,6 +121,11 @@ public class BackgroundPresnter extends DebuggerPresenter {
         statementPresenter2.addPossibleFaultyAxioms( backgroundAxioms, new ArrayList<>());
     }
 
+    private void setAxiomsToViews(PossiblyFaultyAxioms possiblyFaultyAxioms, CorrectAxioms correctAxioms) {
+        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possiblyFaultyAxioms.getAxioms());
+        statementPresenter2.addPossibleFaultyAxioms( correctAxioms.getAxioms(), new ArrayList<>());
+    }
+
     public void handlerFaultyAxiomRemove(SafeHtml axiom){
         if (axiom != null) {
             backgroundAxioms.add(axiom);
@@ -97,6 +133,29 @@ public class BackgroundPresnter extends DebuggerPresenter {
             setAxiomsToViews();
         }
     }
+
+    public void handlerReplaceAxiom(SafeHtml axiom){
+        GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
+
+        this.dsm.execute(new MoveToAction(projectId, axiom),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Move axioms";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        setAxiomsToViews(debuggingSessionStateResult.getPossiblyFaultyAxioms(),debuggingSessionStateResult.getCorrectAxioms());
+                    }
+                });
+    }
+
     public void handlerBackgroundAxiomRemove(SafeHtml axiom){
         if (axiom != null) {
             backgroundAxioms.remove((axiom));

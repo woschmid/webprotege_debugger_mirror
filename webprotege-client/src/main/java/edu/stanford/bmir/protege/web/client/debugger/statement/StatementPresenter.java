@@ -61,10 +61,6 @@ public class StatementPresenter {
 
     public void addPossibleFaultyAxioms(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms) {  view.updateBackground(backgroundAxioms, possibleFaultyAxioms);}
 
-//    public void addSinglePossibleFaultyAxiom(SafeHtml msg) {  view.addSinglePossibleFaultyAxiom(msg);}
-//
-//    public void addSingleBackgroundAxioms(SafeHtml msg) {  view.addSingleBackgroundAxioms(msg);}
-
 
     public void clearAxoim(){
         view.table.clear();

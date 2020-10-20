@@ -2,7 +2,9 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
+import edu.stanford.bmir.protege.web.shared.debugger.CorrectAxioms;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.PossiblyFaultyAxioms;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
@@ -25,12 +27,14 @@ public class DebuggingResultFactory {
     protected static DebuggingSessionStateResult generateResult(@Nonnull DebuggingSession session, @Nonnull Boolean isOk, @Nullable String message) {
 
         if (session.getState() == SessionState.INIT)
-            return new DebuggingSessionStateResult(Boolean.TRUE, session.getUserId(),null,null,null, null, null, null);
+            return new DebuggingSessionStateResult(Boolean.TRUE, session.getUserId(),null,null,null, null, null, null, null, null);
 
         edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
         List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> p = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> n = new ArrayList<>();
+        PossiblyFaultyAxioms possiblyFaultyAxioms = null;
+        CorrectAxioms correctAxioms = null;
 
         // get the state of the session
         final Query<OWLLogicalAxiom> query = session.getQuery();
@@ -51,9 +55,20 @@ public class DebuggingResultFactory {
 
             for (OWLLogicalAxiom a : diagnosisModel.getNotEntailedExamples())
                 n.add(new edu.stanford.bmir.protege.web.shared.debugger.TestCase(session.getRenderingManager().getHtmlBrowserText(a)));
+
+            Set<SafeHtml> possiblyFaultySet = new HashSet<>();
+            for (OWLLogicalAxiom a: diagnosisModel.getPossiblyFaultyFormulas())
+                possiblyFaultySet.add(session.getRenderingManager().getHtmlBrowserText(a));
+            possiblyFaultyAxioms = new PossiblyFaultyAxioms(possiblyFaultySet);
+
+            Set<SafeHtml> correctSet = new HashSet<>();
+            for (OWLLogicalAxiom a: diagnosisModel.getCorrectFormulas())
+                correctSet.add(session.getRenderingManager().getHtmlBrowserText(a));
+            correctAxioms = new CorrectAxioms(correctSet);
+
         }
 
-        return new DebuggingSessionStateResult(isOk, session.getUserId(), q, d, p, n, sessionState, message);
+        return new DebuggingSessionStateResult(isOk, session.getUserId(), q, d, p, n, possiblyFaultyAxioms, correctAxioms, sessionState, message);
     }
 
     @Nonnull
