@@ -400,6 +400,10 @@ public class DebuggingSession implements HasDispose {
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
+        // verify that the session state in STARTED state
+        if (state == SessionState.STARTED)
+            throw new RuntimeException("Debugging session is in " + state + " and thus changing of the background is not allowed.");
+
         boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
         if (!hasMoved)
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
