@@ -26,28 +26,12 @@ public class DebuggingResultFactory {
     @Nonnull
     protected static DebuggingSessionStateResult generateResult(@Nonnull DebuggingSession session, @Nonnull Boolean isOk, @Nullable String message) {
 
-        if (session.getState() == SessionState.INIT)
-            return new DebuggingSessionStateResult(Boolean.TRUE, session.getUserId(),null,null,null, null, null, null, null, null);
-
-        edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
-        List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> p = new ArrayList<>();
         List<edu.stanford.bmir.protege.web.shared.debugger.TestCase> n = new ArrayList<>();
         PossiblyFaultyAxioms possiblyFaultyAxioms = null;
         CorrectAxioms correctAxioms = null;
 
-        // get the state of the session
-        final Query<OWLLogicalAxiom> query = session.getQuery();
-        final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = session.getDiagnoses();
         final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = session.getDiagnosisModel();
-        final SessionState sessionState = session.getState();
-
-        if (query != null)
-            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(renderAxioms(query.formulas, session.getRenderingManager()));
-
-        if (diagnoses != null)
-            for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
-                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(renderAxioms(diag.getFormulas(), session.getRenderingManager())));
 
         if (diagnosisModel != null) {
             for (OWLLogicalAxiom a : diagnosisModel.getEntailedExamples())
@@ -67,6 +51,27 @@ public class DebuggingResultFactory {
             correctAxioms = new CorrectAxioms(correctSet);
 
         }
+
+        final SessionState sessionState = session.getState();
+
+        if (sessionState == SessionState.INIT)
+            return new DebuggingSessionStateResult(Boolean.TRUE, session.getUserId(),null,null,p, n, possiblyFaultyAxioms, correctAxioms, sessionState, null);
+
+        edu.stanford.bmir.protege.web.shared.debugger.Query q = null;
+        List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
+
+        // get the state of the session
+        final Query<OWLLogicalAxiom> query = session.getQuery();
+        final Set<Diagnosis<OWLLogicalAxiom>> diagnoses = session.getDiagnoses();
+
+        if (query != null)
+            q = new edu.stanford.bmir.protege.web.shared.debugger.Query(renderAxioms(query.formulas, session.getRenderingManager()));
+
+        if (diagnoses != null)
+            for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> diag : diagnoses)
+                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(renderAxioms(diag.getFormulas(), session.getRenderingManager())));
+
+
 
         return new DebuggingSessionStateResult(isOk, session.getUserId(), q, d, p, n, possiblyFaultyAxioms, correctAxioms, sessionState, message);
     }

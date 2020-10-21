@@ -20,11 +20,12 @@ import javax.annotation.Nonnull;
  */
 public class SolverFactory {
 
-    public static ISolver<OWLLogicalAxiom> getSolver(OWLOntology ontology, DebuggingSession debuggingSession) throws ActionExecutionException {
+    @Nonnull public static ISolver<OWLLogicalAxiom> getSolver(@Nonnull OWLOntology ontology,
+                                                     @Nonnull DiagnosisModel<OWLLogicalAxiom> diagnosisModel,
+                                                     @Nonnull DebuggingSession debuggingSession) throws ActionExecutionException {
 
         // choose between the available reasoners below!
-        @Nonnull
-        OWLReasonerFactory reasonerFactory;
+        @Nonnull OWLReasonerFactory reasonerFactory;
 
         // Select between different popular reasoners here - recompilation necessary!
 
@@ -36,9 +37,6 @@ public class SolverFactory {
 
         // JFact DL Reasoner Factory (http://jfact.sourceforge.net/)
         // reasonerFactory = new uk.ac.manchester.cs.jfact.JFactFactory();
-
-        // creates a diagnosis model from the ontology
-        DiagnosisModel<OWLLogicalAxiom> diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
 
         try {
 

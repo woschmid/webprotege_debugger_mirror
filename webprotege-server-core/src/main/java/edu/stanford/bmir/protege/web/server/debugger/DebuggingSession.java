@@ -27,6 +27,7 @@ import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
+import org.exquisite.core.solver.ExquisiteOWLReasoner;
 import org.exquisite.core.solver.ISolver;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -57,7 +58,11 @@ public class DebuggingSession implements HasDispose {
     /** The owner of this debugging session */
     private UserId userId;
 
+    private OWLOntology ontology;
+
     private OWLOntologyID ontologyID;
+
+    private DiagnosisModel<OWLLogicalAxiom> diagnosisModel;
 
     /** The current state of the debugging session */
     private SessionState state;
@@ -72,8 +77,6 @@ public class DebuggingSession implements HasDispose {
     private Set<Diagnosis<OWLLogicalAxiom>> diagnoses;
 
     private RenderingManager renderingManager;
-
-    private RevisionManager revisionManager;
 
     private IExquisiteProgressMonitor monitor;
 
@@ -100,7 +103,6 @@ public class DebuggingSession implements HasDispose {
         id = projectId.getId();
 
         this.projectId = projectId;
-        this.revisionManager = revisionManager;
         this.renderingManager = renderingManager;
 
         this.state = SessionState.INIT;
@@ -140,6 +142,18 @@ public class DebuggingSession implements HasDispose {
                 webProtegeProperties.getProjectDormantTime() * 90L / 100L,
                 TimeUnit.MILLISECONDS);
 
+        // loading ontology and generating diagnosis model
+        final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
+        final List<OWLOntology> ontologies = new ArrayList<>(ontologyManager.getOntologies());
+        if (ontologies.size() != 1)
+            throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
+
+        this.ontology = ontologies.get(0);
+        this.ontologyID = ontology.getOntologyID();
+        logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
+
+        this.diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
+
         logger.info("{} created", this);
     }
 
@@ -171,9 +185,7 @@ public class DebuggingSession implements HasDispose {
     }
 
     @Nullable public DiagnosisModel<OWLLogicalAxiom> getDiagnosisModel() {
-        if (engine != null)
-            return engine.getSolver().getDiagnosisModel();
-        return null;
+        return diagnosisModel;
     }
 
     public RenderingManager getRenderingManager() {
@@ -195,20 +207,9 @@ public class DebuggingSession implements HasDispose {
             if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
                 throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
 
-
             this.userId = userId;
             this.state = SessionState.STARTED;
             this.monitor = new LoggingQueryProgressMonitor(this);
-
-            final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
-            final List<OWLOntology> ontologies = new ArrayList<>(ontologyManager.getOntologies());
-            if (ontologies.size() != 1)
-                throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
-
-            final OWLOntology ontology = ontologies.get(0);
-            this.ontologyID = ontology.getOntologyID();
-            logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
-
 
             logger.info("{} initiating for {} in {} ...", this, userId, projectId);
 
@@ -216,7 +217,7 @@ public class DebuggingSession implements HasDispose {
             this.state = SessionState.COMPUTING;
 
             // creates a solver instance  using the ontology
-            final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology, this);
+            final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology, diagnosisModel,this);
             logger.info("{} Solver created: {}", this, solver);
 
             // let's go back to init state after the solver has been created and a consistency and coherency check are done
@@ -475,7 +476,7 @@ public class DebuggingSession implements HasDispose {
         monitor = null;
         query = null;
         diagnoses = null;
-        ontologyID = null;
+        diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
     }
 
     @Override
@@ -483,9 +484,11 @@ public class DebuggingSession implements HasDispose {
         logger.info("Disposing {}", this);
         stop();
         renderingManager = null;
-        revisionManager = null;
         engine = null;
         purgePreventionService.shutdown();
+        ontologyID = null;
+        ontology = null;
+        diagnosisModel = null;
     }
 
     /**
