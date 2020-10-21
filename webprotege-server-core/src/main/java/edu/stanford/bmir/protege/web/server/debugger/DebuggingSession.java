@@ -450,14 +450,14 @@ public class DebuggingSession implements HasDispose {
         final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
         if (positiveTestcase != null) {
             getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
-            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,null);
+            return calculateQuery(userId, null);
         }
 
         // search and remove in negative test cases
         final OWLLogicalAxiom negativeTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getNotEntailedExamples());
         if (negativeTestcase != null) {
             getDiagnosisModel().getNotEntailedExamples().remove(negativeTestcase);
-            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,null);
+            return calculateQuery(userId, null);
         }
 
         return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
