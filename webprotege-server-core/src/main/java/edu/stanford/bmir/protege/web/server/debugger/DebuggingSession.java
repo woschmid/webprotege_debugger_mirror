@@ -387,34 +387,79 @@ public class DebuggingSession implements HasDispose {
                 "The ontology has been successfully repaired!");
     }
 
+    /**
+     * Moves an axiom between correct and possibly faulty axioms.
+     *
+     * @param userId The user who wants to move the axiom before starting a debugging session.
+     * @param axiom The user who wants to stop a debugging session.
+     * @return A result for the front end representing the current state of the backend.
+     */
     public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) {
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
-        boolean hasMoved = moveTo(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
+        boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
         if (!hasMoved)
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
 
-    private boolean moveTo(SafeHtml axiomAsString, List<OWLLogicalAxiom> list1, List<OWLLogicalAxiom> list2) {
-        // lookup the matching axiom
-        for (OWLLogicalAxiom a : list1) {
-            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a))) {
-                list1.remove(a);
-                list2.add(a);
-                return true;
-            }
+    /**
+     * Moves the axiom between two lists.
+     *
+     * @param axiomAsString A SafeHtml representation of the axiom to move.
+     * @param list1 List of axiom possibly containing the axiom to move from or move to.
+     * @param list2 List of axiom possibly containing the axiom to move from or move to.
+     * @return <code>true</code> if the axiom was found in one of the lists and moved to the other. <code>false</code> otherwise.
+     */
+    private boolean moveBetween(@Nonnull SafeHtml axiomAsString, @Nonnull List<OWLLogicalAxiom> list1, @Nonnull List<OWLLogicalAxiom> list2) {
+        OWLLogicalAxiom a = lookupAxiomInCollection(axiomAsString, list1);
+        if (a != null) {
+            list1.remove(a);
+            list2.add(a);
+            return true;
         }
-        for (OWLLogicalAxiom a : list2) {
-            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a))) {
-                list2.remove(a);
-                list1.add(a);
-                return true;
-            }
+        a = lookupAxiomInCollection(axiomAsString, list2);
+        if (a != null) {
+            list2.remove(a);
+            list1.add(a);
+            return true;
         }
         return false;
+    }
+
+    /**
+     * Removes an axiom from the testcases.
+     *
+     * @param userId The user who wants to stop a debugging session.
+     * @param testCase The SafeHtml representation of the testcase to be removed.
+     * @return A result for the front end representing the current state of the backend.
+     */
+    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) {
+        if (!userId.equals(getUserId()))
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                    "A debugging session is already running for this project by user " + getUserId());
+
+        // verify that the session state in STARTED state
+        if (state != SessionState.STARTED)
+            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus removing a test case is not allowed.");
+
+        // search and remove in positive test cases
+        final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
+        if (positiveTestcase != null) {
+            getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,null);
+        }
+
+        // search and remove in negative test cases
+        final OWLLogicalAxiom negativeTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getNotEntailedExamples());
+        if (negativeTestcase != null) {
+            getDiagnosisModel().getNotEntailedExamples().remove(positiveTestcase);
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,null);
+        }
+
+        return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
     }
 
     /**
@@ -481,6 +526,21 @@ public class DebuggingSession implements HasDispose {
 
         // if no axiom could be found, we have to throw an exception
         throw new ActionExecutionException(new RuntimeException(axiomAsString + " could not be not found"));
+    }
+
+
+    /**
+     * Searches for an axiom in a collection that fits the SafeHtml representation and returns the actual axiom.
+     *
+     * @param axiomAsString The SafeHtml representation of the axiom to search for.
+     * @param collection The collection searched within.
+     * @return The axiom if a fitting
+     */
+    @Nullable private OWLLogicalAxiom lookupAxiomInCollection(@Nonnull final SafeHtml axiomAsString, @Nonnull Collection<OWLLogicalAxiom> collection) {
+        for (OWLLogicalAxiom axiom : collection)
+            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(axiom)))
+                return axiom;
+        return null;
     }
 
 }

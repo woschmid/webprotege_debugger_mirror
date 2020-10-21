@@ -6,19 +6,24 @@ import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
+
 import java.util.Objects;
 
-public class MoveToAction implements ProjectAction<DebuggingSessionStateResult> {
-    private ProjectId projectId;
-    private SafeHtml axiom;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-    public MoveToAction(@Nonnull ProjectId projectId, @Nonnull SafeHtml axiom) {
-        this.projectId = projectId;
-        this.axiom = axiom;
+public class RemoveTestCaseAction implements ProjectAction<DebuggingSessionStateResult>  {
+
+    private ProjectId projectId;
+
+    private SafeHtml testCase;
+
+    public RemoveTestCaseAction(@Nonnull ProjectId projectId, @Nonnull SafeHtml axiom) {
+        this.projectId = checkNotNull(projectId);
+        this.testCase = axiom;
     }
 
     @GwtSerializationConstructor
-    private MoveToAction() {}
+    private RemoveTestCaseAction() {}
 
     @Nonnull
     @Override
@@ -27,29 +32,29 @@ public class MoveToAction implements ProjectAction<DebuggingSessionStateResult> 
     }
 
     @Nonnull
-    public SafeHtml getAxiom() {
-        return axiom;
+    public SafeHtml getTestCase() {
+        return testCase;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MoveToAction that = (MoveToAction) o;
+        RemoveTestCaseAction that = (RemoveTestCaseAction) o;
         return Objects.equals(projectId, that.projectId) &&
-                Objects.equals(axiom, that.axiom);
+                Objects.equals(testCase, that.testCase);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, axiom);
+        return Objects.hash(projectId, testCase);
     }
 
     @Override
     public String toString() {
-        return "MoveToAction{" +
+        return "RemoveTestCaseAction{" +
                 "projectId=" + projectId +
-                ", axiom=" + axiom +
+                ", testCase=" + testCase +
                 '}';
     }
 }
