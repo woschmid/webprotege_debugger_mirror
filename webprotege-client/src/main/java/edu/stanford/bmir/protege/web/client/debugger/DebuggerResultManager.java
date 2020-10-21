@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.client.debugger;
 
 import com.google.gwt.core.client.GWT;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
 
 import javax.inject.Inject;
@@ -39,6 +40,20 @@ public class DebuggerResultManager {
                 presenterList) {
             debuggerpresenter.clearAxiomtable();
         }
+    }
+    public void changeButtonStatus(){
+        SessionState state = debuggingSessionStateResult.getSessionState();
+        for (DebuggerPresenter debuggerpresenter:
+                presenterList) {
+            if(state == SessionState.STARTED || state == SessionState.COMPUTING){
+                debuggerpresenter.setEnabledButton("start");
+            }else if (state == SessionState.STOPPED){
+                debuggerpresenter.setEnabledButton("stop");
+            }else if (state == SessionState.INIT){
+                debuggerpresenter.setEnabledButton("start");
+            }
+        }
+
     }
 
 }

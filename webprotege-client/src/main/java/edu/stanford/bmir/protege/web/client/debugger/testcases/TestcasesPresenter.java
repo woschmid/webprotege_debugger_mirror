@@ -41,7 +41,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
     StatementPresenter statementPresenter1;
     StatementPresenter statementPresenter2;
 
-    private final DebuggerResultManager debuggerResultManager;
+//    private final DebuggerResultManager debuggerResultManager;
 
     DispatchErrorMessageDisplay errorDisplay;
 
@@ -55,7 +55,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
                               DispatchServiceManager dispatchServiceManager,
                               MessageBox messageBox, StatementPresenter statementPresenter,
                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, TestcasesView view, LoggedInUserProvider loggedInUserProvider) {
-        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.errorDisplay = errorDisplay;
         this.progressDisplay = progressDisplay;
@@ -64,7 +64,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
         this.statementPresenter2 = statementPresenter2;
         this.view = view;
 
-        this.debuggerResultManager = debuggerResultManager;
+//        this.debuggerResultManager = debuggerResultManager;
     }
 
 
@@ -84,6 +84,11 @@ public class TestcasesPresenter extends DebuggerPresenter {
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(),debuggingSessionStateResult.getNegativeTestCases());
+    }
+
+    @Override
+    public void setEnabledButton(String buttonTyp) {
+
     }
 
     public void setTestCasesStatement(List<TestCase> msgP, List<TestCase> msgN){
@@ -118,8 +123,9 @@ public class TestcasesPresenter extends DebuggerPresenter {
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                         GWT.log("[TestcasesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult.getNegativeTestCases());
-                        debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
-                        debuggerResultManager.updateContent();
+                        handlerDebugging(debuggingSessionStateResult);
+//                        debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
+//                        debuggerResultManager.updateContent();
                     }
                 });
     }

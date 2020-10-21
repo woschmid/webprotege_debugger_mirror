@@ -39,7 +39,7 @@ public class RepairsPresenter extends DebuggerPresenter {
                             DispatchServiceManager dispatchServiceManager,
                             MessageBox messageBox, StatementPresenter statementPresenter,
                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, RepairsView view, LoggedInUserProvider loggedInUserProvider) {
-        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.view = view;
         this.statementPresenter = statementPresenter;
         this.debuggerResultManager = debuggerResultManager;
@@ -52,6 +52,11 @@ public class RepairsPresenter extends DebuggerPresenter {
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
+    }
+
+    @Override
+    public void setEnabledButton(String buttonTyp) {
+
     }
 
 //    public void remove

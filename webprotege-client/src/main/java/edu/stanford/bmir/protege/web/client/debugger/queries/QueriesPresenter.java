@@ -32,16 +32,16 @@ public class QueriesPresenter extends DebuggerPresenter {
     private QueriesView view;
 
     private DispatchServiceManager dsm;
-
-    private DispatchErrorMessageDisplay errorDisplay;
-
-    private ProgressDisplay progressDisplay;
+//
+//    private DispatchErrorMessageDisplay errorDisplay;
+//
+//    private ProgressDisplay progressDisplay;
 
     private LoggedInUserProvider loggedInUserProvider;
 
-    private DebuggerResultManager debuggerResultManager;
-
-    private MessageBox messageBox;
+//    private DebuggerResultManager debuggerResultManager;
+//
+//    private MessageBox messageBox;
 
     @Nonnull
     private ProjectId projectId;
@@ -52,13 +52,10 @@ public class QueriesPresenter extends DebuggerPresenter {
                             DispatchServiceManager dispatchServiceManager,
                             MessageBox messageBox, StatementPresenter statementPresenter,
                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider) {
-        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.loggedInUserProvider = loggedInUserProvider;
-        this.errorDisplay= errorDisplay;
-        this.progressDisplay = progressDisplay;
-        this.messageBox = messageBox;
-        this.debuggerResultManager = debuggerResultManager;
+//        this.debuggerResultManager = debuggerResultManager;
         this.dsm = dispatchServiceManager;
         this.statementPresenter = statementPresenter;
         this.view = view;
@@ -191,54 +188,54 @@ public class QueriesPresenter extends DebuggerPresenter {
     }
 
 
-    private void handlerDebugging(DebuggingSessionStateResult debuggingSessionStateResult) {
-        boolean isStop = false;
-        if (debuggingSessionStateResult.getSessionState() == SessionState.STOPPED) {
-            isStop = true;
-        }
-//        clearAxiomtabel();
-        if (!debuggingSessionStateResult.isOk()) {
-            messageBox.showAlert("Can not start!", debuggingSessionStateResult.getMessage());
-            setEnabledButton("locked");
-        } else {
-            if (debuggingSessionStateResult.getMessage() != null) {
-                messageBox.showAlert("Information", debuggingSessionStateResult.getMessage());
-            }
-            GWT.log("[QueriesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult);
-            debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
-            showResults(debuggingSessionStateResult, isStop);
-            checkFinal(debuggingSessionStateResult);
-        }
+//    private void handlerDebugging(DebuggingSessionStateResult debuggingSessionStateResult) {
+//        boolean isStop = false;
+//        if (debuggingSessionStateResult.getSessionState() == SessionState.STOPPED) {
+//            isStop = true;
+//        }
+////        clearAxiomtabel();
+//        if (!debuggingSessionStateResult.isOk()) {
+//            messageBox.showAlert("Can not start!", debuggingSessionStateResult.getMessage());
+//            setEnabledButton("locked");
+//        } else {
+//            if (debuggingSessionStateResult.getMessage() != null) {
+//                messageBox.showAlert("Information", debuggingSessionStateResult.getMessage());
+//            }
+//            GWT.log("[QueriesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult);
+//            debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
+//            showResults(debuggingSessionStateResult, isStop);
+//            checkFinal(debuggingSessionStateResult);
+//        }
+//
+//    }
 
-    }
+//    private void showResults(DebuggingSessionStateResult debuggingSessionStateResult, boolean isStop) {
+//        if(!isStop){
+//            debuggerResultManager.updateContent();
+//        }
+//        changeSessionState(debuggingSessionStateResult.getSessionState());
+//    }
 
-    private void showResults(DebuggingSessionStateResult debuggingSessionStateResult, boolean isStop) {
-        if(!isStop){
-            debuggerResultManager.updateContent();
-        }
-        changeSessionState(debuggingSessionStateResult.getSessionState());
-    }
+//    private void checkFinal(DebuggingSessionStateResult result){
+//        if (result.getSessionState() == SessionState.STARTED &&
+//                (result.getQuery() == null && result.getDiagnoses() != null &&
+//                        result.getDiagnoses().size() == 1)){
+//            setEnabledButton("repair");
+//        }else{
+//            changeSessionState(result.getSessionState());
+//        }
+//
+//    }
 
-    private void checkFinal(DebuggingSessionStateResult result){
-        if (result.getSessionState() == SessionState.STARTED &&
-                (result.getQuery() == null && result.getDiagnoses() != null &&
-                        result.getDiagnoses().size() == 1)){
-            setEnabledButton("repair");
-        }else{
-            changeSessionState(result.getSessionState());
-        }
-
-    }
-
-    private void changeSessionState(SessionState state){
-        if(state == SessionState.STARTED || state == SessionState.COMPUTING){
-            setEnabledButton("start");
-        }else if (state == SessionState.STOPPED){
-            setEnabledButton("stop");
-        }else if (state == SessionState.INIT){
-            setEnabledButton("start");
-        }
-    }
+//    private void changeSessionState(SessionState state){
+//        if(state == SessionState.STARTED || state == SessionState.COMPUTING){
+//            setEnabledButton("start");
+//        }else if (state == SessionState.STOPPED){
+//            setEnabledButton("stop");
+//        }else if (state == SessionState.INIT){
+//            setEnabledButton("start");
+//        }
+//    }
 
     private ImmutableMap<SafeHtml, Boolean> getAnswers() {
         Map<SafeHtml, Boolean> allSelectQueries = getStatementPresenter().getTableInfo();

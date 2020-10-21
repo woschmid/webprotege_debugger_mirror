@@ -43,9 +43,9 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
     private final DebuggerResultManager debuggerResultManager;
 
-    DispatchErrorMessageDisplay errorDisplay;
-
-    ProgressDisplay progressDisplay;
+//    DispatchErrorMessageDisplay errorDisplay;
+//
+//    ProgressDisplay progressDisplay;
 
     @Nonnull
     private ProjectId projectId;
@@ -56,10 +56,10 @@ public class BackgroundPresenter extends DebuggerPresenter {
                                DispatchServiceManager dispatchServiceManager,
                                MessageBox messageBox, StatementPresenter statementPresenter,
                                DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider) {
-        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
-        this.errorDisplay = errorDisplay;
-        this.progressDisplay = progressDisplay;
+//        this.errorDisplay = errorDisplay;
+//        this.progressDisplay = progressDisplay;
         this.dsm = dispatchServiceManager;
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
@@ -91,16 +91,18 @@ public class BackgroundPresenter extends DebuggerPresenter {
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
 
+    @Override
+    public void setEnabledButton(String buttonTyp) {
+
+    }
+
     List<SafeHtml> backgroundAxioms = new ArrayList<>();
     List<SafeHtml> possibleFaultyAxioms = new ArrayList<>();
 
     public void setPossibleFaultyAxioms(PossiblyFaultyAxioms axioms){
         if (axioms != null) {
             List<SafeHtml> items = axioms.getAxioms();
-            for (SafeHtml axiom:items
-                 ) {
-                possibleFaultyAxioms.add(axiom);
-            }
+            possibleFaultyAxioms.addAll(items);
             setAxiomsToViews();
         }
     }
@@ -108,10 +110,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
     public void setBackgroundAxioms(CorrectAxioms axioms){
         if (axioms != null) {
             List<SafeHtml> items = axioms.getAxioms();
-            for (SafeHtml axiom:items
-            ) {
-                backgroundAxioms.add(axiom);
-            }
+            backgroundAxioms.addAll(items);
             setAxiomsToViews();
         }
     }
@@ -151,7 +150,8 @@ public class BackgroundPresenter extends DebuggerPresenter {
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        setAxiomsToViews(debuggingSessionStateResult.getPossiblyFaultyAxioms(),debuggingSessionStateResult.getCorrectAxioms());
+                        handlerDebugging(debuggingSessionStateResult);
+//                        setAxiomsToViews(debuggingSessionStateResult.getPossiblyFaultyAxioms(),debuggingSessionStateResult.getCorrectAxioms());
                     }
                 });
     }
