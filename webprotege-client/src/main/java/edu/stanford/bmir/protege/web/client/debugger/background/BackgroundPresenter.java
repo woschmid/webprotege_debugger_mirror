@@ -29,7 +29,7 @@ import java.util.List;
  * 12 Jun 2018
  */
 
-public class BackgroundPresnter extends DebuggerPresenter {
+public class BackgroundPresenter extends DebuggerPresenter {
 
     @Nonnull
     private BackgroundView view;
@@ -51,11 +51,11 @@ public class BackgroundPresnter extends DebuggerPresenter {
     private ProjectId projectId;
 
     @Inject
-    public BackgroundPresnter(@Nonnull ProjectId projectId,
-                              StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
-                              DispatchServiceManager dispatchServiceManager,
-                              MessageBox messageBox, StatementPresenter statementPresenter,
-                              DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider) {
+    public BackgroundPresenter(@Nonnull ProjectId projectId,
+                               StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
+                               DispatchServiceManager dispatchServiceManager,
+                               MessageBox messageBox, StatementPresenter statementPresenter,
+                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider);
         this.projectId = projectId;
         this.errorDisplay = errorDisplay;
@@ -135,7 +135,7 @@ public class BackgroundPresnter extends DebuggerPresenter {
     }
 
     public void handlerReplaceAxiom(SafeHtml axiom){
-        GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
+        GWT.log("[BackgroundPresenter]Replace Button pressed!!!!!");
 
         this.dsm.execute(new MoveToAction(projectId, axiom),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,

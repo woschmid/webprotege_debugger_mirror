@@ -16,10 +16,10 @@ import javax.inject.Inject;
 public class BackgroundProletPresenter extends AbstractWebProtegePortletPresenter {
 
     @Nonnull
-    public BackgroundPresnter background;
+    public BackgroundPresenter background;
 
     @Inject
-    public BackgroundProletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull BackgroundPresnter presenter) {
+    public BackgroundProletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull BackgroundPresenter presenter) {
         super(selectionModel, projectId, displayNameRenderer);
         this.background = presenter;
     }

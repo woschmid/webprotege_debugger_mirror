@@ -44,7 +44,7 @@ public class StatementViewImpl extends Composite{
 
     DeleteTestCasesHandler deleteTestCasesHandler= new DeleteTestCasesHandler() {
         @Override
-        public void DeleteTestCases() {
+        public void DeleteTestCases(SafeHtml axiom) {
 
         }
     };
@@ -150,7 +150,7 @@ public class StatementViewImpl extends Composite{
             button.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
-                    deleteTestCasesHandler.DeleteTestCases();
+                    deleteTestCasesHandler.DeleteTestCases(axiom);
                 }
             });
         }
@@ -207,6 +207,10 @@ public class StatementViewImpl extends Composite{
 
     public void setBackgroundAxiomRemoveHandler(BackgroundAxiomRemoveHandler backgroundAxiomRemoveHandler) {
         this.backgroundAxiomRemoveHandler = backgroundAxiomRemoveHandler;
+    }
+
+    public void setDeleteTestCasesHandler(DeleteTestCasesHandler deleteTestCasesHandler) {
+        this.deleteTestCasesHandler = deleteTestCasesHandler;
     }
 
     public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {

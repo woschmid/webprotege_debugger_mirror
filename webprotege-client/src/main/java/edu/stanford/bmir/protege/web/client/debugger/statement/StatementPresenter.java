@@ -39,6 +39,10 @@ public class StatementPresenter {
         view.setBackgroundAxiomRemoveHandler(backgroundAxiomRemoveHandler);
     }
 
+    public void addDeleteTestCasesHandler(DeleteTestCasesHandler deleteTestCasesHandler){
+        view.setDeleteTestCasesHandler(deleteTestCasesHandler);
+    }
+
 
     public void start(AcceptsOneWidget container) {
         this.container = container;
