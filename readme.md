@@ -91,6 +91,12 @@ Edit the WebProtégé Settings
 
    ``` http://localhost:8080/#application/settings```
 
+
+Building Docker image
+-------------------
+```docker build -t webprotege_debugger --build-arg WEBPROTEGE_VERSION=4.0.2 ```
+
+
 Running from Docker
 -------------------
 
@@ -98,23 +104,46 @@ To run WebProtégé using the Docker container
 
 1) Create a new file called "docker-compose.yml" and copy-and-paste the following text:
    ```yml
-   version: '3'
-
+   version: "3"
+   
    services:
+   
      wpmongo:
+       container_name: webprotege-mongodb
        image: mongo:4.1-bionic
+       restart: unless-stopped
+       volumes: 
+         - ./.protegedata/mongodb:/data/db
+   
      webprotege:
-       image: protegeproject/webprotege
-       restart: always
-       environment:
-         - webprotege.mongodb.host=wpmongo
-       ports:
-         - 5000:8080
+       container_name: webprotege
+       image: webprotege_debugger
        depends_on:
          - wpmongo
+       restart: unless-stopped
+       environment:
+         - webprotege.mongodb.host=wpmongo
+       volumes: 
+       - ./.protegedata/protege:/srv/webprotege
+       ports:
+         - 5000:8080
    ```
 2) Enter this following command in the Terminal to start the docker container.
    ```bash
-   $ docker-compose up
+   $ docker-compose up -d
    ```
-3) Browse to WebProtégé in a Web browser by navigating to [http://localhost:5000](http://localhost:5000)
+   
+3) Create the admin user (follow the questions prompted to provider username, email and password)
+   ```bash
+   docker exec -it webprotege java -jar /webprotege-cli.jar create-admin-account
+   ```
+3) Browse to WebProtégé in a Web browser by navigating to [http://localhost:5000/#application/settings](http://localhost:5000/#application/settings)
+
+4) To stop WebProtégé and MongoDB:
+   ```bash
+   docker-compose down
+   ```
+   Sharing the volumes used by the WebProtégé app and MongoDB allow to keep persistent data, even when the containers stop. Default shared data storage:
+   - WebProtégé will store its data in the source code folder at `./.protegedata/protege` where you run docker-compose
+   - MongoDB will store its data in the source code folder at `./.protegedata/mongodb` where you run docker-compose
+   Path to the shared volumes can be changed in the `docker-compose.yml` file.
