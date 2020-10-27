@@ -61,7 +61,7 @@
 
         <g:HorizontalPanel width="100%">
             <g:cell horizontalAlignment="ALIGN_LEFT" >
-                <g:Button ui:field="startButton" text="Start"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
+                <g:Button ui:field="startButton" text="Init"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_LEFT" >
                 <g:Button ui:field="stopButton" text="Stop"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>

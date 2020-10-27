@@ -21,6 +21,8 @@ public interface QueriesView extends DebuggerView {
 
     void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler);
 
+    void changeStartButton(@Nonnull boolean start);
+
     AcceptsOneWidget getCriteriaContainer();
 
     void disablebutton(String s);

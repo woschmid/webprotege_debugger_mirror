@@ -33,6 +33,13 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @UiField
     SimplePanel criteriaContainer;
 
+//    @UiField
+//    protected Button startButton;
+
+    String INIT="Init";
+
+    String START="Debug";
+
     @UiField
     protected Button startButton;
 
@@ -71,10 +78,29 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     }
 
     @UiHandler("startButton")
-    protected void handleStartDebugging(ClickEvent clickEvent) { startDebuggingHandler.handleStartDebugging();}
+    protected void handleStartDebugging(ClickEvent clickEvent) {
+        if (startButton.getText().equals("INIT")){
+            // TODO: 2020/10/27 pre-processing handler
+            changeStartButton(true);
+        }else{
+            startDebuggingHandler.handleStartDebugging();
+        }
+
+    }
+
+    public void changeStartButton(boolean start){
+        if (start){
+            // TODO: 2020/10/27 pre-processing handler
+            startButton.setText(START);
+        }else{
+            startButton.setText(INIT);
+        }
+    }
 
     @UiHandler("stopButton")
-    protected void handleStopDebugging(ClickEvent clickEvent){ stopDebuggingHandler.handleStopDebugging();}
+    protected void handleStopDebugging(ClickEvent clickEvent){
+        stopDebuggingHandler.handleStopDebugging();
+    }
 
     @UiHandler("submitButton")
     protected void submitButtonClick(ClickEvent event) { submitDebuggingHandler.handleSubmitDebugging(); }
