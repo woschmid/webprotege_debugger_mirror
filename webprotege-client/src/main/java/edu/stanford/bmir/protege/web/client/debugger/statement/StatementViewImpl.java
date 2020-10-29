@@ -74,8 +74,10 @@ public class StatementViewImpl extends Composite{
             Label statement = new HTML(axiom);
             CheckBox checkBoxP = new CheckBox();
             StringBuilder sbP = getStyle(Icon.TRUE);
+            checkBoxP.setTitle("The axiom is correct");
             checkBoxP.setHTML(sbP.toString());
             CheckBox checkBoxN = new CheckBox();
+            checkBoxN.setTitle("The axiom is incorrect");
             StringBuilder sbN = getStyle(Icon.FALSE);
             checkBoxN.setHTML(sbN.toString());
             listcheckbox.add(checkBoxP);
@@ -144,6 +146,7 @@ public class StatementViewImpl extends Composite{
             Label statement =new HTML(axiom);
             Button button = new Button("X");
             StringBuilder sbN = getStyle(Icon.CROSS);
+            button.setTitle("Remove");
             button.setHTML(sbN.toString());
             table.setWidget(row, 0, statement);
             table.setWidget(row,1, button);
@@ -167,6 +170,7 @@ public class StatementViewImpl extends Composite{
                 int row = table.getRowCount();
                 Label statement = new HTML(axiom);
                 Button button = new Button("remove");
+                button.setTitle("Remove from background");
                 StringBuilder sbN = getStyle(Icon.TOP);
                 button.setHTML(sbN.toString());
                 table.setWidget(row, 0, statement);
@@ -186,6 +190,7 @@ public class StatementViewImpl extends Composite{
                 int row = table.getRowCount();
                 Label statement = new HTML(axiom);
                 Button button = new Button("remove");
+                button.setTitle("Move to background");
                 StringBuilder sbN = getStyle(Icon.BOTTOM);
                 button.setHTML(sbN.toString());
                 table.setWidget(row, 0, statement);

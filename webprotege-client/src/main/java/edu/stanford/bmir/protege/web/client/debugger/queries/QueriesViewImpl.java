@@ -79,11 +79,12 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     @UiHandler("startButton")
     protected void handleStartDebugging(ClickEvent clickEvent) {
-        if (startButton.getText().equals("INIT")){
+        if (startButton.getText().equals(INIT)){
             // TODO: 2020/10/27 pre-processing handler
             changeStartButton(true);
         }else{
             startDebuggingHandler.handleStartDebugging();
+            changeStartButton(false);
         }
 
     }
@@ -92,8 +93,10 @@ public class QueriesViewImpl extends Composite implements QueriesView {
         if (start){
             // TODO: 2020/10/27 pre-processing handler
             startButton.setText(START);
+            startButton.setTitle("Start Debugger");
         }else{
             startButton.setText(INIT);
+            startButton.setTitle("Check Ontology");
         }
     }
 
