@@ -6,21 +6,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
-import edu.stanford.bmir.protege.web.client.individualslist.InstanceRetrievalTypeChangedHandler;
-import edu.stanford.bmir.protege.web.client.list.ListBox;
-import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
-import edu.stanford.bmir.protege.web.client.pagination.PaginatorPresenter;
-import edu.stanford.bmir.protege.web.shared.entity.EntityNode;
-import edu.stanford.bmir.protege.web.shared.individuals.InstanceRetrievalMode;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,7 +24,7 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 //    @UiField
 //    protected Button startButton;
 
-    String INIT="Init";
+    String CHECK="check";
 
     String START="Debug";
 
@@ -72,6 +60,8 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     };
 
+    private CheckOntologyHandler checkOntologyHandler = () -> {};
+
     @Inject
     public QueriesViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
@@ -79,8 +69,9 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     @UiHandler("startButton")
     protected void handleStartDebugging(ClickEvent clickEvent) {
-        if (startButton.getText().equals(INIT)){
+        if (startButton.getText().equals(CHECK)){
             // TODO: 2020/10/27 pre-processing handler
+            checkOntologyHandler.handlerCheckontology();
             changeStartButton(true);
         }else{
             startDebuggingHandler.handleStartDebugging();
@@ -95,7 +86,7 @@ public class QueriesViewImpl extends Composite implements QueriesView {
             startButton.setText(START);
             startButton.setTitle("Start Debugger");
         }else{
-            startButton.setText(INIT);
+            startButton.setText(CHECK);
             startButton.setTitle("Check Ontology");
         }
     }
@@ -119,6 +110,10 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     @Override
     public void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler){ this.submitDebuggingHandler = checkNotNull(handler);}
+
+    public void setCheckOntologyHandler(CheckOntologyHandler checkOntologyHandler) {
+        this.checkOntologyHandler = checkOntologyHandler;
+    }
 
     @Override
     public void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler) {

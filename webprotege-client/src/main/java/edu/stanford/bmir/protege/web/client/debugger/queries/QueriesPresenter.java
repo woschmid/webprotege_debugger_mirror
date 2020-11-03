@@ -75,12 +75,34 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.view.setStopDebuggingHandler(this::stopDebugging);
         this.view.setSubmitDebuggingHandler(this::submitDebugging);
         this.view.setRepairDebuggingHandler(this::RepairDebugging);
+        this.view.setCheckOntologyHandler(this::checkOntology);
         reload();
+    }
+
+    private void checkOntology() {
+        GWT.log("[DebuggerPresenter]Check Button pressed!!!!!");
+        this.dsm.execute(new CheckOntologyAction(projectId),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Check Ontology";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!" + debuggingSessionStateResult);
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
     }
 
     private void startDebugging() {
         GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!");
-        GWT.log("[DebuggerPresenter]dsm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+dsm);
         this.dsm.execute(new StartDebuggingAction(projectId),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {

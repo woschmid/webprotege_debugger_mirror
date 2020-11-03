@@ -192,6 +192,14 @@ public class DebuggingSession implements HasDispose {
         return renderingManager;
     }
 
+
+    public DebuggingSessionStateResult checkOntology(UserId userId) {
+        if (getUserId() != null)
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
+
+        return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Your ontology is inconsistent. Please click on debug to repair your ontology!");
+    }
+
     /**
      * Starts a new debugging session.
      *
