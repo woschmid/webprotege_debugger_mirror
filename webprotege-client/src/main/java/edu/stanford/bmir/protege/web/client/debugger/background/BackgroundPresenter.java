@@ -3,6 +3,7 @@ package edu.stanford.bmir.protege.web.client.debugger.background;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
@@ -10,6 +11,7 @@ import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.CorrectAxioms;
@@ -43,6 +45,8 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
     private final DebuggerResultManager debuggerResultManager;
 
+
+
 //    DispatchErrorMessageDisplay errorDisplay;
 //
 //    ProgressDisplay progressDisplay;
@@ -55,7 +59,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
                                StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
                                DispatchServiceManager dispatchServiceManager,
                                MessageBox messageBox, StatementPresenter statementPresenter,
-                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider) {
+                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
 //        this.errorDisplay = errorDisplay;
@@ -156,13 +160,16 @@ public class BackgroundPresenter extends DebuggerPresenter {
                 });
     }
 
-    public void handlerBackgroundAxiomRemove(SafeHtml axiom){
-        if (axiom != null) {
-            backgroundAxioms.remove((axiom));
-            possibleFaultyAxioms.add(axiom);
-            setAxiomsToViews();
-        }
-    }
+//    public void handlerBackgroundAxiomRemove(SafeHtml axiom){
+//        if (axiom != null) {
+//            backgroundAxioms.remove((axiom));
+//            possibleFaultyAxioms.add(axiom);
+//            setAxiomsToViews();
+//        }
+//    }
+
+
+
 
     public void clearAxiomtable() {
         backgroundAxioms.clear();

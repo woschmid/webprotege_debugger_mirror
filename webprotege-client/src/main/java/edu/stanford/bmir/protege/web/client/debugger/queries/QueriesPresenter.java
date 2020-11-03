@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
+import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
@@ -13,7 +14,13 @@ import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
+import edu.stanford.bmir.protege.web.client.portlet.HasPortletActions;
+import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
@@ -46,12 +53,18 @@ public class QueriesPresenter extends DebuggerPresenter {
     @Nonnull
     private ProjectId projectId;
 
+    @Nonnull
+    private final ModalManager modalManager;
+
+    @Nonnull
+    private final ConfigureDebuggerView configureDebuggerView;
+
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
                             DispatchServiceManager dispatchServiceManager,
                             MessageBox messageBox, StatementPresenter statementPresenter,
-                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider) {
+                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.loggedInUserProvider = loggedInUserProvider;
@@ -59,6 +72,8 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.dsm = dispatchServiceManager;
         this.statementPresenter = statementPresenter;
         this.view = view;
+        this.modalManager = modalManager;
+        this.configureDebuggerView = configureDebuggerView;
         statementPresenter.addCheckBoxClickhandler(this::CheckCheckBox);
     }
 
@@ -184,6 +199,7 @@ public class QueriesPresenter extends DebuggerPresenter {
 
     private void RepairDebugging() {
         GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
+
         messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
 
     }
@@ -283,6 +299,29 @@ public class QueriesPresenter extends DebuggerPresenter {
                 view.changeStartButton(true);
                 break;
         }
+    }
+
+    public void installActions(HasPortletActions hasPortletActions) {
+        PortletAction createClassAction = new PortletAction("Setting",
+                "wp-btn-g--editor",
+                this::ConfigureTimeout);
+        hasPortletActions.addAction(createClassAction);
+    }
+
+    public void ConfigureTimeout() {
+        ModalPresenter modalPresenter = modalManager.createPresenter();
+        modalPresenter.setTitle("Configure Timeout");
+        modalPresenter.setView(configureDebuggerView);
+        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK,
+                this::handleModalButton);
+        modalManager.showModal(modalPresenter);
+
+    }
+
+    private void handleModalButton(ModalCloser closer) {
+        closer.closeModal();
     }
 
 }
