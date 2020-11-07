@@ -24,7 +24,7 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 //    @UiField
 //    protected Button startButton;
 
-    String CHECK="check";
+    String CHECK="Check";
 
     String START="Debug";
 
