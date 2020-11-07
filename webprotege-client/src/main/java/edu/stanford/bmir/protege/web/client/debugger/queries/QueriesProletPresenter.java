@@ -11,7 +11,7 @@ import edu.stanford.webprotege.shared.annotations.Portlet;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-@Portlet(id = "portlet.Queries", title = "Queries")
+@Portlet(id = "portlet.Queries", title = "Debugging Session")
 public class QueriesProletPresenter extends AbstractWebProtegePortletPresenter {
 
     @Nonnull
