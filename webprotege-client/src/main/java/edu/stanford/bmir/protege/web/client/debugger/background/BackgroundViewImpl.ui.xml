@@ -47,7 +47,7 @@
         <g:VerticalPanel addStyleNames="{style.individualsList}">
             <g:cell height="50%">
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Possible Faulty Axioms" addStyleNames="{style.searchBox}"/>
+                <g:Label text="Possibly Faulty Axioms" addStyleNames="{style.searchBox}"/>
                 <!--            <g:VerticalPanel ui:field="table" />-->
                 <g:SimplePanel ui:field="EntailedcriteriaContainer" />
             </g:FlowPanel>

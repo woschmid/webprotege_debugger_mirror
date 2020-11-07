@@ -55,9 +55,9 @@
 
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
 
-        <div class="{style.typeGroup}">
-            <g:Label text="Queries" addStyleNames="{wp.style.formLabel}"/>
-        </div>
+<!--        <div class="{style.typeGroup}">-->
+<!--            <g:Label text="Queries" addStyleNames="{style.searchBox}"/>-->
+<!--        </div>-->
 
         <g:HorizontalPanel width="100%">
             <g:cell horizontalAlignment="ALIGN_LEFT" >

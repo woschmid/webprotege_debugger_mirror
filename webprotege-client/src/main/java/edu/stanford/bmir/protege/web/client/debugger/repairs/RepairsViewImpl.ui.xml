@@ -29,10 +29,17 @@
             flex-shrink: 0;
             margin-bottom: 10px;
         }
+        .searchBox {
+            flex-grow: 0;
+            flex-shrink: 0;
+            padding: 2px;
+            margin: 1px;
+            border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
+        }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
         <div class="{style.typeGroup}">
-            <g:Label text="Possible Ontology Repairs" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Possible Ontology Repairs" addStyleNames="{style.searchBox}"/>
         </div>
         <g:HTMLPanel addStyleNames="{style.individualsList}">
             <g:SimplePanel ui:field="criteriaContainer" />
