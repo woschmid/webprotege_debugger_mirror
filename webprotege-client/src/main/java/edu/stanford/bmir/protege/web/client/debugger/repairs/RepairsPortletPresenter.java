@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.debugger.background;
+package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
@@ -11,21 +11,20 @@ import edu.stanford.webprotege.shared.annotations.Portlet;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-@Portlet(id = "portlet.Background", title = "Background")
-
-public class BackgroundProletPresenter extends AbstractWebProtegePortletPresenter {
+@Portlet(id = "portlet.Repairs", title = "Repairs")
+public class RepairsPortletPresenter extends AbstractWebProtegePortletPresenter {
 
     @Nonnull
-    public BackgroundPresenter background;
+    public RepairsPresenter repairsPresenter;
 
     @Inject
-    public BackgroundProletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull BackgroundPresenter presenter) {
+    public RepairsPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull RepairsPresenter repairsPresenter) {
         super(selectionModel, projectId, displayNameRenderer);
-        this.background = presenter;
+        this.repairsPresenter = repairsPresenter;
     }
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        background.start(portletUi);
+        repairsPresenter.start(portletUi,eventBus);
     }
 }

@@ -1,8 +1,11 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -47,6 +50,9 @@ public class RepairsViewImpl extends Composite implements RepairsView{
     public AcceptsOneWidget getCriteriaContainer() {
         return criteriaContainer;
     }
+
+    @UiHandler("helpButton")
+    protected void helpButtonClick(ClickEvent event) { Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/faulty-axioms","_blank",""); }
 
     @Override
     public void clearResults() {

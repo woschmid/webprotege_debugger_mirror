@@ -44,7 +44,15 @@
         <g:VerticalPanel addStyleNames="{style.individualsList}">
             <g:cell height="50%">
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Entailed Test Cases" addStyleNames="{style.searchBox}"/>
+                <g:HorizontalPanel width="100%">
+                    <g:cell horizontalAlignment="ALIGN_LEFT" >
+                        <g:Label text="Entailed Test Cases" addStyleNames="{style.searchBox}"/>
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_RIGHT">
+                        <g:Button ui:field="helpButton" text="Help"/>
+                    </g:cell>
+                </g:HorizontalPanel>
+<!--                <g:Label text="Entailed Test Cases" addStyleNames="{style.searchBox}"/>-->
                 <!--            <g:VerticalPanel ui:field="table" />-->
                 <g:SimplePanel ui:field="EntailedcriteriaContainer" />
             </g:FlowPanel>

@@ -38,9 +38,17 @@
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
-        <div class="{style.typeGroup}">
-            <g:Label text="Possible Ontology Repairs" addStyleNames="{style.searchBox}"/>
-        </div>
+        <g:HorizontalPanel width="100%">
+            <g:cell horizontalAlignment="ALIGN_LEFT" >
+                <g:Label text="Possible Ontology Repairs" addStyleNames="{style.searchBox}"/>
+            </g:cell>
+            <g:cell horizontalAlignment="ALIGN_RIGHT">
+                <g:Button ui:field="helpButton" text="Help"/>
+            </g:cell>
+        </g:HorizontalPanel>
+<!--        <div class="{style.typeGroup}">-->
+<!--            <g:Label text="Possible Ontology Repairs" addStyleNames="{style.searchBox}"/>-->
+<!--        </div>-->
         <g:HTMLPanel addStyleNames="{style.individualsList}">
             <g:SimplePanel ui:field="criteriaContainer" />
         </g:HTMLPanel>

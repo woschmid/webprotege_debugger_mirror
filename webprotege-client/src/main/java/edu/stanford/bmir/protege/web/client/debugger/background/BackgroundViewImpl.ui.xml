@@ -47,9 +47,17 @@
         <g:VerticalPanel addStyleNames="{style.individualsList}">
             <g:cell height="50%">
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Possibly Faulty Axioms" addStyleNames="{style.searchBox}"/>
-                <!--            <g:VerticalPanel ui:field="table" />-->
+                <g:HorizontalPanel width="100%">
+                    <g:cell horizontalAlignment="ALIGN_LEFT" >
+                        <g:Label text="Possibly Faulty Axioms" addStyleNames="{style.searchBox}"/>
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_RIGHT">
+                        <g:Button ui:field="helpButton" text="Help"/>
+                    </g:cell>
+                </g:HorizontalPanel>
                 <g:SimplePanel ui:field="EntailedcriteriaContainer" />
+<!--                <g:Label text="Possibly Faulty Axioms" addStyleNames="{style.searchBox}"/>-->
+<!--                <g:SimplePanel ui:field="EntailedcriteriaContainer" />-->
             </g:FlowPanel>
             </g:cell>
             <g:FlowPanel addStyleNames="{style.viewGroup}" >

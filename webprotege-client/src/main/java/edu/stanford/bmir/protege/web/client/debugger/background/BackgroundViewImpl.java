@@ -1,8 +1,11 @@
 package edu.stanford.bmir.protege.web.client.debugger.background;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -40,6 +43,9 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     public BackgroundViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
     }
+
+    @UiHandler("helpButton")
+    protected void helpButtonClick(ClickEvent event) { Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/input-ontology","_blank",""); }
 
     @Nonnull
     public AcceptsOneWidget getEntailedCriteriaContainer() {

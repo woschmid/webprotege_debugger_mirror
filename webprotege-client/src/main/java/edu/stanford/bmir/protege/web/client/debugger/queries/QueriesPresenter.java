@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
 import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
@@ -306,9 +307,13 @@ public class QueriesPresenter extends DebuggerPresenter {
                 "wp-btn-g--editor",
                 this::ConfigureTimeout);
         hasPortletActions.addAction(createClassAction);
+        PortletAction helpAction = new PortletAction("Help",
+                "wp-btn-g--question",
+                this::showHelp);
+        hasPortletActions.addAction(helpAction);
     }
 
-    public void ConfigureTimeout() {
+    private void ConfigureTimeout() {
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Configure Timeout");
         modalPresenter.setView(configureDebuggerView);
@@ -318,6 +323,10 @@ public class QueriesPresenter extends DebuggerPresenter {
                 this::handleModalButton);
         modalManager.showModal(modalPresenter);
 
+    }
+
+    private void showHelp(){
+        Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/input-ontology","_blank","");
     }
 
     private void handleModalButton(ModalCloser closer) {

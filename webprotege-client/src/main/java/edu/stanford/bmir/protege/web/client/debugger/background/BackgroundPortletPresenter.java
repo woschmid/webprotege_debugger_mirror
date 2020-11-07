@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.debugger.queries;
+package edu.stanford.bmir.protege.web.client.debugger.background;
 
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
@@ -11,23 +11,21 @@ import edu.stanford.webprotege.shared.annotations.Portlet;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-@Portlet(id = "portlet.Queries", title = "Debugging Session")
-public class QueriesProletPresenter extends AbstractWebProtegePortletPresenter {
+@Portlet(id = "portlet.Background", title = "Background")
+
+public class BackgroundPortletPresenter extends AbstractWebProtegePortletPresenter {
 
     @Nonnull
-    QueriesPresenter queriesPresenter;
+    public BackgroundPresenter background;
 
     @Inject
-    public QueriesProletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer
-                                ,@Nonnull QueriesPresenter queriesPresenter) {
+    public BackgroundPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull BackgroundPresenter presenter) {
         super(selectionModel, projectId, displayNameRenderer);
-        this.queriesPresenter = queriesPresenter;
+        this.background = presenter;
     }
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        queriesPresenter.installActions(portletUi);
-        queriesPresenter.start(portletUi, eventBus);
-//        queriesPresenter.setHasBusy(portletUi);
+        background.start(portletUi);
     }
 }

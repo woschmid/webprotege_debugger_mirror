@@ -13,13 +13,13 @@ import javax.inject.Inject;
 
 @Portlet(id = "portlet.Testcases", title = "Testcases")
 
-public class TestcasesProletPresenter extends AbstractWebProtegePortletPresenter {
+public class TestcasesPortletPresenter extends AbstractWebProtegePortletPresenter {
 
     @Nonnull
     public TestcasesPresenter testcasesPresenter;
 
     @Inject
-    public TestcasesProletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull TestcasesPresenter presenter) {
+    public TestcasesPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull TestcasesPresenter presenter) {
         super(selectionModel, projectId, displayNameRenderer);
         this.testcasesPresenter = presenter;
     }
