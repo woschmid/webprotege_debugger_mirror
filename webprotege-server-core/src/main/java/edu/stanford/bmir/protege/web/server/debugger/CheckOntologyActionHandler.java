@@ -6,6 +6,7 @@ import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.access.BuiltInAction;
 import edu.stanford.bmir.protege.web.shared.debugger.CheckOntologyAction;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,7 +37,7 @@ public class CheckOntologyActionHandler extends AbstractProjectActionHandler<Che
     public DebuggingSessionStateResult execute(@Nonnull CheckOntologyAction action, @Nonnull ExecutionContext executionContext) {
         try {
             return session.checkOntology(executionContext.getUserId());
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | OWLOntologyCreationException e) {
             session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }

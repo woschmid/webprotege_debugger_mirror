@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.app.WebProtegeProperties;
+import edu.stanford.bmir.protege.web.server.change.HasApplyChanges;
 import edu.stanford.bmir.protege.web.server.change.*;
 import edu.stanford.bmir.protege.web.server.owlapi.RenameMap;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
@@ -28,11 +29,7 @@ import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
 import org.exquisite.core.solver.ExquisiteOWLReasoner;
-import org.exquisite.core.solver.ISolver;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +63,8 @@ public class DebuggingSession implements HasDispose {
 
     /** The current state of the debugging session */
     private SessionState state;
+
+    private ConsistencyCheckResult consistencyCheckResult;
 
     /** The diagnosis engine used for this debugging session*/
     private IDiagnosisEngine<OWLLogicalAxiom> engine;
@@ -193,11 +192,68 @@ public class DebuggingSession implements HasDispose {
     }
 
 
-    public DebuggingSessionStateResult checkOntology(UserId userId) {
-        if (getUserId() != null)
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
+    /**
+     * Checks the ontology before starting a debugging session.
+     * <ul>
+     *     <li>Evaluate DPI</li>
+     *     <li>Checks for consistency</li>
+     *     <li>Checking for coherency</li>
+     *     <li>Uses Module extraction</li>
+     *     <li>NO Reduce to inconsistency</li>
+     * </ul>
+     *
+     * @param userId
+     * @return
+     */
+    public DebuggingSessionStateResult checkOntology(UserId userId) throws OWLOntologyCreationException {
+        synchronized (this) {
+            if (getUserId() != null)
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
-        return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Your ontology is inconsistent. Please click on debug to repair your ontology!");
+            // guarantee that the session state is either in INIT or STOPPED state
+            // let's not allow to check an already started session
+            if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
+                throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
+
+            this.userId = userId;
+
+            logger.info("{} Checking ontology and creating reasoner for {} in {} ...", this, userId, projectId);
+
+            // creating a solver includes a possibly long-lasting consistency and coherency check
+            this.state = SessionState.COMPUTING;
+            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(), new LoggingReasonerProgressMonitor(this));
+            this.diagnosisModel = consistencyCheckResult.getDiagnosisModel();
+
+            // since we have done the check we can set the flag and return the appropriate result
+            this.state = SessionState.CHECKED;
+
+            if (Boolean.FALSE.equals(consistencyCheckResult.isConsistent())) {
+
+                if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
+                    // inconsistent and incoherent
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is inconsistent and incoherent. Please click on debug to repair your ontology!");
+                else if (Boolean.TRUE.equals(consistencyCheckResult.isCoherent()))
+                    // inconsistent but coherent
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is coherent but inconsistent. Please click on debug to repair your ontology!");
+                else
+                    // inconsistent and undefined coherency
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is inconsistent. Please click on debug to repair your ontology!");
+            } else if (Boolean.TRUE.equals(consistencyCheckResult.isConsistent())) {
+
+                if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
+                    // consistent but incoherent
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is consistent but incoherent. Please click on debug to repair your ontology!");
+                else if (Boolean.TRUE.equals(consistencyCheckResult.isCoherent()))
+                    // consistent and coherent
+                    return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Your ontology is consistent. No debugging required!");
+                else
+                    // inconsistent and undefined coherency
+                    return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Your ontology is consistent. No debugging required!");
+            } else {
+                // unexpected states
+                throw new ActionExecutionException(new RuntimeException("Unexpected ontology check result: " + consistencyCheckResult.toString()));
+            }
+        }
     }
 
     /**
@@ -205,35 +261,31 @@ public class DebuggingSession implements HasDispose {
      *
      * @param userId The user who wants to start a debugging session.
      */
-    public DebuggingSessionStateResult start(@Nonnull UserId userId) {
+    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException {
         synchronized (this) {
-            if (getUserId() != null)
+            if (!userId.equals(getUserId()))
                 return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
-            // guarantee that the session state is either in INIT or STOPPED state
-            // let's not allow to start an already started session
-            if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
-                throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
+            // guarantee that the session state is in CHECKED state
+            if (state != SessionState.CHECKED || this.consistencyCheckResult == null)
+                throw new ActionExecutionException(new RuntimeException("Debugging session can only be started when the ontology has been checked first."));
 
-            this.userId = userId;
+            // verify the result consistency check before we start a debugging session
+            if (! (Boolean.FALSE.equals(this.consistencyCheckResult.isConsistent())
+                    || Boolean.FALSE.equals(consistencyCheckResult.isCoherent())) )
+                throw new ActionExecutionException(new RuntimeException("Debugging session cannot be started for a consistent and coherent ontology"));
+
+            // reduce to inconsistency for incoherent ontologies
+            if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
+                ConsistencyChecker.reduceToInconsistency(diagnosisModel, monitor, consistencyCheckResult);
+
+            // now lets create a new diagnosis engine and start the session
+            this.engine = DiagnosisEngineFactory.createDiagnosisEngine(this.diagnosisModel, this);
+            logger.info("{} Solver created: {}", this, this.engine.getSolver());
+            logger.info("{} Diagnosis engine created: {}", this, this.engine);
+
             this.state = SessionState.STARTED;
             this.monitor = new LoggingQueryProgressMonitor(this);
-
-            logger.info("{} initiating for {} in {} ...", this, userId, projectId);
-
-            // creating a solver includes a possibly long-lasting consistency and coherency check
-            this.state = SessionState.COMPUTING;
-
-            // creates a solver instance  using the ontology
-            final ISolver<OWLLogicalAxiom> solver = SolverFactory.getSolver(ontology, diagnosisModel,this);
-            logger.info("{} Solver created: {}", this, solver);
-
-            // let's go back to init state after the solver has been created and a consistency and coherency check are done
-            this.state = SessionState.STARTED;
-
-            // create diagnosis engine using the solver
-            this.engine = DiagnosisEngineFactory.getDiagnosisEngine(solver);
-            logger.info("{} Diagnosis engine created: {}", this, this.engine);
 
             logger.info("{} started for {} in {}", this, userId, projectId);
 
@@ -488,6 +540,7 @@ public class DebuggingSession implements HasDispose {
         monitor = null;
         query = null;
         diagnoses = null;
+        consistencyCheckResult = null;
         diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
     }
 
