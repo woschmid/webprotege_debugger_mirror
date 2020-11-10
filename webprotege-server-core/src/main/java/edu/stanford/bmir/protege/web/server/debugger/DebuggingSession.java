@@ -217,6 +217,8 @@ public class DebuggingSession implements HasDispose {
 
             this.userId = userId;
 
+            this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
             logger.info("{} Checking ontology and creating reasoner for {} in {} ...", this, userId, projectId);
 
             // creating a solver includes a possibly long-lasting consistency and coherency check
@@ -231,24 +233,28 @@ public class DebuggingSession implements HasDispose {
 
                 if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
                     // inconsistent and incoherent
-                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is inconsistent and incoherent. Please click on debug to repair your ontology!");
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is <strong>inconsistent</strong> and <strong>incoherent</strong>.<br/><br/>Click on the <strong>Debug</strong> button to repair your ontology!");
                 else if (Boolean.TRUE.equals(consistencyCheckResult.isCoherent()))
                     // inconsistent but coherent
-                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is coherent but inconsistent. Please click on debug to repair your ontology!");
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is coherent but <strong>inconsistent</strong>.<br/><br/>Click on the <strong>Debug</strong> button to repair your ontology!");
                 else
                     // inconsistent and undefined coherency
-                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is inconsistent. Please click on debug to repair your ontology!");
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is <strong>inconsistent</strong>.<br/><br/>Click on the <strong>Debug</strong> button to repair your ontology!");
+
             } else if (Boolean.TRUE.equals(consistencyCheckResult.isConsistent())) {
 
                 if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
                     // consistent but incoherent
-                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is consistent but incoherent. Please click on debug to repair your ontology!");
-                else if (Boolean.TRUE.equals(consistencyCheckResult.isCoherent()))
-                    // consistent and coherent
-                    return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Your ontology is consistent. No debugging required!");
-                else
-                    // inconsistent and undefined coherency
-                    return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Your ontology is consistent. No debugging required!");
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is <strong>consistent but incoherent</strong>.<br/><br/>Please click on the <strong>Debug</strong> button to repair your ontology!");
+                else if (Boolean.TRUE.equals(consistencyCheckResult.isCoherent())) {
+                    // the ontology is consistent and coherent, we stop the session
+                    stop();
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is <strong>consistent</strong> and <strong>coherent</strong>!<br/><br/>No debugging necessary!");
+                } else {
+                    // consistent and undefined coherency, we stop the session
+                    stop();
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, "Your ontology is <strong>consistent</strong>.<br/><br/>No debugging necessary!");
+                }
             } else {
                 // unexpected states
                 throw new ActionExecutionException(new RuntimeException("Unexpected ontology check result: " + consistencyCheckResult.toString()));
@@ -362,7 +368,7 @@ public class DebuggingSession implements HasDispose {
                 return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
                                 "The debugger identified <strong>" + size +
                                 " faulty " + (size > 1 ? "axioms" : "axiom") + "</strong>.<br/><br/>" +
-                                "Use the REPAIR button to remove " + (size > 1 ? "them" : "it") + " from the ontology.");
+                                "Use the <strong>Repair</strong> button to remove " + (size > 1 ? "them" : "it") + " from the ontology.");
             } else {
                 // diagnoses.size() == 0: the ontology is consistent and coherent and has therefore no diagnoses
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
