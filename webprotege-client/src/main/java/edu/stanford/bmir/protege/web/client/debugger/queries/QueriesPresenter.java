@@ -92,6 +92,8 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.view.setSubmitDebuggingHandler(this::submitDebugging);
         this.view.setRepairDebuggingHandler(this::RepairDebugging);
         this.view.setCheckOntologyHandler(this::checkOntology);
+        this.view.setEditSettingHandler(this::ConfigureTimeout);
+        this.view.setHelpHandler(this::showHelp);
         reload();
     }
 

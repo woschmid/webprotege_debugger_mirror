@@ -10,6 +10,11 @@ import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
+import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
@@ -32,6 +37,9 @@ import java.util.Set;
 public class TestcasesPresenter extends DebuggerPresenter {
 
     @Nonnull
+    ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
+
+    @Nonnull
     private TestcasesView view;
 
     private DispatchServiceManager dsm;
@@ -48,13 +56,16 @@ public class TestcasesPresenter extends DebuggerPresenter {
     ProgressDisplay progressDisplay;
 
     @Nonnull
+    private final ModalManager modalManager;
+
+    @Nonnull
     private ProjectId projectId;
 
     @Inject
     public TestcasesPresenter(@Nonnull ProjectId projectId, StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
                               DispatchServiceManager dispatchServiceManager,
-                              MessageBox messageBox, StatementPresenter statementPresenter,
-                              DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, TestcasesView view, LoggedInUserProvider loggedInUserProvider) {
+                              MessageBox messageBox, StatementPresenter statementPresenter, ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter,
+                              DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, TestcasesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.errorDisplay = errorDisplay;
@@ -63,8 +74,8 @@ public class TestcasesPresenter extends DebuggerPresenter {
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
         this.view = view;
-
-//        this.debuggerResultManager = debuggerResultManager;
+        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
+        this.modalManager = modalManager;
     }
 
 
@@ -79,6 +90,8 @@ public class TestcasesPresenter extends DebuggerPresenter {
         statementPresenter2 = new StatementPresenter();
         statementPresenter2.start(view.getNonEntailedcriteriaContainer());
         statementPresenter2.addDeleteTestCasesHandler(this::deleteTestcase);
+
+        this.view.setAddTestcasesHandler(this::manchesterEditor);
 
     }
 
@@ -128,6 +141,22 @@ public class TestcasesPresenter extends DebuggerPresenter {
 //                        debuggerResultManager.updateContent();
                     }
                 });
+    }
+
+    private void manchesterEditor() {
+        ModalPresenter modalPresenter = modalManager.createPresenter();
+        modalPresenter.setTitle("Manchester Editor");
+        modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
+        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK,
+                this::handleModalButton);
+        modalManager.showModal(modalPresenter);
+
+    }
+
+    private void handleModalButton(ModalCloser closer) {
+        closer.closeModal();
     }
 
 

@@ -64,7 +64,7 @@
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
 
         <g:HorizontalPanel width="100%">
-            <g:cell horizontalAlignment="ALIGN_LEFT"  width="100%">
+            <g:cell horizontalAlignment="ALIGN_LEFT" width="100%" >
                 <g:Label text="Queries" addStyleNames="{style.form-label}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_RIGHT">

@@ -23,6 +23,10 @@ public interface QueriesView extends DebuggerView {
 
     void setCheckOntologyHandler(@Nonnull CheckOntologyHandler handler);
 
+    void setEditSettingHandler(@Nonnull EditSettingHandler handler);
+
+    void setHelpHandler(@Nonnull HelpHandler handler);
+
     void changeStartButton(@Nonnull boolean start);
 
     AcceptsOneWidget getCriteriaContainer();

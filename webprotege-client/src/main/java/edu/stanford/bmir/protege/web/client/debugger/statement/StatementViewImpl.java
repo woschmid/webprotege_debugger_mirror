@@ -54,6 +54,8 @@ public class StatementViewImpl extends Composite{
     @UiField
     protected FlexTable table;
 
+
+
     public List<RadioButton> radioGroups;
 
     protected StatementPresenter statementPresenter;

@@ -5,6 +5,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
 import javax.annotation.Nonnull;
@@ -64,18 +65,16 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
 
     private RepairDebuggingHandler repairDebuggingHandler = () -> {
-
     };
 
     private CheckOntologyHandler checkOntologyHandler = () -> {};
 
-    @Inject
-    public QueriesViewImpl() {
-        initWidget(ourUiBinder.createAndBindUi(this));
-//        editButton.addStyleName(BUNDLE.buttons().button());
-//        editButton.addStyleName(BUNDLE.buttons().dialogButton());
+    private EditSettingHandler editSettingHandler = () -> {};
 
-    }
+    private HelpHandler helpHandler = () -> {};
+
+    @Inject
+    public QueriesViewImpl() { initWidget(ourUiBinder.createAndBindUi(this)); }
 
     @UiHandler("startButton")
     protected void handleStartDebugging(ClickEvent clickEvent) {
@@ -100,6 +99,15 @@ public class QueriesViewImpl extends Composite implements QueriesView {
             startButton.setTitle("Check Ontology");
         }
     }
+    @UiHandler("editButton")
+    protected void handleEditSetting(ClickEvent clickEvent){
+        editSettingHandler.EditSetting();
+    }
+
+    @UiHandler("helpButton")
+    protected void handleHelp(ClickEvent clickEvent){
+        helpHandler.showHelp();
+    }
 
     @UiHandler("stopButton")
     protected void handleStopDebugging(ClickEvent clickEvent){
@@ -121,14 +129,17 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @Override
     public void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler){ this.submitDebuggingHandler = checkNotNull(handler);}
 
-    public void setCheckOntologyHandler(CheckOntologyHandler checkOntologyHandler) {
-        this.checkOntologyHandler = checkOntologyHandler;
-    }
+    @Override
+    public void setCheckOntologyHandler(CheckOntologyHandler checkOntologyHandler) { this.checkOntologyHandler = checkOntologyHandler; }
 
     @Override
-    public void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler) {
-        this.repairDebuggingHandler = checkNotNull(handler);
-    }
+    public void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler) { this.repairDebuggingHandler = checkNotNull(handler);}
+
+    @Override
+    public void setEditSettingHandler(@Nonnull EditSettingHandler editSettingHandler) { this.editSettingHandler = editSettingHandler; }
+
+    @Override
+    public void setHelpHandler(@Nonnull HelpHandler helpHandler) { this.helpHandler = helpHandler; }
 
     @Nonnull
     public AcceptsOneWidget getCriteriaContainer() {

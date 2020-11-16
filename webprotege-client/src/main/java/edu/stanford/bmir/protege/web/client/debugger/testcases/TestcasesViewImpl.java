@@ -7,6 +7,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.client.debugger.queries.StartDebuggingHandler;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -23,6 +24,12 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
 
     @UiField
     SimplePanel NonEntailedcriteriaContainer;
+
+    @UiField
+    protected Button addTestcasesButton;
+
+    private AddtestcasesHandler addtestcasesHandler = () -> {
+    };
 
     @Override
     public AcceptsOneWidget getCriteriaContainer() {
@@ -44,6 +51,9 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     @UiHandler("helpButton")
     protected void helpButtonClick(ClickEvent event) { Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/acquired-test-cases","_blank",""); }
 
+    @UiHandler("addTestcasesButton")
+    protected void addTestcasesButtonClick(ClickEvent event) { addtestcasesHandler.addTestcases(); }
+
     @Nonnull
     public AcceptsOneWidget getEntailedCriteriaContainer() {
         return EntailedcriteriaContainer;
@@ -52,6 +62,11 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     @Nonnull
     public AcceptsOneWidget getNonEntailedcriteriaContainer() {
         return NonEntailedcriteriaContainer;
+    }
+
+    @Override
+    public void setAddTestcasesHandler(AddtestcasesHandler addtestcasesHandler) {
+        this.addtestcasesHandler = addtestcasesHandler;
     }
 
 }
