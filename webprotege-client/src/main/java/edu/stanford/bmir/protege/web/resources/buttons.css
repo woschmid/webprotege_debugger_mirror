@@ -11,6 +11,7 @@
 @url hierarchyIconUrl hierarchyIcon;
 @url searchIconUrl searchIcon;
 @url questionIconUrl questionIcon;
+@url questionSmallIconUrl svgQuestionSmallIcon;
 @url createIconUrl svgCreateIcon;
 @url deleteIconUrl svgDeleteIcon;
 @url createIndividualIconUrl svgCreateIndividualIcon;
@@ -20,6 +21,7 @@
 @url refreshIconUrl svgRefreshIcon;
 @url createThreadIconUrl svgCreateThread;
 @url editorIconUrl svgEditorIcon;
+@url editorSmallIconUrl svgEditorSmallIcon;
 @url changesIconUrl svgChangesIcon;
 @url vizIconUrl vizIcon;
 @url downloadIconUrl downloadIcon;
@@ -333,7 +335,6 @@
     mask-image:  questionIconUrl;
     -webkit-mask-image:  questionIconUrl;
 }
-questionIconUrl
 
 .wp-btn-g--move-to-parent {
     mask-image: moveToParentIconUrl;
@@ -403,6 +404,16 @@ questionIconUrl
 .wp-btn-g--editor {
     mask-image: editorIconUrl;
     -webkit-mask-image: editorIconUrl;
+}
+
+.wp-btn-g--question-small {
+    mask-image:  questionSmallIconUrl;
+    -webkit-mask-image:  questionSmallIconUrl;
+}
+
+.wp-btn-g--editor-small {
+    mask-image: editorSmallIconUrl;
+    -webkit-mask-image: editorSmallIconUrl;
 }
 
 .wp-btn-g--changes {

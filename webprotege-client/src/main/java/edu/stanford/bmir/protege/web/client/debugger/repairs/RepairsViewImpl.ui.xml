@@ -36,14 +36,22 @@
             margin: 1px;
             border-bottom: 1px solid literal("var(--inlay-panel--background-color)");
         }
+        .classNavButton {
+        flex-grow: 0;
+        flex-shrink: 0;
+        }
+        .form-label {
+        font-weight: bold;
+        font-size: 17px;
+        }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
         <g:HorizontalPanel width="100%">
             <g:cell horizontalAlignment="ALIGN_LEFT" >
-                <g:Label text="Possible Ontology Repairs" addStyleNames="{style.searchBox}"/>
+                <g:Label text="Possible Ontology Repairs" addStyleNames="{style.form-label}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_RIGHT">
-                <g:Button ui:field="helpButton" text="Help"/>
+                <g:Button ui:field="helpButton" text="Help"  addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.questionSmall}"/>
             </g:cell>
         </g:HorizontalPanel>
 <!--        <div class="{style.typeGroup}">-->

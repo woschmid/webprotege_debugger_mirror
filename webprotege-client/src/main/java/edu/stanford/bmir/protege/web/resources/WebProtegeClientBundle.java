@@ -163,6 +163,10 @@ public interface WebProtegeClientBundle extends ClientBundle {
     @DataResource.MimeType("image/svg+xml")
     DataResource questionIcon();
 
+    @Source("question-small-icon.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource questionSmallIcon();
+
     @Source("message-icon.svg")
     @DataResource.MimeType("image/svg+xml")
     DataResource messageIcon();
@@ -253,6 +257,14 @@ public interface WebProtegeClientBundle extends ClientBundle {
     @Source("editor-icon.svg")
     @DataResource.MimeType("image/svg+xml")
     DataResource svgEditorIcon();
+
+    @Source("editor-small-icon.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource svgEditorSmallIcon();
+
+    @Source("question-small-icon.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource svgQuestionSmallIcon();
 
     @Source("changes-icon.svg")
     @DataResource.MimeType("image/svg+xml")
@@ -651,6 +663,13 @@ public interface WebProtegeClientBundle extends ClientBundle {
 
         @ClassName("wp-btn-g--editor")
         String editor();
+
+        @ClassName("wp-btn-g--editor-small")
+        String editorSmall();
+
+        @ClassName("wp-btn-g--question-small")
+        String questionSmall();
+
 
         @ClassName("wp-btn-g--changes")
         String changes();

@@ -50,13 +50,32 @@
             flex-shrink: 0;
             margin-bottom: 10px;
         }
+        .classNavButton {
+        flex-grow: 0;
+        flex-shrink: 0;
+        }
+        .form-label {
+            font-weight: bold;
+            font-size: 17px;
+        }
     </ui:style>
 
 
     <g:HTMLPanel addStyleNames="{style.main} {wp.style.panelFilled}">
 
+        <g:HorizontalPanel width="100%">
+            <g:cell horizontalAlignment="ALIGN_LEFT"  width="100%">
+                <g:Label text="Queries" addStyleNames="{style.form-label}"/>
+            </g:cell>
+            <g:cell horizontalAlignment="ALIGN_RIGHT">
+                <g:Button ui:field="editButton" text="Setting" title="Setting" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.editorSmall} {style.classNavButton}"/>
+            </g:cell>
+            <g:cell horizontalAlignment="ALIGN_RIGHT">
+                <g:Button ui:field="helpButton" text="Help" title="Help" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.questionSmall} {style.classNavButton}"/>
+            </g:cell>
+        </g:HorizontalPanel>
 <!--        <div class="{style.typeGroup}">-->
-<!--            <g:Label text="Queries" addStyleNames="{style.searchBox}"/>-->
+<!--            <g:Label text="Queries" addStyleNames="{wp.style.formLabel}"/>-->
 <!--        </div>-->
 
         <g:HorizontalPanel width="100%">

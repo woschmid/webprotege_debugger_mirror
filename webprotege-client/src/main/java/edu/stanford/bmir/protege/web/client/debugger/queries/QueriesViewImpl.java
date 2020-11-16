@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle.BUNDLE;
 
 /**
  * Matthew Horridge
@@ -27,6 +28,12 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     String CHECK="Check";
 
     String START="Debug";
+
+    @UiField
+    protected Button editButton;
+
+    @UiField
+    protected Button helpButton;
 
     @UiField
     protected Button startButton;
@@ -65,6 +72,9 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @Inject
     public QueriesViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
+//        editButton.addStyleName(BUNDLE.buttons().button());
+//        editButton.addStyleName(BUNDLE.buttons().dialogButton());
+
     }
 
     @UiHandler("startButton")
