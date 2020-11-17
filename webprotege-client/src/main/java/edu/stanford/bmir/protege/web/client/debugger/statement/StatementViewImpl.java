@@ -164,7 +164,7 @@ public class StatementViewImpl extends Composite{
 //    List<SafeHtml> backgroundAxioms = new ArrayList<>();
 //    List<SafeHtml> possibleFaultyAxioms = new ArrayList<>();
 
-    public void updateBackground(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms) {
+    public void updateBackground(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms, boolean isChecked) {
         table.clear();
         table.removeAllRows();
         if (!backgroundAxioms.isEmpty()) {
@@ -175,8 +175,9 @@ public class StatementViewImpl extends Composite{
                 button.setTitle("Remove from background");
                 StringBuilder sbN = getStyle(Icon.TOP);
                 button.setHTML(sbN.toString());
+
                 table.setWidget(row, 0, statement);
-                table.setWidget(row, 1, button);
+                if (isChecked){table.setWidget(row, 1, button);}
 
                 button.addClickHandler(new ClickHandler() {
                     @Override
@@ -196,7 +197,7 @@ public class StatementViewImpl extends Composite{
                 StringBuilder sbN = getStyle(Icon.BOTTOM);
                 button.setHTML(sbN.toString());
                 table.setWidget(row, 0, statement);
-                table.setWidget(row, 1, button);
+                if (isChecked){table.setWidget(row, 1, button);}
 
                 button.addClickHandler(new ClickHandler() {
                     @Override

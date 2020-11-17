@@ -89,7 +89,9 @@ public class GetManchesterSyntaxFrameCompletionsActionHandler
 //                    break;
 //                }
 //            }
+            System.out.println(from);
             int lastWordStartIndex = getLastWordIndex(syntax, from);
+            System.out.println(lastWordStartIndex);
             int lastWordEndIndex = getWordEnd(syntax, from);
 
             int fromLineNumber = action.getFromPos().getLineNumber();

@@ -14,10 +14,7 @@ import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
-import edu.stanford.bmir.protege.web.shared.debugger.CorrectAxioms;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.MoveToAction;
-import edu.stanford.bmir.protege.web.shared.debugger.PossiblyFaultyAxioms;
+import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
@@ -89,8 +86,11 @@ public class BackgroundPresenter extends DebuggerPresenter {
         statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerReplaceAxiom);
 
     }
-
+    boolean isChecked = true;
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
+
+        if(debuggingSessionStateResult.getSessionState()!=SessionState.CHECKED)
+            isChecked = false;
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
@@ -120,14 +120,14 @@ public class BackgroundPresenter extends DebuggerPresenter {
     }
 
     private void setAxiomsToViews() {
-        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possibleFaultyAxioms);
-        statementPresenter2.addPossibleFaultyAxioms( backgroundAxioms, new ArrayList<>());
+        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possibleFaultyAxioms, isChecked);
+        statementPresenter2.addPossibleFaultyAxioms( backgroundAxioms, new ArrayList<>(), isChecked);
     }
 
-    private void setAxiomsToViews(PossiblyFaultyAxioms possiblyFaultyAxioms, CorrectAxioms correctAxioms) {
-        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possiblyFaultyAxioms.getAxioms());
-        statementPresenter2.addPossibleFaultyAxioms( correctAxioms.getAxioms(), new ArrayList<>());
-    }
+//    private void setAxiomsToViews(PossiblyFaultyAxioms possiblyFaultyAxioms, CorrectAxioms correctAxioms) {
+//        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possiblyFaultyAxioms.getAxioms());
+//        statementPresenter2.addPossibleFaultyAxioms( correctAxioms.getAxioms(), new ArrayList<>());
+//    }
 
     public void handlerFaultyAxiomRemove(SafeHtml axiom){
         if (axiom != null) {

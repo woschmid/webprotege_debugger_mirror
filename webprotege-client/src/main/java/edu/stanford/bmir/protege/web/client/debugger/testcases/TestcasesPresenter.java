@@ -20,6 +20,7 @@ import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.RemoveTestCaseAction;
 import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
+import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
@@ -78,11 +79,12 @@ public class TestcasesPresenter extends DebuggerPresenter {
         this.modalManager = modalManager;
     }
 
-
-    public void start(AcceptsOneWidget container) {
+    WebProtegeEventBus eventBus;
+    public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         container.setWidget(view.asWidget());
         debuggerResultManager.addToList(this);
-
+        this.eventBus = eventBus;
+        manchesterSyntaxFrameEditorPresenter.start(eventBus);
         statementPresenter1 = new StatementPresenter();
         statementPresenter1.start(view.getEntailedCriteriaContainer());
         statementPresenter1.addDeleteTestCasesHandler(this::deleteTestcase);
@@ -147,6 +149,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Manchester Editor");
         modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
+        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK,
@@ -156,7 +159,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     private void handleModalButton(ModalCloser closer) {
-        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue().toString());
+        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getFreshEntities());
         closer.closeModal();
     }
 

@@ -63,7 +63,7 @@ public class StatementPresenter {
 
     public void addTestCasesStatement(Set<SafeHtml> msg){ view.addTestcasesStatement(msg);}
 
-    public void addPossibleFaultyAxioms(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms) {  view.updateBackground(backgroundAxioms, possibleFaultyAxioms);}
+    public void addPossibleFaultyAxioms(List<SafeHtml> backgroundAxioms,List<SafeHtml> possibleFaultyAxioms, boolean isChecked) {  view.updateBackground(backgroundAxioms, possibleFaultyAxioms, isChecked);}
 
 
     public void clearAxoim(){

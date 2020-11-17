@@ -26,6 +26,6 @@ public class TestcasesPortletPresenter extends AbstractWebProtegePortletPresente
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        testcasesPresenter.start(portletUi);
+        testcasesPresenter.start(portletUi, eventBus);
     }
 }
