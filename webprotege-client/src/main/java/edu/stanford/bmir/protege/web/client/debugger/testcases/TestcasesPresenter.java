@@ -156,6 +156,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     private void handleModalButton(ModalCloser closer) {
+        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue().toString());
         closer.closeModal();
     }
 
