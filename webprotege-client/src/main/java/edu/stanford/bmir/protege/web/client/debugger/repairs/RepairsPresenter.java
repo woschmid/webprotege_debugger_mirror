@@ -7,6 +7,7 @@ import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresente
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
@@ -64,4 +65,5 @@ public class RepairsPresenter extends DebuggerPresenter {
     public void clearAxiomtable() {
         statementPresenter.clearAxoim();
     }
+
 }

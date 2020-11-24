@@ -10,6 +10,8 @@ import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditor;
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorImpl;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
@@ -22,11 +24,13 @@ import edu.stanford.bmir.protege.web.shared.debugger.RemoveTestCaseAction;
 import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
+import org.semanticweb.owlapi.model.*;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -65,7 +69,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
     @Inject
     public TestcasesPresenter(@Nonnull ProjectId projectId, StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
                               DispatchServiceManager dispatchServiceManager,
-                              MessageBox messageBox, StatementPresenter statementPresenter, ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter,
+                              MessageBox messageBox, StatementPresenter statementPresenter,
                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, TestcasesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
@@ -75,7 +79,6 @@ public class TestcasesPresenter extends DebuggerPresenter {
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
         this.view = view;
-        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
         this.modalManager = modalManager;
     }
 
@@ -84,7 +87,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
         container.setWidget(view.asWidget());
         debuggerResultManager.addToList(this);
         this.eventBus = eventBus;
-        manchesterSyntaxFrameEditorPresenter.start(eventBus);
+
         statementPresenter1 = new StatementPresenter();
         statementPresenter1.start(view.getEntailedCriteriaContainer());
         statementPresenter1.addDeleteTestCasesHandler(this::deleteTestcase);
@@ -94,7 +97,6 @@ public class TestcasesPresenter extends DebuggerPresenter {
         statementPresenter2.addDeleteTestCasesHandler(this::deleteTestcase);
 
         this.view.setAddTestcasesHandler(this::manchesterEditor);
-
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
@@ -139,17 +141,16 @@ public class TestcasesPresenter extends DebuggerPresenter {
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                         GWT.log("[TestcasesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult.getNegativeTestCases());
                         handlerDebugging(debuggingSessionStateResult);
-//                        debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
-//                        debuggerResultManager.updateContent();
                     }
                 });
     }
 
     private void manchesterEditor() {
+        GWT.log("[TestcasesPresenter]+++++++++++++++++++ " + manchesterSyntaxFrameEditorPresenter.getView().getValue());
+        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Manchester Editor");
         modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
-        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK,
@@ -159,7 +160,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     private void handleModalButton(ModalCloser closer) {
-        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getFreshEntities());
+        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue());
         closer.closeModal();
     }
 
@@ -167,5 +168,9 @@ public class TestcasesPresenter extends DebuggerPresenter {
     public void clearAxiomtable() {
         statementPresenter1.clearAxoim();
         statementPresenter2.clearAxoim();
+    }
+
+    public void setManchesterSyntaxFrameEditorPresenter(ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter) {
+        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
     }
 }

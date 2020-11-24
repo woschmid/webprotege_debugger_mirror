@@ -7,7 +7,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import edu.stanford.bmir.protege.web.client.debugger.queries.StartDebuggingHandler;
+import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
+import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -28,6 +29,9 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     @UiField
     protected Button addTestcasesButton;
 
+    @UiField
+    protected Button addNTestcasesButton;
+
     private AddtestcasesHandler addtestcasesHandler = () -> {
     };
 
@@ -46,6 +50,12 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     @Inject
     public TestcasesViewImpl() {
         initWidget(ourUiBinder.createAndBindUi(this));
+        StringBuilder sbP = getStyle(Icon.ADD);
+        addTestcasesButton.setTitle("Add entailed Testcase");
+        addTestcasesButton.setHTML(sbP.toString());
+        StringBuilder sbN = getStyle(Icon.NADD);
+        addNTestcasesButton.setTitle("Add Non-entailed Testcase");
+        addNTestcasesButton.setHTML(sbN.toString());
     }
 
     @UiHandler("helpButton")
@@ -53,6 +63,9 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
 
     @UiHandler("addTestcasesButton")
     protected void addTestcasesButtonClick(ClickEvent event) { addtestcasesHandler.addTestcases(); }
+
+    @UiHandler("addNTestcasesButton")
+    protected void addNTestcasesButtonClick(ClickEvent event) { addtestcasesHandler.addTestcases(); }
 
     @Nonnull
     public AcceptsOneWidget getEntailedCriteriaContainer() {
@@ -67,6 +80,27 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     @Override
     public void setAddTestcasesHandler(AddtestcasesHandler addtestcasesHandler) {
         this.addtestcasesHandler = addtestcasesHandler;
+    }
+
+    private StringBuilder getStyle(Icon b){
+        DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();
+        StringBuilder sb = new StringBuilder();
+        if (b == Icon.TRUE){
+            sb.append("<div class=\"").append( style.addBullet()).append(" \">").append("</div>");
+        }else if( b == Icon.FALSE){
+            sb.append("<div class=\"").append(style.removeBullet()).append(" \">").append("</div>");
+        }else if ( b == Icon.BOTTOM){
+            sb.append("<div class=\"").append(style.goBottom()).append(" \">").append("</div>");
+        }else if (b == Icon.TOP){
+            sb.append("<div class=\"").append(style.goTop()).append(" \">").append("</div>");
+        }else if (b == Icon.CROSS){
+            sb.append("<div class=\"").append(style.cross()).append(" \">").append("</div>");
+        }else if (b == Icon.NADD){
+            sb.append("<div class=\"").append(style.addNTest()).append(" \">").append("</div>");
+        } else if (b == Icon.ADD){
+            sb.append("<div class=\"").append(style.addTest()).append(" \">").append("</div>");
+        }
+        return sb;
     }
 
 }

@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
 import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
@@ -16,6 +17,7 @@ public class RepairsPortletPresenter extends AbstractWebProtegePortletPresenter 
 
     @Nonnull
     public RepairsPresenter repairsPresenter;
+
 
     @Inject
     public RepairsPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull RepairsPresenter repairsPresenter) {

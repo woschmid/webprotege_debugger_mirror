@@ -7,14 +7,18 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.IsWidget;
 import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
+import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfacePresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
+import edu.stanford.bmir.protege.web.client.debugger.statement.StatementView;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
@@ -34,6 +38,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class QueriesPresenter extends DebuggerPresenter {
+
+    @Nonnull
+    ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
 
     private StatementPresenter statementPresenter;
 
@@ -60,11 +67,13 @@ public class QueriesPresenter extends DebuggerPresenter {
     @Nonnull
     private final ConfigureDebuggerView configureDebuggerView;
 
+    @Nonnull  RepairInterfacePresenter repairInterfacePresenter;
+
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
                             DispatchServiceManager dispatchServiceManager,
-                            MessageBox messageBox, StatementPresenter statementPresenter,
+                            MessageBox messageBox, StatementPresenter statementPresenter, RepairInterfacePresenter repairInterfacePresenter,
                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
@@ -75,6 +84,7 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.view = view;
         this.modalManager = modalManager;
         this.configureDebuggerView = configureDebuggerView;
+        this.repairInterfacePresenter = repairInterfacePresenter;
         statementPresenter.addCheckBoxClickhandler(this::CheckCheckBox);
     }
 
@@ -83,9 +93,10 @@ public class QueriesPresenter extends DebuggerPresenter {
     }
 
 
-
+    WebProtegeEventBus eventBus;
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         super.start(container,eventBus);
+        this.eventBus = eventBus;
         setEnabledButton("stop");
         this.view.setStartDebuggingHandler(this::startDebugging);
         this.view.setStopDebuggingHandler(this::stopDebugging);
@@ -202,8 +213,17 @@ public class QueriesPresenter extends DebuggerPresenter {
 
     private void RepairDebugging() {
         GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
+        ModalPresenter modalPresenter = modalManager.createPresenter();
+        modalPresenter.setTitle("Repair");
+        repairInterfacePresenter.start(eventBus,debuggerResultManager.getDebuggingSessionStateResult());
+        modalPresenter.setView(repairInterfacePresenter.getView());
+        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK,
+                this::handleModalButton);
+        modalManager.showModal(modalPresenter);
 
-        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
+//        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
 
     }
 
@@ -304,17 +324,6 @@ public class QueriesPresenter extends DebuggerPresenter {
         }
     }
 
-    public void installActions(HasPortletActions hasPortletActions) {
-        PortletAction createClassAction = new PortletAction("Setting",
-                "wp-btn-g--editor",
-                this::ConfigureTimeout);
-        hasPortletActions.addAction(createClassAction);
-        PortletAction helpAction = new PortletAction("Help",
-                "wp-btn-g--question",
-                this::showHelp);
-        hasPortletActions.addAction(helpAction);
-    }
-
     private void ConfigureTimeout() {
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Configure Timeout");
@@ -335,4 +344,7 @@ public class QueriesPresenter extends DebuggerPresenter {
         closer.closeModal();
     }
 
+    public void setManchesterSyntaxFrameEditorPresenter(ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter) {
+        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
+    }
 }

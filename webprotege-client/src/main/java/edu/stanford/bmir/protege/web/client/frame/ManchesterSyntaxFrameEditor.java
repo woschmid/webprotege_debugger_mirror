@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.client.frame;
 
 import com.google.gwt.user.client.ui.HasEnabled;
 import edu.stanford.bmir.gwtcodemirror.client.AutoCompletionHandler;
+import edu.stanford.bmir.gwtcodemirror.client.GWTCodeMirror;
 import edu.stanford.bmir.protege.web.client.editor.ValueEditor;
 import edu.stanford.bmir.protege.web.shared.frame.ManchesterSyntaxFrameParseError;
 
@@ -21,5 +22,6 @@ public interface ManchesterSyntaxFrameEditor extends ValueEditor<String>, HasEna
     void setApplyChangesViewVisible(boolean visible);
 
     void setApplyChangesHandler(ApplyChangesActionHandler handler);
+
 
 }

@@ -39,13 +39,9 @@
             width: 100%;
             height: 100%;
         }
-        .classNavButton {
-        flex-grow: 0;
-        flex-shrink: 0;
-        }
         .form-label {
-        font-weight: bold;
-        font-size: 17px;
+            font-weight: bold;
+            font-size: 17px;
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main}">
@@ -57,7 +53,7 @@
                         <g:Label text="Entailed Test Cases" addStyleNames="{style.form-label}" />
                     </g:cell>
                     <g:cell horizontalAlignment="ALIGN_LEFT" >
-                        <g:Button ui:field="addTestcasesButton" text="Add" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.addButton}"/>
+                        <g:Button ui:field="addTestcasesButton" text="Add"/>
                     </g:cell>
                     <g:cell horizontalAlignment="ALIGN_RIGHT">
                         <g:Button ui:field="helpButton" text="Help"  addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.questionSmall} "/>
@@ -67,8 +63,14 @@
             </g:FlowPanel>
             </g:cell>
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Non-Entailed Test Cases" addStyleNames="{style.form-label}" />
-                <!--            <g:VerticalPanel ui:field="table" />-->
+                <g:HorizontalPanel width="100%">
+                    <g:cell horizontalAlignment="ALIGN_LEFT" width="100%" >
+                        <g:Label text="Non-Entailed Test Cases" addStyleNames="{style.form-label}" />
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_LEFT" >
+                        <g:Button ui:field="addNTestcasesButton" text="Add"/>
+                    </g:cell>
+                </g:HorizontalPanel>
                 <g:SimplePanel ui:field="NonEntailedcriteriaContainer" />
             </g:FlowPanel>
         </g:VerticalPanel>

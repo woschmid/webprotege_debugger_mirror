@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.debugger.statement;
+package edu.stanford.bmir.protege.web.client.debugger.resources;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
@@ -20,6 +20,10 @@ public interface DiffClientBundle extends ClientBundle {
     @Source("../resources/change-op-add-icon.svg")
     @DataResource.MimeType("image/svg+xml")
     DataResource changeOpAddIcon();
+
+    @Source("../resources/change-op-add-test-icon.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource changeOpAddTestIcon();
 
     @Source("../resources/change-op-remove-icon.svg")
     @DataResource.MimeType("image/svg+xml")
@@ -45,6 +49,8 @@ public interface DiffClientBundle extends ClientBundle {
 
         String addBullet();
 
+        String addTest();
+
         String remove();
 
         String removeBullet();
@@ -56,6 +62,8 @@ public interface DiffClientBundle extends ClientBundle {
         String goBottom();
 
         String cross();
+
+        String addNTest();
 
         String lineElement();
     }

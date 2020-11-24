@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.client.debugger.testcases;
 
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
 import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
@@ -18,14 +19,21 @@ public class TestcasesPortletPresenter extends AbstractWebProtegePortletPresente
     @Nonnull
     public TestcasesPresenter testcasesPresenter;
 
+    @Nonnull
+    public ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
+
     @Inject
-    public TestcasesPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull TestcasesPresenter presenter) {
+    public TestcasesPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer, @Nonnull TestcasesPresenter presenter, @Nonnull ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter) {
         super(selectionModel, projectId, displayNameRenderer);
         this.testcasesPresenter = presenter;
+        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
     }
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
+        manchesterSyntaxFrameEditorPresenter.start(eventBus);
         testcasesPresenter.start(portletUi, eventBus);
+        testcasesPresenter.setManchesterSyntaxFrameEditorPresenter(this.manchesterSyntaxFrameEditorPresenter);
+
     }
 }

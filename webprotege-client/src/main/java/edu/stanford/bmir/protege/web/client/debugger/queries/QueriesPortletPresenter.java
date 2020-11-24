@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.client.debugger.queries;
 
+import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
 import edu.stanford.bmir.protege.web.client.portlet.AbstractWebProtegePortletPresenter;
 import edu.stanford.bmir.protege.web.client.portlet.PortletUi;
@@ -15,19 +16,23 @@ import javax.inject.Inject;
 public class QueriesPortletPresenter extends AbstractWebProtegePortletPresenter {
 
     @Nonnull
+    public ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
+
+    @Nonnull
     QueriesPresenter queriesPresenter;
 
     @Inject
-    public QueriesPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer
+    public QueriesPortletPresenter(@Nonnull SelectionModel selectionModel,@Nonnull ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer
                                 , @Nonnull QueriesPresenter queriesPresenter) {
         super(selectionModel, projectId, displayNameRenderer);
         this.queriesPresenter = queriesPresenter;
+        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
     }
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-//        queriesPresenter.installActions(portletUi);
+        manchesterSyntaxFrameEditorPresenter.start(eventBus);
         queriesPresenter.start(portletUi, eventBus);
-//        queriesPresenter.setHasBusy(portletUi);
+        queriesPresenter.setManchesterSyntaxFrameEditorPresenter(this.manchesterSyntaxFrameEditorPresenter);
     }
 }

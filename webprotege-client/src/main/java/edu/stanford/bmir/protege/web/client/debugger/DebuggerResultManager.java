@@ -56,4 +56,7 @@ public class DebuggerResultManager {
 
     }
 
+    public DebuggingSessionStateResult getDebuggingSessionStateResult() {
+        return debuggingSessionStateResult;
+    }
 }

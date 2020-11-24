@@ -5,6 +5,7 @@
 @url moveToParentIconUrl moveToParentIcon;
 
 @url crossIconUrl crossIcon;
+@url changeOpAddTestIconUrl changeOpAddTestIcon;
 
 .line {
     border-bottom: 1px solid literal("var(--separator--color)");
@@ -31,6 +32,33 @@
     background-color: literal("var(--create--color)");
     flex-grow: 0;
     flex-shrink: 0;
+}
+
+.addTest {
+    mask-image: changeOpAddTestIconUrl;
+    -webkit-mask-image: changeOpAddTestIconUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    margin: 4px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    background-color: literal("var(--create--color)");
+}
+.addNTest {
+    mask-image: changeOpAddTestIconUrl;
+    -webkit-mask-image: changeOpAddTestIconUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    margin: 4px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    background-color: literal("var(--delete--color)");
 }
 .goBottom {
     mask-image: moveToChildIconUrl;

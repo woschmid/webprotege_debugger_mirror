@@ -84,7 +84,7 @@ public class ManchesterSyntaxFrameEditorImpl extends Composite implements Manche
     @Override
     public void clearValue() {
         dirty = false;
-//        editor.setValue("");
+        editor.setValue("");
     }
 
     @Override
