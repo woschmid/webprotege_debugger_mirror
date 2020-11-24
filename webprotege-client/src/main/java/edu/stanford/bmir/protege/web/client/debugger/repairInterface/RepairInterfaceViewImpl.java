@@ -21,6 +21,13 @@ public class RepairInterfaceViewImpl extends Composite{
     }
     private static RepairInterfaceViewImplUiBinder ourUiBinder = GWT.create(RepairInterfaceViewImplUiBinder.class);
 
+    ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
+        @Override
+        public void addManchesterEditor() {
+
+        }
+    };
+
     public RepairInterfaceViewImpl(){
         DiffClientBundle.INSTANCE.style().ensureInjected();
         initWidget(ourUiBinder.createAndBindUi(this));
@@ -50,6 +57,7 @@ public class RepairInterfaceViewImpl extends Composite{
             buttonM.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
+                    manchesterEditorHandler.addManchesterEditor();
                 }
             });
 
@@ -80,4 +88,7 @@ public class RepairInterfaceViewImpl extends Composite{
         return sb;
     }
 
+    public void setManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler) {
+        this.manchesterEditorHandler = manchesterEditorHandler;
+    }
 }
