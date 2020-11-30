@@ -652,4 +652,15 @@ public class ProjectActionHandlersModule {
         return handler;
     }
 
+    @Provides @IntoSet
+    public ProjectActionHandler provideDeleteRepairAxiomActionHandler(DeleteRepairAxiomActionHandler handler) {
+        return handler;
+    }
+
+    @Provides @IntoSet
+    public ProjectActionHandler provideModifyRepairAxiomActionHandler(ModifyRepairAxiomActionHandler handler) {
+        return handler;
+    }
+
+
 }

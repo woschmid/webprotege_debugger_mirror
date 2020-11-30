@@ -614,4 +614,13 @@ public class DebuggingSession implements HasDispose {
         return null;
     }
 
+    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull SafeHtml axiomToDelete) {
+        // TODO implementation required
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+    }
+
+    public DebuggingSessionStateResult modifyRepairAxiom(@Nonnull UserId userId, @Nonnull SafeHtml originalAxiom, @Nonnull SafeHtml modifiedAxiom) {
+        // TODO implementation required
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+    }
 }
