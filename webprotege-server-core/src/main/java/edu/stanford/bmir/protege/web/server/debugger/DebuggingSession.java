@@ -452,6 +452,90 @@ public class DebuggingSession implements HasDispose {
     }
 
     /**
+     * Deletes an axiom from the final diagnosis.
+     *
+     * @param userId The user who wants to delete a specific
+     * @param axiomToDelete A safehtml representation of the axiom to remove.
+     * @return
+     */
+    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) {
+        if (!userId.equals(getUserId()))
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                    "A debugging session is already running for this project by user " + getUserId());
+
+        // verify that the session state in STARTED state
+        if (state != SessionState.STARTED)
+            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
+
+        // check the preconditions for a repair action
+        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
+            throw new RuntimeException("A repair is not allowed!");
+
+        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
+        // get the final diagnosis and apply are remove axioms change operation for them
+        final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
+
+        final DebuggingSession debuggingSession = this;
+
+        final ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
+
+            @Override
+            public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
+                final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
+                OWLLogicalAxiom axiomToRemove = null;
+                // lookup the axiom to remove
+                for (OWLLogicalAxiom axiom : diagnosis.getFormulas()) {
+                    if (axiomToDelete.equals(renderingManager.getHtmlBrowserText(axiom))) {
+                        // changeList.removeAxiom(ontologyID, axiom);
+                        axiomToRemove = axiom;
+                        break; // we found the axiom
+                    }
+                }
+                if (axiomToRemove != null) {
+                    changeList.removeAxiom(ontologyID, axiomToRemove);
+                    diagnosis.getFormulas().remove(axiomToRemove); // todo CAN WE ASSUME TO JUST REMOVE THE AXIOM INSTEAD OF HAVING TO RECALCULATE THE DIAGNOSIS?
+                    return changeList.build(true);
+                } else {
+                    return changeList.build(false);
+                }
+
+            }
+
+            @Override
+            public Boolean getRenamedResult(Boolean result, RenameMap renameMap) {
+                return true;
+            }
+
+            @Nonnull
+            @Override
+            public String getMessage(ChangeApplicationResult<Boolean> result) {
+                return "Repair action of " + debuggingSession;
+            }
+        };
+
+        applyChanges.applyChanges(getUserId(), changeListGenerator);
+
+        this.diagnoses = null;
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                "The ontology has been successfully repaired!");
+    }
+
+    /**
+     * Modifies an axiom from the final diagnosis.
+     *
+     * @param userId
+     * @param applyChanges
+     * @param originalAxiom
+     * @param modifiedAxiom
+     * @return
+     */
+    public DebuggingSessionStateResult modifyRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml originalAxiom, @Nonnull SafeHtml modifiedAxiom) {
+        // TODO implementation required
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+    }
+
+    /**
      * Moves an axiom between correct and possibly faulty axioms.
      *
      * @param userId The user who wants to move the axiom before starting a debugging session.
@@ -614,13 +698,4 @@ public class DebuggingSession implements HasDispose {
         return null;
     }
 
-    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull SafeHtml axiomToDelete) {
-        // TODO implementation required
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
-    }
-
-    public DebuggingSessionStateResult modifyRepairAxiom(@Nonnull UserId userId, @Nonnull SafeHtml originalAxiom, @Nonnull SafeHtml modifiedAxiom) {
-        // TODO implementation required
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
-    }
 }

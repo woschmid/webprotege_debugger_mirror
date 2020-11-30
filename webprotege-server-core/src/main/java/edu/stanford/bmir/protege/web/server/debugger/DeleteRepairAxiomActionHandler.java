@@ -1,6 +1,7 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
 import edu.stanford.bmir.protege.web.server.access.AccessManager;
+import edu.stanford.bmir.protege.web.server.change.HasApplyChanges;
 import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.access.BuiltInAction;
@@ -16,10 +17,16 @@ public class DeleteRepairAxiomActionHandler extends AbstractProjectActionHandler
     @Nonnull
     private final DebuggingSession session;
 
+    @Nonnull
+    private final HasApplyChanges applyChanges;
+
     @Inject
-    public DeleteRepairAxiomActionHandler(@Nonnull DebuggingSession session, @Nonnull AccessManager accessManager) {
+    public DeleteRepairAxiomActionHandler(@Nonnull DebuggingSession session,
+                                          @Nonnull AccessManager accessManager,
+                                          @Nonnull HasApplyChanges applyChanges) {
         super(accessManager);
         this.session = session;
+        this.applyChanges = applyChanges;
     }
 
     @Nonnull
@@ -32,7 +39,7 @@ public class DeleteRepairAxiomActionHandler extends AbstractProjectActionHandler
     @Override
     public DebuggingSessionStateResult execute(@Nonnull DeleteRepairAxiomAction action, @Nonnull ExecutionContext executionContext) {
         try {
-            return session.deleteRepairAxiom(executionContext.getUserId(), action.getAxiomToDelete());
+            return session.deleteRepairAxiom(executionContext.getUserId(), applyChanges, action.getAxiomToDelete());
         } catch (RuntimeException e) {
             session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
