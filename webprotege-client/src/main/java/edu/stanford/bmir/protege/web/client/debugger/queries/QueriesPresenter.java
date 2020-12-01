@@ -46,23 +46,16 @@ public class QueriesPresenter extends DebuggerPresenter {
 
     private QueriesView view;
 
-    private DispatchServiceManager dsm;
-//
-//    private DispatchErrorMessageDisplay errorDisplay;
-//
-//    private ProgressDisplay progressDisplay;
-
     private LoggedInUserProvider loggedInUserProvider;
 
-//    private DebuggerResultManager debuggerResultManager;
-//
-//    private MessageBox messageBox;
 
     @Nonnull
     private ProjectId projectId;
 
     @Nonnull
     private final ModalManager modalManager;
+
+    private DispatchServiceManager dsm;
 
     @Nonnull
     private final ConfigureDebuggerView configureDebuggerView;
@@ -220,11 +213,16 @@ public class QueriesPresenter extends DebuggerPresenter {
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK,
-                this::handleModalButton);
+                this::reload);
         modalManager.showModal(modalPresenter);
 
 //        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
 
+    }
+
+    private void reload(ModalCloser modalCloser) {
+        modalCloser.closeModal();
+        reload();
     }
 
     private void runRepair(){
