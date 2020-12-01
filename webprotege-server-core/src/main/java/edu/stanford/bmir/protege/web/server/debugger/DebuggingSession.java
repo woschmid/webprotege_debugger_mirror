@@ -78,6 +78,8 @@ public class DebuggingSession implements HasDispose {
 
     private RenderingManager renderingManager;
 
+    private RevisionManager revisionManager;
+
     private IExquisiteProgressMonitor monitor;
 
     private final ScheduledExecutorService purgePreventionService;
@@ -104,6 +106,7 @@ public class DebuggingSession implements HasDispose {
 
         this.projectId = projectId;
         this.renderingManager = renderingManager;
+        this.revisionManager = revisionManager;
 
         this.state = SessionState.INIT;
         this.query = null;
@@ -142,20 +145,11 @@ public class DebuggingSession implements HasDispose {
                 webProtegeProperties.getProjectDormantTime() * 90L / 100L,
                 TimeUnit.MILLISECONDS);
 
-        // loading ontology and generating diagnosis model
-        final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
-        final List<OWLOntology> ontologies = new ArrayList<>(ontologyManager.getOntologies());
-        if (ontologies.size() != 1)
-            throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
-
-        this.ontology = ontologies.get(0);
-        this.ontologyID = ontology.getOntologyID();
-        logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
-
-        this.diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
+        loadOntology();
 
         logger.info("{} created", this);
     }
+
 
     @Override
     public String toString() {
@@ -215,6 +209,8 @@ public class DebuggingSession implements HasDispose {
             // let's not allow to check an already started session
             if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
                 throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
+
+            loadOntology();
 
             this.userId = userId;
 
@@ -479,47 +475,50 @@ public class DebuggingSession implements HasDispose {
 
         final DebuggingSession debuggingSession = this;
 
-        final ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
+        final ChangeListGenerator<OWLLogicalAxiom> changeListGenerator = new ChangeListGenerator<>() {
 
             @Override
-            public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
-                final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
+            public OntologyChangeList<OWLLogicalAxiom> generateChanges(ChangeGenerationContext context) {
+                final OntologyChangeList.Builder<OWLLogicalAxiom> changeList = new OntologyChangeList.Builder<>();
                 OWLLogicalAxiom axiomToRemove = null;
                 // lookup the axiom to remove
                 for (OWLLogicalAxiom axiom : diagnosis.getFormulas()) {
                     if (axiomToDelete.equals(renderingManager.getHtmlBrowserText(axiom))) {
-                        // changeList.removeAxiom(ontologyID, axiom);
                         axiomToRemove = axiom;
                         break; // we found the axiom
                     }
                 }
                 if (axiomToRemove != null) {
                     changeList.removeAxiom(ontologyID, axiomToRemove);
-                    diagnosis.getFormulas().remove(axiomToRemove); // todo CAN WE ASSUME TO JUST REMOVE THE AXIOM INSTEAD OF HAVING TO RECALCULATE THE DIAGNOSIS?
-                    return changeList.build(true);
-                } else {
-                    return changeList.build(false);
-                }
-
+                    return changeList.build(axiomToRemove);
+                } else
+                    throw new RuntimeException("No matching axiom found in diagnosis to delete!");
             }
 
             @Override
-            public Boolean getRenamedResult(Boolean result, RenameMap renameMap) {
-                return true;
+            public OWLLogicalAxiom getRenamedResult(OWLLogicalAxiom axiom, RenameMap renameMap) {
+                return axiom;
             }
 
             @Nonnull
             @Override
-            public String getMessage(ChangeApplicationResult<Boolean> result) {
+            public String getMessage(ChangeApplicationResult<OWLLogicalAxiom> result) {
                 return "Repair action of " + debuggingSession;
             }
         };
 
-        applyChanges.applyChanges(getUserId(), changeListGenerator);
+        final ChangeApplicationResult<OWLLogicalAxiom> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-        this.diagnoses = null;
+        // remove the axiom also from the diagnosis
+        diagnosis.getFormulas().remove(result.getSubject());
+        if (diagnosis.getFormulas().isEmpty())
+            diagnoses = null;
+
+        // and remove the axiom also from diagnosis model
+        getDiagnosisModel().getPossiblyFaultyFormulas().remove(result.getSubject());
+
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
-                "The ontology has been successfully repaired!");
+                    "The ontology has been successfully repaired!");
     }
 
     /**
@@ -654,7 +653,7 @@ public class DebuggingSession implements HasDispose {
         query = null;
         diagnoses = null;
         consistencyCheckResult = null;
-        diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
+        loadOntology();
     }
 
     @Override
@@ -724,4 +723,18 @@ public class DebuggingSession implements HasDispose {
         return null;
     }
 
+    private void loadOntology() {
+        // loading ontology and generating diagnosis model
+        final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
+        final List<OWLOntology> ontologies = new ArrayList<>(ontologyManager.getOntologies());
+        if (ontologies.size() != 1)
+            throw new ActionExecutionException(new RuntimeException("Expected only one ontology but there are " + ontologies.size()));
+
+        this.ontology = ontologies.get(0);
+        this.ontologyID = ontology.getOntologyID();
+        logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
+
+        this.diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
+        logger.info("Diagnosis model created {})", this.diagnosisModel);
+    }
 }
