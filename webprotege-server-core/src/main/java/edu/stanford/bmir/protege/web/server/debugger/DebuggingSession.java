@@ -580,7 +580,7 @@ public class DebuggingSession implements HasDispose {
         this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
 
         // TODO
-        return null;
+        return new GetEntityResult(null);
     }
 
     /**
