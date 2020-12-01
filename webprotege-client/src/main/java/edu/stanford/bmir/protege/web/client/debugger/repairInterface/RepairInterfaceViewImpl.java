@@ -16,6 +16,14 @@ import java.util.Set;
 
 
 public class RepairInterfaceViewImpl extends Composite{
+
+    private DeleteRepairHandler deleteRepairHandler = new DeleteRepairHandler() {
+        @Override
+        public void DeleteRepair(SafeHtml selectedAxiom) {
+
+        }
+    };
+
     interface RepairInterfaceViewImplUiBinder extends UiBinder<HTMLPanel, RepairInterfaceViewImpl> {
 
     }
@@ -64,6 +72,7 @@ public class RepairInterfaceViewImpl extends Composite{
             buttonD.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
+                    deleteRepairHandler.DeleteRepair(axiom);
                 }
             });
             table.setWidget(row,0,statement);
@@ -90,5 +99,9 @@ public class RepairInterfaceViewImpl extends Composite{
 
     public void setManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler) {
         this.manchesterEditorHandler = manchesterEditorHandler;
+    }
+
+    public void setDeleteRepairHandler(DeleteRepairHandler deleteRepairHandler) {
+        this.deleteRepairHandler = deleteRepairHandler;
     }
 }
