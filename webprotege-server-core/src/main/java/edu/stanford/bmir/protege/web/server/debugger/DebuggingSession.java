@@ -13,6 +13,7 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.GetEntityResult;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
@@ -555,6 +556,31 @@ public class DebuggingSession implements HasDispose {
         if (!hasMoved)
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+    }
+
+    /**
+     * Returns the owl entity belonging to an diagnosis axiom.
+     *
+     * @param userId
+     * @param axiom
+     * @return
+     */
+    public GetEntityResult getEntity(UserId userId, SafeHtml axiom) {
+        if (!userId.equals(getUserId()))
+            throw new RuntimeException("A debugging session is already running for this project by user " + getUserId());
+
+        // verify that the session state in STARTED state
+        if (state != SessionState.STARTED)
+            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
+
+        // check the preconditions for a repair action
+        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
+            throw new RuntimeException("A repair is not allowed!");
+
+        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
+        // TODO
+        return null;
     }
 
     /**
