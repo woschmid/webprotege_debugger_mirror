@@ -8,6 +8,8 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 public class MoveToAction implements ProjectAction<DebuggingSessionStateResult> {
     private ProjectId projectId;
     private SafeHtml axiom;
@@ -47,9 +49,9 @@ public class MoveToAction implements ProjectAction<DebuggingSessionStateResult> 
 
     @Override
     public String toString() {
-        return "MoveToAction{" +
-                "projectId=" + projectId +
-                ", axiom=" + axiom +
-                '}';
+        return toStringHelper("MoveToAction")
+                .addValue(projectId)
+                .addValue(axiom)
+                .toString();
     }
 }

@@ -6,9 +6,9 @@ import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
-
 import java.util.Objects;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RemoveTestCaseAction implements ProjectAction<DebuggingSessionStateResult>  {
@@ -52,9 +52,9 @@ public class RemoveTestCaseAction implements ProjectAction<DebuggingSessionState
 
     @Override
     public String toString() {
-        return "RemoveTestCaseAction{" +
-                "projectId=" + projectId +
-                ", testCase=" + testCase +
-                '}';
+        return toStringHelper("RemoveTestCaseAction")
+                .addValue(projectId)
+                .addValue(testCase)
+                .toString();
     }
 }

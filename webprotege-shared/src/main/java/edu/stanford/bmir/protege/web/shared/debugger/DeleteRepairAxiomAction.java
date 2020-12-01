@@ -1,6 +1,7 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
+import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -11,10 +12,12 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 
 public class DeleteRepairAxiomAction implements ProjectAction<DebuggingSessionStateResult> {
 
-    @Nonnull final private ProjectId projectId;
+    private ProjectId projectId;
 
-    @Nonnull
-    private final SafeHtml axiomToDelete;
+    private SafeHtml axiomToDelete;
+
+    @GwtSerializationConstructor
+    private DeleteRepairAxiomAction() {}
 
     public DeleteRepairAxiomAction(@Nonnull ProjectId projectId, @Nonnull SafeHtml axiomToDelete) {
         this.projectId = projectId;
