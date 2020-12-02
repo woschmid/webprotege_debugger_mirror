@@ -362,7 +362,7 @@ public class DebuggingSession implements HasDispose {
                 return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
                                 "The debugger identified <strong>" + size +
                                 " faulty " + (size > 1 ? "axioms" : "axiom") + "</strong>.<br/><br/>" +
-                                "Use the <strong>Repair</strong> button to remove " + (size > 1 ? "them" : "it") + " from the ontology.");
+                                "<strong>Modify</strong> or <strong>Delete</strong> " + ((size > 1) ? "them" : "it") + " to repair the ontology.");
             } else {
                 // diagnoses.size() == 0: the ontology is consistent and coherent and has therefore no diagnoses
                 logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
