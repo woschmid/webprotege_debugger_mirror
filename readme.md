@@ -94,7 +94,7 @@ Edit the WebProtégé Settings
 
 Building Docker image
 -------------------
-```docker build -t webprotege_debugger --build-arg WEBPROTEGE_VERSION=4.0.2 ```
+```docker build -t webprotege_debugger --build-arg WEBPROTEGE_VERSION=4.0.2 .```
 
 
 Running from Docker
