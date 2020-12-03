@@ -43,6 +43,14 @@ public class StatementPresenter {
         view.setDeleteTestCasesHandler(deleteTestCasesHandler);
     }
 
+    public void addManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler){
+        view.setManchesterEditorHandler(manchesterEditorHandler);
+    }
+
+    public void addDeleteRepairHandler(DeleteRepairHandler deleteRepairHandler){
+        view.setDeleteRepairHandler(deleteRepairHandler);
+    }
+
 
     public void start(AcceptsOneWidget container) {
         this.container = container;

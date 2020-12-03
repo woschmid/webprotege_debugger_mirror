@@ -21,6 +21,7 @@ public class ModifyRepairAxiomAction implements ProjectAction<DebuggingSessionSt
     @GwtSerializationConstructor
     private ModifyRepairAxiomAction() {}
 
+
     public ModifyRepairAxiomAction(@Nonnull ProjectId projectId, @Nonnull SafeHtml originalAxiom, @Nonnull SafeHtml modifiedAxiom) {
         this.projectId = projectId;
         this.originalAxiom = originalAxiom;

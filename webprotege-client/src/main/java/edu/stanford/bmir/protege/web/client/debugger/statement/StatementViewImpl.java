@@ -9,6 +9,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.client.debugger.statement.DeleteRepairHandler;
+import edu.stanford.bmir.protege.web.client.debugger.statement.ManchesterEditorHandler;
 import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
 import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
@@ -48,6 +50,20 @@ public class StatementViewImpl extends Composite{
     DeleteTestCasesHandler deleteTestCasesHandler= new DeleteTestCasesHandler() {
         @Override
         public void DeleteTestCases(SafeHtml axiom) {
+
+        }
+    };
+
+    private DeleteRepairHandler deleteRepairHandler = new DeleteRepairHandler() {
+        @Override
+        public void DeleteRepair(SafeHtml selectedAxiom) {
+
+        }
+    };
+
+    ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
+        @Override
+        public void addManchesterEditor() {
 
         }
     };
@@ -127,19 +143,46 @@ public class StatementViewImpl extends Composite{
         int numOfRepairs = 1;
         for (Diagnosis diagnosis :
                 diagnoseStatement) {
-            SafeHtmlBuilder diagnosisString = new SafeHtmlBuilder();
-            for (SafeHtml axiom:
-                 diagnosis.getAxioms()) {
-//                axioms = changeAxoimsStyle(axiom);
-                diagnosisString.append(axiom);
-                diagnosisString.append(new OnlyToBeUsedInGeneratedCodeStringBlessedAsSafeHtml("<br/>"));
-            }
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
             repair.getElement().getStyle().setColor("blue");
-            Label statement = new HTML( diagnosisString.toSafeHtml() );
             table.setWidget(row,0,repair);
-            table.setWidget(row+1,0,statement);
+            int numbAxioms = 1;
+            for(SafeHtml axiom: diagnosis.getAxioms()){
+                Label statement = new HTML(axiom);
+                table.setWidget(row+numbAxioms,0,statement);
+                if (diagnoseStatement.size()== 1){
+                    Button buttonM = new Button("Modify");
+                    buttonM.setTitle("Modify");
+                    Button buttonD = new Button("Delete");
+                    buttonD.setTitle("Delete");
+                    buttonM.addClickHandler(new ClickHandler() {
+                        @Override
+                        public void onClick(ClickEvent clickEvent) {
+                            manchesterEditorHandler.addManchesterEditor();
+                        }
+                    });
+
+                    buttonD.addClickHandler(new ClickHandler() {
+                        @Override
+                        public void onClick(ClickEvent clickEvent) {
+                            deleteRepairHandler.DeleteRepair(axiom);
+                        }
+                    });
+                    table.setWidget(row+numbAxioms,1,buttonM);
+                    table.setWidget(row+numbAxioms,2,buttonD);
+                }
+                numbAxioms++;
+            }
+//            SafeHtmlBuilder diagnosisString = new SafeHtmlBuilder();
+//            for (SafeHtml axiom:
+//                 diagnosis.getAxioms()) {
+////                axioms = changeAxoimsStyle(axiom);
+//                diagnosisString.append(axiom);
+//                diagnosisString.append(new OnlyToBeUsedInGeneratedCodeStringBlessedAsSafeHtml("<br/>"));
+//            }
+//            Label statement = new HTML( diagnosisString.toSafeHtml() );
+
         }
     }
 
@@ -223,7 +266,17 @@ public class StatementViewImpl extends Composite{
         this.deleteTestCasesHandler = deleteTestCasesHandler;
     }
 
+    public void setManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler) {
+        this.manchesterEditorHandler = manchesterEditorHandler;
+    }
+
+    public void setDeleteRepairHandler(DeleteRepairHandler deleteRepairHandler) {
+        this.deleteRepairHandler = deleteRepairHandler;
+    }
+
     public void setCheckCheckBox(CheckCheckBoxHandler checkCheckBox) {
         this.checkCheckBox = checkCheckBox;
     }
+
+
 }

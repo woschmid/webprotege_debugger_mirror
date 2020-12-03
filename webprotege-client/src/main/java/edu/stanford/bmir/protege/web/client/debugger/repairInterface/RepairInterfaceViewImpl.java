@@ -17,18 +17,19 @@ import java.util.Set;
 
 public class RepairInterfaceViewImpl extends Composite{
 
-    private DeleteRepairHandler deleteRepairHandler = new DeleteRepairHandler() {
-        @Override
-        public void DeleteRepair(SafeHtml selectedAxiom) {
 
-        }
-    };
 
     interface RepairInterfaceViewImplUiBinder extends UiBinder<HTMLPanel, RepairInterfaceViewImpl> {
 
     }
     private static RepairInterfaceViewImplUiBinder ourUiBinder = GWT.create(RepairInterfaceViewImplUiBinder.class);
 
+    private DeleteRepairHandler deleteRepairHandler = new DeleteRepairHandler() {
+        @Override
+        public void DeleteRepair(SafeHtml selectedAxiom) {
+
+        }
+    };
     ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
         @Override
         public void addManchesterEditor() {
