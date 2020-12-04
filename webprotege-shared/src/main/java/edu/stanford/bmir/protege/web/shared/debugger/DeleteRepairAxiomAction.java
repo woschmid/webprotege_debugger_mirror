@@ -10,7 +10,7 @@ import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
-public class DeleteRepairAxiomAction implements ProjectAction<DebuggingSessionStateResult> {
+@Deprecated public class DeleteRepairAxiomAction implements ProjectAction<DebuggingSessionStateResult> {
 
     private ProjectId projectId;
 

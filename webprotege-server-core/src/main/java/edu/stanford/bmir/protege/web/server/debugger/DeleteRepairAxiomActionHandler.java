@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+@Deprecated
 public class DeleteRepairAxiomActionHandler extends AbstractProjectActionHandler<DeleteRepairAxiomAction, DebuggingSessionStateResult> {
 
     @Nonnull

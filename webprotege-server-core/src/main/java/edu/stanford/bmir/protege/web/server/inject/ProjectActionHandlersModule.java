@@ -657,7 +657,7 @@ public class ProjectActionHandlersModule {
         return handler;
     }
 
-    @Provides @IntoSet
+    @Provides @IntoSet @Deprecated
     public ProjectActionHandler provideDeleteRepairAxiomActionHandler(DeleteRepairAxiomActionHandler handler) {
         return handler;
     }
