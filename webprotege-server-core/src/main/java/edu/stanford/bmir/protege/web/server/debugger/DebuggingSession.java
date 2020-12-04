@@ -618,7 +618,7 @@ public class DebuggingSession implements HasDispose {
      *
      * @param userId The user who wants to stop a debugging session.
      * @param testCase The SafeHtml representation of the testcase to be removed.
-     * @return A result for the front end representing the current state of the backend.
+     * @return A result for the frontend if the deletion was successful and representing the current state of the backend.
      */
     public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) {
         if (!userId.equals(getUserId()))
@@ -644,6 +644,19 @@ public class DebuggingSession implements HasDispose {
         }
 
         return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
+    }
+
+    /**
+     * Adds a testcase to the entailed or non-entailed testcases.
+     *
+     * @param userId The id of the user who wants to add the test case.
+     * @param testCase A string representation of the axiom. This string will be parsed and evaluated. If the string is
+     *                 not valid, an exception will be thrown.
+     * @param isEntailed The type of test case. <code>true</code> means <i>entailed</i>, <code>false</code> means <i>non-entailed</i>.
+     * @return A result for the frontend if addition was successful and representing the current state of the backend.
+     */
+    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) {
+        return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "This method is not yet implemented");
     }
 
     /**

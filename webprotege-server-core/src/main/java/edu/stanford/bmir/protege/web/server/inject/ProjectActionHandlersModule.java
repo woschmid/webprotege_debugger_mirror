@@ -653,6 +653,11 @@ public class ProjectActionHandlersModule {
     }
 
     @Provides @IntoSet
+    public ProjectActionHandler provideAddTestCaseActionHandler(AddTestCaseActionHandler handler) {
+        return handler;
+    }
+
+    @Provides @IntoSet
     public ProjectActionHandler provideDeleteRepairAxiomActionHandler(DeleteRepairAxiomActionHandler handler) {
         return handler;
     }
