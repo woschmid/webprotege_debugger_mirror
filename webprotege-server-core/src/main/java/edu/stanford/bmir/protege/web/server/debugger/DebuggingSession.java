@@ -399,6 +399,7 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to repair the debugging session.
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
+     * @deprecated todo to be deleted
      */
     public DebuggingSessionStateResult repair(@Nonnull UserId userId, HasApplyChanges applyChanges) {
         if (!userId.equals(getUserId()))
@@ -454,6 +455,7 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to delete a specific
      * @param axiomToDelete A safehtml representation of the axiom to remove.
      * @return
+     * @deprecated to be deleted
      */
     public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) {
         if (!userId.equals(getUserId()))
@@ -480,14 +482,8 @@ public class DebuggingSession implements HasDispose {
             @Override
             public OntologyChangeList<OWLLogicalAxiom> generateChanges(ChangeGenerationContext context) {
                 final OntologyChangeList.Builder<OWLLogicalAxiom> changeList = new OntologyChangeList.Builder<>();
-                OWLLogicalAxiom axiomToRemove = null;
-                // lookup the axiom to remove
-                for (OWLLogicalAxiom axiom : diagnosis.getFormulas()) {
-                    if (axiomToDelete.equals(renderingManager.getHtmlBrowserText(axiom))) {
-                        axiomToRemove = axiom;
-                        break; // we found the axiom
-                    }
-                }
+                final OWLLogicalAxiom axiomToRemove = lookupAxiomInCollection(axiomToDelete, diagnosis.getFormulas());
+
                 if (axiomToRemove != null) {
                     changeList.removeAxiom(ontologyID, axiomToRemove);
                     return changeList.build(axiomToRemove);
@@ -509,16 +505,49 @@ public class DebuggingSession implements HasDispose {
 
         final ChangeApplicationResult<OWLLogicalAxiom> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-        // remove the axiom also from the diagnosis
+        // remove the deleted axiom also from the diagnosis
         diagnosis.getFormulas().remove(result.getSubject());
         if (diagnosis.getFormulas().isEmpty())
             diagnoses = null;
 
-        // and remove the axiom also from diagnosis model
+        // and remove the deleted axiom also from diagnosis model
         getDiagnosisModel().getPossiblyFaultyFormulas().remove(result.getSubject());
 
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
                     "The ontology has been successfully repaired!");
+    }
+
+    /**
+     * Returns the owl entity belonging to an diagnosis axiomAsString.
+     *
+     * @param userId The user who wants to identify the owl entity behind an OWLLogicalAxiom.
+     * @param axiomAsString The SafeHtml representation of an OWLLogicalAxiom which is expected to be in the diagnosis.
+     * @return
+     * @deprecated to be deleted
+     */
+    public GetEntityResult getEntity(UserId userId, SafeHtml axiomAsString) {
+        if (!userId.equals(getUserId()))
+            throw new RuntimeException("A debugging session is already running for this project by user " + getUserId());
+
+        // verify that the session state in STARTED state
+        if (state != SessionState.STARTED)
+            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
+
+        // check the preconditions for a repair action
+        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
+            throw new RuntimeException("A repair is not allowed!");
+
+        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
+        // lookup the owl logical axiomAsString from the diagnosis axioms
+        final OWLLogicalAxiom axiom = lookupAxiomInCollection(axiomAsString, diagnoses.iterator().next().getFormulas());
+
+        if (axiom != null) {
+            final OWLEntity owlEntity = axiom.accept(new OWLEntityExtractor());
+            return new GetEntityResult(owlEntity);
+        } else
+            throw new RuntimeException("Axiom could not be found in diagnosis");
+
     }
 
     /**
@@ -529,6 +558,7 @@ public class DebuggingSession implements HasDispose {
      * @param originalAxiom
      * @param modifiedAxiom
      * @return
+     * @deprecated todo: to be deleted
      */
     public DebuggingSessionStateResult modifyRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml originalAxiom, @Nonnull SafeHtml modifiedAxiom) {
         // TODO implementation required
@@ -557,30 +587,7 @@ public class DebuggingSession implements HasDispose {
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
 
-    /**
-     * Returns the owl entity belonging to an diagnosis axiom.
-     *
-     * @param userId
-     * @param axiom
-     * @return
-     */
-    public GetEntityResult getEntity(UserId userId, SafeHtml axiom) {
-        if (!userId.equals(getUserId()))
-            throw new RuntimeException("A debugging session is already running for this project by user " + getUserId());
 
-        // verify that the session state in STARTED state
-        if (state != SessionState.STARTED)
-            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
-
-        // check the preconditions for a repair action
-        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
-            throw new RuntimeException("A repair is not allowed!");
-
-        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
-
-        // TODO
-        return new GetEntityResult(null);
-    }
 
     /**
      * Moves the axiom between two lists.
@@ -677,44 +684,25 @@ public class DebuggingSession implements HasDispose {
         final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = engine.getSolver().getDiagnosisModel();
         for (Map.Entry<SafeHtml, Boolean> answer : answers.entrySet()) {
             // look up the axiom representing this string
-            final OWLLogicalAxiom axiom = lookupAxiomFromPreviousQuery(answer.getKey());
-            if (answer.getValue())
-                diagnosisModel.getEntailedExamples().add(axiom);
-            else
-                diagnosisModel.getNotEntailedExamples().add(axiom);
+            final OWLLogicalAxiom axiom = lookupAxiomInCollection(answer.getKey(), query.formulas);
+            // if no axiom could be found, we have to throw an exception
+            if (axiom != null) {
+                if (answer.getValue())
+                    diagnosisModel.getEntailedExamples().add(axiom);
+                else
+                    diagnosisModel.getNotEntailedExamples().add(axiom);
+            } else
+                throw new ActionExecutionException(new RuntimeException("Axiom could not be not found"));
+
         }
     }
-
-    /**
-     * Get the axiom representing the string.
-     *
-     * @param axiomAsString A string representation of an axiom to look up in the previous query.
-     * @return The OWLLogicalAxiom instance representing the string.
-     * @throws ActionExecutionException if no axiom representing this string can be found from the previous query.
-     */
-    private OWLLogicalAxiom lookupAxiomFromPreviousQuery(@Nonnull final SafeHtml axiomAsString) {
-
-        // we expect that the query stated before does exist
-        if (query == null) {
-            throw new ActionExecutionException(new RuntimeException("No previous query instance found"));
-        }
-
-        // lookup the matching axiom
-        for (OWLLogicalAxiom a : query.formulas)
-            if (axiomAsString.equals(renderingManager.getHtmlBrowserText(a)))
-                return a;
-
-        // if no axiom could be found, we have to throw an exception
-        throw new ActionExecutionException(new RuntimeException(axiomAsString + " could not be not found"));
-    }
-
 
     /**
      * Searches for an axiom in a collection that fits the SafeHtml representation and returns the actual axiom.
      *
      * @param axiomAsString The SafeHtml representation of the axiom to search for.
      * @param collection The collection searched within.
-     * @return The axiom if a fitting
+     * @return The axiom if a fitting or <code>null</code> if no axiom fitting the string representation was found.
      */
     @Nullable private OWLLogicalAxiom lookupAxiomInCollection(@Nonnull final SafeHtml axiomAsString, @Nonnull Collection<OWLLogicalAxiom> collection) {
         for (OWLLogicalAxiom axiom : collection)
