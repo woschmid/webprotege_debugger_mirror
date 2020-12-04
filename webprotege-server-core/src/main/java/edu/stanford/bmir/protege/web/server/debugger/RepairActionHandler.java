@@ -39,7 +39,7 @@ public class RepairActionHandler extends AbstractProjectActionHandler<RepairActi
     @Override
     public DebuggingSessionStateResult execute(@Nonnull RepairAction action, @Nonnull ExecutionContext executionContext) {
         try {
-            return session.repair(executionContext.getUserId(), applyChanges);
+            return session.repair(executionContext.getUserId(), action.getRepairDetails(), applyChanges);
         } catch (RuntimeException e) {
             session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());

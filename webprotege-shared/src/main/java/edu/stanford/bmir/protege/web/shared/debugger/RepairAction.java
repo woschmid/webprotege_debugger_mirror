@@ -14,8 +14,15 @@ public class RepairAction implements ProjectAction<DebuggingSessionStateResult> 
 
     private ProjectId projectId;
 
-    public RepairAction(@Nonnull ProjectId projectId) {
+    private RepairDetails repairDetails;
+
+    @Deprecated public RepairAction(@Nonnull ProjectId projectId) {
         this.projectId = checkNotNull(projectId);
+    }
+
+    public RepairAction(@Nonnull ProjectId projectId, @Nonnull RepairDetails repairDetails) {
+        this.projectId = projectId;
+        this.repairDetails = repairDetails;
     }
 
     @GwtSerializationConstructor
@@ -27,23 +34,29 @@ public class RepairAction implements ProjectAction<DebuggingSessionStateResult> 
         return projectId;
     }
 
+    @Nonnull
+    public RepairDetails getRepairDetails() {
+        return repairDetails;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RepairAction that = (RepairAction) o;
-        return Objects.equals(projectId, that.projectId);
+        return Objects.equals(projectId, that.projectId) && Objects.equals(repairDetails, that.repairDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId);
+        return Objects.hash(projectId, repairDetails);
     }
 
     @Override
     public String toString() {
         return toStringHelper("RepairAction")
                 .addValue(projectId)
+                .addValue(repairDetails)
                 .toString();
     }
 }

@@ -14,6 +14,7 @@ import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.GetEntityResult;
+import edu.stanford.bmir.protege.web.shared.debugger.RepairDetails;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
@@ -397,11 +398,11 @@ public class DebuggingSession implements HasDispose {
      * Repairs the final diagnosis.
      *
      * @param userId The user who wants to repair the debugging session.
+     * @param repairDetails
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
-     * @deprecated todo to be deleted
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, HasApplyChanges applyChanges) {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) {
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
