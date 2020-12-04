@@ -13,7 +13,6 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.GetEntityResult;
 import edu.stanford.bmir.protege.web.shared.debugger.RepairDetails;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
@@ -516,54 +515,6 @@ public class DebuggingSession implements HasDispose {
 
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
                     "The ontology has been successfully repaired!");
-    }
-
-    /**
-     * Returns the owl entity belonging to an diagnosis axiomAsString.
-     *
-     * @param userId The user who wants to identify the owl entity behind an OWLLogicalAxiom.
-     * @param axiomAsString The SafeHtml representation of an OWLLogicalAxiom which is expected to be in the diagnosis.
-     * @return
-     * @deprecated to be deleted
-     */
-    public GetEntityResult getEntity(UserId userId, SafeHtml axiomAsString) {
-        if (!userId.equals(getUserId()))
-            throw new RuntimeException("A debugging session is already running for this project by user " + getUserId());
-
-        // verify that the session state in STARTED state
-        if (state != SessionState.STARTED)
-            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
-
-        // check the preconditions for a repair action
-        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
-            throw new RuntimeException("A repair is not allowed!");
-
-        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
-
-        // lookup the owl logical axiomAsString from the diagnosis axioms
-        final OWLLogicalAxiom axiom = lookupAxiomInCollection(axiomAsString, diagnoses.iterator().next().getFormulas());
-
-        if (axiom != null) {
-            final OWLEntity owlEntity = axiom.accept(new OWLEntityExtractor());
-            return new GetEntityResult(owlEntity);
-        } else
-            throw new RuntimeException("Axiom could not be found in diagnosis");
-
-    }
-
-    /**
-     * Modifies an axiom from the final diagnosis.
-     *
-     * @param userId
-     * @param applyChanges
-     * @param originalAxiom
-     * @param modifiedAxiom
-     * @return
-     * @deprecated todo: to be deleted
-     */
-    public DebuggingSessionStateResult modifyRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml originalAxiom, @Nonnull SafeHtml modifiedAxiom) {
-        // TODO implementation required
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
 
     /**

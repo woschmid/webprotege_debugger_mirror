@@ -662,14 +662,4 @@ public class ProjectActionHandlersModule {
         return handler;
     }
 
-    @Provides @IntoSet
-    public ProjectActionHandler provideModifyRepairAxiomActionHandler(ModifyRepairAxiomActionHandler handler) {
-        return handler;
-    }
-
-    @Provides @IntoSet
-    public ProjectActionHandler provideEntityActionHandler(GetEntityActionHandler handler) {
-        return handler;
-    }
-
 }
