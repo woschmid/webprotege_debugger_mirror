@@ -30,6 +30,7 @@ import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
 import org.exquisite.core.solver.ExquisiteOWLReasoner;
+import org.obolibrary.macro.ManchesterSyntaxTool;
 import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -608,7 +609,22 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the frontend if addition was successful and representing the current state of the backend.
      */
     public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) {
-        return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "This method is not yet implemented");
+        if (!userId.equals(getUserId()))
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                    "A debugging session is already running for this project by user " + getUserId());
+
+        // verify that the session state is NOT in STARTED state
+        if (state == SessionState.STARTED || state == SessionState.COMPUTING)
+            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
+
+        final OWLLogicalAxiom axiom = (OWLLogicalAxiom) OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
+
+        if (isEntailed)
+            this.diagnosisModel.getEntailedExamples().add(axiom);
+        else
+            this.diagnosisModel.getNotEntailedExamples().add(axiom);
+
+        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
 
     /**
