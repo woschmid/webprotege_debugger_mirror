@@ -10,6 +10,7 @@ import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditor;
 import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditorImpl;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditor;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditorImpl;
+import edu.stanford.bmir.protege.web.client.debugger.ManchesterSyntaxEditor.DebuggerManchesterSyntaxFrameEditor;
 import edu.stanford.bmir.protege.web.client.debugger.background.BackgroundView;
 import edu.stanford.bmir.protege.web.client.debugger.background.BackgroundViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
@@ -497,6 +498,9 @@ public class ClientProjectModule {
 
     @Provides
     BackgroundView provideTBackgroundView(BackgroundViewImpl impl) { return impl; }
+
+    @Provides
+    DebuggerManchesterSyntaxFrameEditor provideDebuggerMSFEView(DebuggerManchesterSyntaxFrameEditor impl) { return impl; }
 
 }
 

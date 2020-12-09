@@ -171,7 +171,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
 
 
-    public void clearAxiomtable() {
+    public void clearAxiomTable() {
         backgroundAxioms.clear();
         possibleFaultyAxioms.clear();
         statementPresenter1.clearAxoim();

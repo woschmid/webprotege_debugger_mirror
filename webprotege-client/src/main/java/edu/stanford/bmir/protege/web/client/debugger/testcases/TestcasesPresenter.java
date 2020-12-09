@@ -5,13 +5,12 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
+import edu.stanford.bmir.protege.web.client.debugger.ManchesterSyntaxEditor.DebuggerManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
-import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditor;
-import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorImpl;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
@@ -19,18 +18,14 @@ import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.RemoveTestCaseAction;
-import edu.stanford.bmir.protege.web.shared.debugger.TestCase;
+import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
-import org.semanticweb.owlapi.model.*;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -42,14 +37,15 @@ import java.util.Set;
 public class TestcasesPresenter extends DebuggerPresenter {
 
     @Nonnull
-    ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
+    ManchesterSyntaxFrameEditorPresenter debuggerManchesterSyntaxFrameEditorEPresenter;
+
+    @Nonnull
+    ManchesterSyntaxFrameEditorPresenter debuggerManchesterSyntaxFrameEditorNPresenter;
 
     @Nonnull
     private TestcasesView view;
 
     private DispatchServiceManager dsm;
-
-    AcceptsOneWidget container;
 
     StatementPresenter statementPresenter1;
     StatementPresenter statementPresenter2;
@@ -96,7 +92,8 @@ public class TestcasesPresenter extends DebuggerPresenter {
         statementPresenter2.start(view.getNonEntailedcriteriaContainer());
         statementPresenter2.addDeleteTestCasesHandler(this::deleteTestcase);
 
-        this.view.setAddTestcasesHandler(this::manchesterEditor);
+        this.view.setAddTestcasesEHandler(this::manchesterEditorE);
+        this.view.setAddTestcasesNHandler(this::manchesterEditorN);
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
@@ -145,32 +142,88 @@ public class TestcasesPresenter extends DebuggerPresenter {
                 });
     }
 
-    private void manchesterEditor() {
-        GWT.log("[TestcasesPresenter]+++++++++++++++++++ " + manchesterSyntaxFrameEditorPresenter.getView().getValue());
-        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
+    private void manchesterEditorE() {
+        debuggerManchesterSyntaxFrameEditorEPresenter.getView().setValue("Class: ");
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Manchester Editor");
-        modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
+        modalPresenter.setView(debuggerManchesterSyntaxFrameEditorEPresenter.getView());
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
-        modalPresenter.setPrimaryButton(DialogButton.OK);
-        modalPresenter.setButtonHandler(DialogButton.OK,
-                this::handleModalButton);
+        modalPresenter.addButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK, this::handleModalButtonE);
         modalManager.showModal(modalPresenter);
 
     }
 
-    private void handleModalButton(ModalCloser closer) {
-        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue());
+    private void handleModalButtonE(ModalCloser closer) {
+        GWT.log("[handleModalButton]Get entity: "+ debuggerManchesterSyntaxFrameEditorEPresenter.getView().getValue().get());
+        this.dsm.execute(new AddTestCaseAction(projectId,debuggerManchesterSyntaxFrameEditorEPresenter.getView().getValue().get(),true),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Add Testcase";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
+        closer.closeModal();
+    }
+
+    private void manchesterEditorN() {
+        debuggerManchesterSyntaxFrameEditorNPresenter.getView().setValue("Class: ");
+        ModalPresenter modalPresenter = modalManager.createPresenter();
+        modalPresenter.setTitle("Manchester Editor");
+        modalPresenter.setView(debuggerManchesterSyntaxFrameEditorNPresenter.getView());
+        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK,
+                this::handleModalButtonN);
+        modalManager.showModal(modalPresenter);
+
+    }
+
+    private void handleModalButtonN(ModalCloser closer) {
+        GWT.log("[handleModalButton]Get entity: "+ debuggerManchesterSyntaxFrameEditorNPresenter.getView().getValue());
+        this.dsm.execute(new AddTestCaseAction(projectId,debuggerManchesterSyntaxFrameEditorNPresenter.getView().getValue().get(),false),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Repairing";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
         closer.closeModal();
     }
 
 
-    public void clearAxiomtable() {
+    public void clearAxiomTable() {
         statementPresenter1.clearAxoim();
         statementPresenter2.clearAxoim();
     }
 
-    public void setManchesterSyntaxFrameEditorPresenter(ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter) {
-        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
+    public void setDebuggerManchesterSyntaxFrameEditorEPresenter(ManchesterSyntaxFrameEditorPresenter debuggerManchesterSyntaxFrameEditorEPresenter) {
+        this.debuggerManchesterSyntaxFrameEditorEPresenter = debuggerManchesterSyntaxFrameEditorEPresenter;
+
+    }
+
+    public void setDebuggerManchesterSyntaxFrameEditorNPresenter(ManchesterSyntaxFrameEditorPresenter debuggerManchesterSyntaxFrameEditorNPresenter) {
+        this.debuggerManchesterSyntaxFrameEditorNPresenter = debuggerManchesterSyntaxFrameEditorNPresenter;
+
     }
 }

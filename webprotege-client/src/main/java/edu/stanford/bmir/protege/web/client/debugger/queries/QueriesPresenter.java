@@ -277,7 +277,7 @@ public class QueriesPresenter extends DebuggerPresenter {
         }
     }
 
-    public void clearAxiomtable(){
+    public void clearAxiomTable(){
         statementPresenter.clearAxoim();
     }
 

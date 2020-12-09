@@ -38,7 +38,7 @@ public class DebuggerResultManager {
     public void clearAxioms(){
         for (DebuggerPresenter debuggerpresenter:
                 presenterList) {
-            debuggerpresenter.clearAxiomtable();
+            debuggerpresenter.clearAxiomTable();
         }
     }
     public void changeButtonStatus(){

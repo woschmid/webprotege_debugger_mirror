@@ -32,8 +32,9 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     @UiField
     protected Button addNTestcasesButton;
 
-    private AddtestcasesHandler addtestcasesHandler = () -> {
-    };
+    private AddtestcasesEHandler addtestcasesEHandler;
+
+    private AddtestcasesNHandler addtestcasesNHandler;
 
     @Override
     public AcceptsOneWidget getCriteriaContainer() {
@@ -62,10 +63,10 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     protected void helpButtonClick(ClickEvent event) { Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/acquired-test-cases","_blank",""); }
 
     @UiHandler("addTestcasesButton")
-    protected void addTestcasesButtonClick(ClickEvent event) { addtestcasesHandler.addTestcases(); }
+    protected void addTestcasesButtonClick(ClickEvent event) { addtestcasesEHandler.addTestcases(); }
 
     @UiHandler("addNTestcasesButton")
-    protected void addNTestcasesButtonClick(ClickEvent event) { addtestcasesHandler.addTestcases(); }
+    protected void addNTestcasesButtonClick(ClickEvent event) { addtestcasesNHandler.addTestcases(); }
 
     @Nonnull
     public AcceptsOneWidget getEntailedCriteriaContainer() {
@@ -78,9 +79,19 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     }
 
     @Override
-    public void setAddTestcasesHandler(AddtestcasesHandler addtestcasesHandler) {
-        this.addtestcasesHandler = addtestcasesHandler;
+    public void setAddTestcasesEHandler(AddtestcasesEHandler addTestcasesHandler) {
+        this.addtestcasesEHandler = addTestcasesHandler;
     }
+
+    @Override
+    public void setAddTestcasesNHandler(AddtestcasesNHandler addTestcasesHandler) {
+        this.addtestcasesNHandler = addTestcasesHandler;
+    }
+
+//    @Override
+//    public void setAddTestcasesHandler(AddtestcasesHandler addtestcasesHandler) {
+//        this.addtestcasesHandler = addtestcasesHandler;
+//    }
 
     private StringBuilder getStyle(Icon b){
         DiffClientBundle.DiffCssResource style = DiffClientBundle.INSTANCE.style();

@@ -1,5 +1,5 @@
 package edu.stanford.bmir.protege.web.client.debugger.testcases;
 
-public interface AddtestcasesHandler {
+public interface AddtestcasesEHandler {
     void addTestcases();
 }

@@ -14,6 +14,8 @@ public interface TestcasesView extends DebuggerView {
 
     public AcceptsOneWidget getNonEntailedcriteriaContainer();
 
-    public void setAddTestcasesHandler(AddtestcasesHandler addTestcasesHandler);
+    public void setAddTestcasesEHandler(AddtestcasesEHandler addTestcasesHandler);
+
+    public void setAddTestcasesNHandler(AddtestcasesNHandler addTestcasesHandler);
 
 }

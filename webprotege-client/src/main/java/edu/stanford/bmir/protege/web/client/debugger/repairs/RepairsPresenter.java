@@ -75,60 +75,60 @@ public class RepairsPresenter extends DebuggerPresenter {
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         super.start(container,eventBus);
-        statementPresenter.addManchesterEditorHandler(this::manchesterEditor);
-        statementPresenter.addDeleteRepairHandler(this::deleteRepairAxiom);
+//        statementPresenter.addManchesterEditorHandler(this::manchesterEditor);
+//        statementPresenter.addDeleteRepairHandler(this::deleteRepairAxiom);
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
     }
 
-    private void manchesterEditor() {
-        GWT.log("[RepairInterfacePresenter]+++++++++++++++++++ " + manchesterSyntaxFrameEditorPresenter.getView().getValue());
-        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
-        ModalPresenter modalPresenter = modalManager.createPresenter();
-        modalPresenter.setTitle("Manchester Editor");
-        modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
-        modalPresenter.setEscapeButton(DialogButton.CANCEL);
-        modalPresenter.setPrimaryButton(DialogButton.OK);
-        modalPresenter.setButtonHandler(DialogButton.OK,
-                this::handleModalButton);
-        modalManager.showModal(modalPresenter);
-
-    }
-
-    private void deleteRepairAxiom(SafeHtml selectedAxiom){
-        this.dsm.execute(new DeleteRepairAxiomAction(projectId,selectedAxiom),
-                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                        progressDisplay) {
-                    @Override
-                    public String getProgressDisplayTitle() {
-                        return "Repairing";
-                    }
-
-                    @Override
-                    public String getProgressDisplayMessage() {
-                        return "Please wait";
-                    }
-
-                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        statementPresenter.clearAxoim();
-                        setAxioms(debuggingSessionStateResult);
-                    }
-                });
-    }
-
-    private void handleModalButton(ModalCloser closer) {
-        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue());
-        closer.closeModal();
-    }
+//    private void manchesterEditor() {
+//        GWT.log("[RepairInterfacePresenter]+++++++++++++++++++ " + manchesterSyntaxFrameEditorPresenter.getView().getValue());
+//        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
+//        ModalPresenter modalPresenter = modalManager.createPresenter();
+//        modalPresenter.setTitle("Manchester Editor");
+//        modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
+//        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+//        modalPresenter.setPrimaryButton(DialogButton.OK);
+//        modalPresenter.setButtonHandler(DialogButton.OK,
+//                this::handleModalButton);
+//        modalManager.showModal(modalPresenter);
+//
+//    }
+//
+//    private void deleteRepairAxiom(SafeHtml selectedAxiom){
+//        this.dsm.execute(new DeleteRepairAxiomAction(projectId,selectedAxiom),
+//                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+//                        progressDisplay) {
+//                    @Override
+//                    public String getProgressDisplayTitle() {
+//                        return "Repairing";
+//                    }
+//
+//                    @Override
+//                    public String getProgressDisplayMessage() {
+//                        return "Please wait";
+//                    }
+//
+//                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+//                        statementPresenter.clearAxoim();
+//                        setAxioms(debuggingSessionStateResult);
+//                    }
+//                });
+//    }
+//
+//    private void handleModalButton(ModalCloser closer) {
+//        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue());
+//        closer.closeModal();
+//    }
 
     @Override
     public void setEnabledButton(String buttonTyp) {}
 
 //    public void remove
 
-    public void clearAxiomtable() {
+    public void clearAxiomTable() {
         statementPresenter.clearAxoim();
     }
 

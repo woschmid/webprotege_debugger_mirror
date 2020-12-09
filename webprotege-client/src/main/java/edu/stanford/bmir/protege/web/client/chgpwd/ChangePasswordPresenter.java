@@ -80,7 +80,7 @@ public class ChangePasswordPresenter {
         modalPresenter.setView(changePasswordView);
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
-        modalPresenter.setButtonHandler(DialogButton.OK, closer -> {
+        modalPresenter.setButtonHandler(DialogButton.OK, (ModalCloser closer) -> {
             if (changePasswordView.getNewPassword().isEmpty()) {
                 messageBox.showAlert(messages.password_change_specifyNewPassword());
             } else if (!isPasswordConfirmationCorrect()) {

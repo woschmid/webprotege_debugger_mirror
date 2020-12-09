@@ -65,7 +65,7 @@ public abstract class DebuggerPresenter{
         statementPresenter.start(view.getCriteriaContainer());
     }
 
-    public abstract void clearAxiomtable();
+    public abstract void clearAxiomTable();
 
     public abstract void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult);
 
