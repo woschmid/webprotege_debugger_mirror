@@ -30,7 +30,6 @@ import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
 import org.exquisite.core.solver.ExquisiteOWLReasoner;
-import org.obolibrary.macro.ManchesterSyntaxTool;
 import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +78,7 @@ public class DebuggingSession implements HasDispose {
 
     private RenderingManager renderingManager;
 
-    private RevisionManager revisionManager;
+    private final RevisionManager revisionManager;
 
     private IExquisiteProgressMonitor monitor;
 
@@ -198,12 +197,15 @@ public class DebuggingSession implements HasDispose {
      *     <li>NO Reduce to inconsistency</li>
      * </ul>
      *
-     * @param userId
-     * @return
+     * @param userId The user who wants to check the ontology.
+     * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult checkOntology(UserId userId) throws OWLOntologyCreationException {
         synchronized (this) {
-            if (getUserId() != null)
+            if (getUserId() == null)
+                this.userId = userId;
+
+            if (!userId.equals(getUserId()))
                 return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
             // guarantee that the session state is either in INIT or STOPPED state
@@ -211,9 +213,7 @@ public class DebuggingSession implements HasDispose {
             if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
                 throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
 
-            loadOntology();
-
-            this.userId = userId;
+            // loadOntology();
 
             this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
 
@@ -261,9 +261,14 @@ public class DebuggingSession implements HasDispose {
      * Starts a new debugging session.
      *
      * @param userId The user who wants to start a debugging session.
+     * @return A result for the front end representing the current state of the backend.
+     * @throws OWLOntologyCreationException occurred
      */
     public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException {
         synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
+
             if (!userId.equals(getUserId()))
                 return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
@@ -303,6 +308,9 @@ public class DebuggingSession implements HasDispose {
      */
     public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) {
         try {
+            if (getUserId() == null)
+                this.userId = userId;
+
             if (!userId.equals(getUserId()))
                 return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
@@ -385,6 +393,9 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
+        if (getUserId() == null)
+            this.userId = userId;
+
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
@@ -398,11 +409,14 @@ public class DebuggingSession implements HasDispose {
      * Repairs the final diagnosis.
      *
      * @param userId The user who wants to repair the debugging session.
-     * @param repairDetails
+     * @param repairDetails Some repair details (which axioms to delete, which to modify)
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) {
+        if (getUserId() == null)
+            this.userId = userId;
+
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
@@ -455,7 +469,7 @@ public class DebuggingSession implements HasDispose {
      *
      * @param userId The user who wants to delete a specific
      * @param axiomToDelete A safehtml representation of the axiom to remove.
-     * @return
+     * @return A result for the front end representing the current state of the backend.
      * @deprecated to be deleted
      */
     public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) {
@@ -526,12 +540,15 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) {
+        if (getUserId() == null)
+            this.userId = userId;
+
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
         // verify that the session state in STARTED state
-        if (state == SessionState.STARTED)
+        if (state == SessionState.STARTED || state == SessionState.COMPUTING)
             throw new RuntimeException("Debugging session is in " + state + " and thus changing of the background is not allowed.");
 
         boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
@@ -574,26 +591,37 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the frontend if the deletion was successful and representing the current state of the backend.
      */
     public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) {
+
+        if (getUserId() == null)
+            this.userId = userId;
+
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
         // verify that the session state in STARTED state
-        if (state != SessionState.STARTED)
-            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus removing a test case is not allowed.");
+        // if (state != SessionState.STARTED)
+        //    throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus removing a test case is not allowed.");
 
         // search and remove in positive test cases
         final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
         if (positiveTestcase != null) {
             getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
-            return calculateQuery(userId, null);
+
+            if (state == SessionState.STARTED)
+                return calculateQuery(userId, null); // in a running session, lets recompute the query
+            else
+                return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
 
         // search and remove in negative test cases
         final OWLLogicalAxiom negativeTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getNotEntailedExamples());
         if (negativeTestcase != null) {
             getDiagnosisModel().getNotEntailedExamples().remove(negativeTestcase);
-            return calculateQuery(userId, null);
+            if (state == SessionState.STARTED)
+                return calculateQuery(userId, null); // in a running session, lets recompute the query
+            else
+                return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
 
         return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
@@ -609,15 +637,20 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the frontend if addition was successful and representing the current state of the backend.
      */
     public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) {
+        if (getUserId() == null)
+            this.userId = userId;
+
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
-        // verify that the session state is NOT in STARTED state
+        // verify that the debugging session is not in a running state - addition of test cases is only possible before and after
         if (state == SessionState.STARTED || state == SessionState.COMPUTING)
             throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
 
-        final OWLLogicalAxiom axiom = (OWLLogicalAxiom) OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
+        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+
+        final OWLLogicalAxiom axiom = OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
 
         if (isEntailed)
             this.diagnosisModel.getEntailedExamples().add(axiom);

@@ -34,7 +34,7 @@ public class AddTestCaseActionHandler extends AbstractProjectActionHandler<AddTe
         try {
             return session.addTestCase(executionContext.getUserId(), action.getTestCase(), action.isEntailed());
         } catch (RuntimeException e) {
-            session.stop();
+            // session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

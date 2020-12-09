@@ -34,7 +34,7 @@ public class RemoveTestCaseActionHandler extends AbstractProjectActionHandler<Re
         try {
             return session.removeTestCase(executionContext.getUserId(), action.getTestCase());
         } catch (RuntimeException e) {
-            session.stop();
+            // session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
