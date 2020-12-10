@@ -200,20 +200,14 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to check the ontology.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult checkOntology(UserId userId) throws OWLOntologyCreationException {
+    public DebuggingSessionStateResult checkOntology(UserId userId) throws OWLOntologyCreationException, ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // guarantee that the session state is either in INIT or STOPPED state
             // let's not allow to check an already started session
             if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
                 throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
-
-            keepSessionAlive();
 
             logger.info("{} Checking ontology and creating reasoner for {} in {} ...", this, userId, projectId);
 
@@ -262,13 +256,9 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      * @throws OWLOntologyCreationException occurred
      */
-    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException {
+    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException, ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // guarantee that the session state is in CHECKED state
             if (state != SessionState.CHECKED || this.consistencyCheckResult == null)
@@ -304,20 +294,14 @@ public class DebuggingSession implements HasDispose {
      * @param answers String representations of axioms from previous queries and their answers if given. Can be <code>null</code>.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) {
+    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) throws ConcurrentUserException {
         synchronized (this) {
             try {
-                if (getUserId() == null)
-                    this.userId = userId;
-
-                if (!userId.equals(getUserId()))
-                    return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
+                checkUser(userId);
 
                 // verify that the session state in STARTED state
                 if (state != SessionState.STARTED)
                     throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
-
-                keepSessionAlive();
 
                 // reset the engine
                 engine.resetEngine();
@@ -392,16 +376,9 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to stop a debugging session.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
+    public DebuggingSessionStateResult stop(@Nonnull UserId userId) throws ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                        "A debugging session is already running for this project by user " + getUserId());
-
-            keepSessionAlive();
+            checkUser(userId);
             stop();
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
@@ -415,14 +392,9 @@ public class DebuggingSession implements HasDispose {
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) throws ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                        "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // verify that the session state in STARTED state
             if (state != SessionState.STARTED)
@@ -431,8 +403,6 @@ public class DebuggingSession implements HasDispose {
             // check the preconditions for a repair action
             if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
                 throw new RuntimeException("A repair is not allowed!");
-
-            keepSessionAlive();
 
             // get the final diagnosis and apply are remove axioms change operation for them
             final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
@@ -476,14 +446,9 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      * @deprecated to be deleted
      */
-    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) {
+    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) throws ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                        "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // verify that the session state in STARTED state
             if (state != SessionState.STARTED)
@@ -492,8 +457,6 @@ public class DebuggingSession implements HasDispose {
             // check the preconditions for a repair action
             if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
                 throw new RuntimeException("A repair is not allowed!");
-
-            keepSessionAlive();
 
             // get the final diagnosis and apply are remove axioms change operation for them
             final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
@@ -548,14 +511,9 @@ public class DebuggingSession implements HasDispose {
      * @param axiom The user who wants to stop a debugging session.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) {
+    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) throws ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                        "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // verify that the session state in STARTED state
             if (state == SessionState.STARTED || state == SessionState.COMPUTING)
@@ -599,18 +557,11 @@ public class DebuggingSession implements HasDispose {
      * @param testCase The SafeHtml representation of the testcase to be removed.
      * @return A result for the frontend if the deletion was successful and representing the current state of the backend.
      */
-    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) {
+    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) throws ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                        "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // a testcase can be removed anytime thus no session state check here
-
-            keepSessionAlive();
 
             // search and remove in positive test cases
             final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
@@ -646,20 +597,15 @@ public class DebuggingSession implements HasDispose {
      * @param isEntailed The type of test case. <code>true</code> means <i>entailed</i>, <code>false</code> means <i>non-entailed</i>.
      * @return A result for the frontend if addition was successful and representing the current state of the backend.
      */
-    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) {
+    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) throws ConcurrentUserException {
         synchronized (this) {
-            if (getUserId() == null)
-                this.userId = userId;
-
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                        "A debugging session is already running for this project by user " + getUserId());
+            checkUser(userId);
 
             // verify that the debugging session is not in a running state - addition of test cases is only possible before and after
             if (state == SessionState.STARTED || state == SessionState.COMPUTING)
                 throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
 
-            keepSessionAlive();
+
 
             final OWLLogicalAxiom axiom = OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
 
@@ -685,7 +631,25 @@ public class DebuggingSession implements HasDispose {
     }
 
     /**
-     * Keeping the current debugging session alive because of an activity from a authenticated user.
+     * Checks if the user is the initiator of the current running Debugging session.
+     *
+     * @param userId A user
+     * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
+     */
+    private void checkUser(@Nonnull UserId userId) throws ConcurrentUserException {
+        // no user yet defined for this debugging session? Now you are!
+        if (getUserId() == null)
+            this.userId = userId;
+
+        if (!userId.equals(getUserId()))
+            throw new ConcurrentUserException("The debugger is currently in use by user " + getUserId());
+
+        // there is some activity from the user ongoing - therefore we keep the session alive to prevent a purge of the project
+        keepSessionAlive();
+    }
+
+    /**
+     * Keeping the current debugging session alive because of an activity from an authenticated user.
      */
     private void keepSessionAlive() {
         this.lastActivityTimeInMillis = System.currentTimeMillis();

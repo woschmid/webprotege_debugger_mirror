@@ -43,6 +43,8 @@ public class RepairActionHandler extends AbstractProjectActionHandler<RepairActi
         } catch (RuntimeException e) {
             // session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
+        } catch (ConcurrentUserException e) {
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
 
