@@ -112,7 +112,7 @@ public class DebuggingSession implements HasDispose {
         this.query = null;
         this.diagnoses = null;
 
-        this.lastActivityTimeInMillis = System.currentTimeMillis();
+        keepSessionAlive();
 
         // register this Debugging session to the DisposablesManager to free resources when project gets purged
         disposablesManager.register(this);
@@ -213,9 +213,7 @@ public class DebuggingSession implements HasDispose {
             if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
                 throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
 
-            // loadOntology();
-
-            this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+            keepSessionAlive();
 
             logger.info("{} Checking ontology and creating reasoner for {} in {} ...", this, userId, projectId);
 
@@ -318,7 +316,7 @@ public class DebuggingSession implements HasDispose {
             if (state != SessionState.STARTED)
                 throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
 
-            this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+            keepSessionAlive();
 
             // reset the engine
             engine.resetEngine();
@@ -400,7 +398,7 @@ public class DebuggingSession implements HasDispose {
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
-        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+        keepSessionAlive();
         stop();
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
@@ -429,7 +427,7 @@ public class DebuggingSession implements HasDispose {
         if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
             throw new RuntimeException("A repair is not allowed!");
 
-        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+        keepSessionAlive();
 
         // get the final diagnosis and apply are remove axioms change operation for them
         final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
@@ -473,6 +471,10 @@ public class DebuggingSession implements HasDispose {
      * @deprecated to be deleted
      */
     public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) {
+
+        if (getUserId() == null)
+            this.userId = userId;
+
         if (!userId.equals(getUserId()))
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
@@ -485,7 +487,7 @@ public class DebuggingSession implements HasDispose {
         if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
             throw new RuntimeException("A repair is not allowed!");
 
-        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+        keepSessionAlive();
 
         // get the final diagnosis and apply are remove axioms change operation for them
         final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
@@ -557,8 +559,6 @@ public class DebuggingSession implements HasDispose {
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
     }
 
-
-
     /**
      * Moves the axiom between two lists.
      *
@@ -599,9 +599,9 @@ public class DebuggingSession implements HasDispose {
             return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
                     "A debugging session is already running for this project by user " + getUserId());
 
-        // verify that the session state in STARTED state
-        // if (state != SessionState.STARTED)
-        //    throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus removing a test case is not allowed.");
+        // a testcase can be removed anytime thus no session state check here
+
+        keepSessionAlive();
 
         // search and remove in positive test cases
         final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
@@ -648,7 +648,7 @@ public class DebuggingSession implements HasDispose {
         if (state == SessionState.STARTED || state == SessionState.COMPUTING)
             throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
 
-        this.lastActivityTimeInMillis = System.currentTimeMillis(); // new activity timestamp
+        keepSessionAlive();
 
         final OWLLogicalAxiom axiom = OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
 
@@ -658,6 +658,25 @@ public class DebuggingSession implements HasDispose {
             this.diagnosisModel.getNotEntailedExamples().add(axiom);
 
         return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+    }
+
+    @Override
+    public void dispose() {
+        logger.info("Disposing {}", this);
+        stop();
+        renderingManager = null;
+        engine = null;
+        purgePreventionService.shutdown();
+        ontologyID = null;
+        ontology = null;
+        diagnosisModel = null;
+    }
+
+    /**
+     * Keeping the current debugging session alive because of an activity from a authenticated user.
+     */
+    private void keepSessionAlive() {
+        this.lastActivityTimeInMillis = System.currentTimeMillis();
     }
 
     /**
@@ -675,18 +694,6 @@ public class DebuggingSession implements HasDispose {
         diagnoses = null;
         consistencyCheckResult = null;
         loadOntology();
-    }
-
-    @Override
-    public void dispose() {
-        logger.info("Disposing {}", this);
-        stop();
-        renderingManager = null;
-        engine = null;
-        purgePreventionService.shutdown();
-        ontologyID = null;
-        ontology = null;
-        diagnosisModel = null;
     }
 
     /**
