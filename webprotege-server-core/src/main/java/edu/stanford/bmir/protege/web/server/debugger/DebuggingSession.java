@@ -200,14 +200,13 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to check the ontology.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult checkOntology(UserId userId) throws OWLOntologyCreationException, ConcurrentUserException {
+    public DebuggingSessionStateResult checkOntology(UserId userId) throws OWLOntologyCreationException, ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
             // guarantee that the session state is either in INIT or STOPPED state
             // let's not allow to check an already started session
-            if (! (state==SessionState.INIT || state==SessionState.STOPPED) )
-                throw new ActionExecutionException(new RuntimeException("Debugging session has been started already and cannot be started again"));
+            verifyPreCondition(! (state==SessionState.INIT || state==SessionState.STOPPED) );
 
             logger.info("{} Checking ontology and creating reasoner for {} in {} ...", this, userId, projectId);
 
@@ -256,18 +255,16 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      * @throws OWLOntologyCreationException occurred
      */
-    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException, ConcurrentUserException {
+    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException, ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
             // guarantee that the session state is in CHECKED state
-            if (state != SessionState.CHECKED || this.consistencyCheckResult == null)
-                throw new ActionExecutionException(new RuntimeException("Debugging session can only be started when the ontology has been checked first."));
-
             // verify the result consistency check before we start a debugging session
-            if (! (Boolean.FALSE.equals(this.consistencyCheckResult.isConsistent())
-                    || Boolean.FALSE.equals(consistencyCheckResult.isCoherent())) )
-                throw new ActionExecutionException(new RuntimeException("Debugging session cannot be started for a consistent and coherent ontology"));
+            verifyPreCondition((state != SessionState.CHECKED || this.consistencyCheckResult == null)
+                    ||
+                    (! (Boolean.FALSE.equals(this.consistencyCheckResult.isConsistent())
+                        || Boolean.FALSE.equals(consistencyCheckResult.isCoherent())) ));
 
             // reduce to inconsistency for incoherent ontologies
             if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
@@ -294,14 +291,13 @@ public class DebuggingSession implements HasDispose {
      * @param answers String representations of axioms from previous queries and their answers if given. Can be <code>null</code>.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) throws ConcurrentUserException {
+    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             try {
                 checkUser(userId);
 
                 // verify that the session state in STARTED state
-                if (state != SessionState.STARTED)
-                    throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
+                verifyPreCondition(state != SessionState.STARTED);
 
                 // reset the engine
                 engine.resetEngine();
@@ -392,17 +388,13 @@ public class DebuggingSession implements HasDispose {
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) throws ConcurrentUserException {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
             // verify that the session state in STARTED state
-            if (state != SessionState.STARTED)
-                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
-
-            // check the preconditions for a repair action
-            if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
-                throw new RuntimeException("A repair is not allowed!");
+            // and check the preconditions for a repair action
+            verifyPreCondition(state != SessionState.STARTED || !(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1));
 
             // get the final diagnosis and apply are remove axioms change operation for them
             final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
@@ -446,17 +438,15 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      * @deprecated to be deleted
      */
-    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) throws ConcurrentUserException {
+    public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
             // verify that the session state in STARTED state
-            if (state != SessionState.STARTED)
-                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
-
             // check the preconditions for a repair action
-            if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
-                throw new RuntimeException("A repair is not allowed!");
+            verifyPreCondition(state != SessionState.STARTED
+                    ||
+                    !(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1));
 
             // get the final diagnosis and apply are remove axioms change operation for them
             final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
@@ -511,13 +501,12 @@ public class DebuggingSession implements HasDispose {
      * @param axiom The user who wants to stop a debugging session.
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) throws ConcurrentUserException {
+    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
             // verify that the session state in STARTED state
-            if (state == SessionState.STARTED || state == SessionState.COMPUTING)
-                throw new RuntimeException("Debugging session is in " + state + " and thus changing of the background is not allowed.");
+            verifyPreCondition(state == SessionState.STARTED || state == SessionState.COMPUTING);
 
             boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
             if (!hasMoved)
@@ -557,7 +546,7 @@ public class DebuggingSession implements HasDispose {
      * @param testCase The SafeHtml representation of the testcase to be removed.
      * @return A result for the frontend if the deletion was successful and representing the current state of the backend.
      */
-    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) throws ConcurrentUserException {
+    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
@@ -597,15 +586,12 @@ public class DebuggingSession implements HasDispose {
      * @param isEntailed The type of test case. <code>true</code> means <i>entailed</i>, <code>false</code> means <i>non-entailed</i>.
      * @return A result for the frontend if addition was successful and representing the current state of the backend.
      */
-    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) throws ConcurrentUserException {
+    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
             checkUser(userId);
 
             // verify that the debugging session is not in a running state - addition of test cases is only possible before and after
-            if (state == SessionState.STARTED || state == SessionState.COMPUTING)
-                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
-
-
+            verifyPreCondition(state == SessionState.STARTED || state == SessionState.COMPUTING);
 
             final OWLLogicalAxiom axiom = OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
 
@@ -653,6 +639,17 @@ public class DebuggingSession implements HasDispose {
      */
     private void keepSessionAlive() {
         this.lastActivityTimeInMillis = System.currentTimeMillis();
+    }
+
+    /**
+     * Verifies if the precondition for an is fulfilled.
+     *
+     * @param conditionForFailure Is the precondition for an action fulfilled?
+     * @throws UnsatisfiedPreconditionException If the precondition for an action is not fulfilled.
+     */
+    private void verifyPreCondition(boolean conditionForFailure) throws UnsatisfiedPreconditionException {
+        if (conditionForFailure)
+            throw new UnsatisfiedPreconditionException("This action is not allowed.<br>A precondition is not fulfilled!");
     }
 
     /**

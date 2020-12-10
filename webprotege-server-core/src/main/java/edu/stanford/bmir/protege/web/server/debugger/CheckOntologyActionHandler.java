@@ -42,6 +42,8 @@ public class CheckOntologyActionHandler extends AbstractProjectActionHandler<Che
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         } catch (ConcurrentUserException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
+        } catch (UnsatisfiedPreconditionException e) {
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
 
