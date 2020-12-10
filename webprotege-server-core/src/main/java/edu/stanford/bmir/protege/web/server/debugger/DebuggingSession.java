@@ -305,82 +305,84 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) {
-        try {
-            if (getUserId() == null)
-                this.userId = userId;
+        synchronized (this) {
+            try {
+                if (getUserId() == null)
+                    this.userId = userId;
 
-            if (!userId.equals(getUserId()))
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
+                if (!userId.equals(getUserId()))
+                    return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "A debugging session is already running for this project by user " + getUserId());
 
-            // verify that the session state in STARTED state
-            if (state != SessionState.STARTED)
-                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
+                // verify that the session state in STARTED state
+                if (state != SessionState.STARTED)
+                    throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus query calculation is not allowed.");
 
-            keepSessionAlive();
+                keepSessionAlive();
 
-            // reset the engine
-            engine.resetEngine();
+                // reset the engine
+                engine.resetEngine();
 
-            // sets the cost estimator
-            ((AbstractDiagnosisEngine) engine).setCostsEstimator(new CardinalityCostEstimator());
+                // sets the cost estimator
+                ((AbstractDiagnosisEngine) engine).setCostsEstimator(new CardinalityCostEstimator());
 
-            // add possible answers
-            // when we start a new session, then answers will be null,
-            // otherwise this map should have at least one element
-            if (answers != null && !answers.isEmpty())
-                addAnswersToDiagnosisModel(answers);
+                // add possible answers
+                // when we start a new session, then answers will be null,
+                // otherwise this map should have at least one element
+                if (answers != null && !answers.isEmpty())
+                    addAnswersToDiagnosisModel(answers);
 
-            state = SessionState.COMPUTING;
-            // calculate diagnoses
-            Set<Diagnosis<OWLLogicalAxiom>> newDiagnoses = new TreeSet<>(Comparator.reverseOrder());
-            newDiagnoses.addAll(engine.calculateDiagnoses());
-            logger.info("{} got {} diagnoses: {}", this, newDiagnoses.size(), newDiagnoses);
+                state = SessionState.COMPUTING;
+                // calculate diagnoses
+                Set<Diagnosis<OWLLogicalAxiom>> newDiagnoses = new TreeSet<>(Comparator.reverseOrder());
+                newDiagnoses.addAll(engine.calculateDiagnoses());
+                logger.info("{} got {} diagnoses: {}", this, newDiagnoses.size(), newDiagnoses);
 
-            if (newDiagnoses.size() >= 2) {
-                // there are more than one diagnoses, therefore we need to create a query for the user to narrow down the problem.
+                if (newDiagnoses.size() >= 2) {
+                    // there are more than one diagnoses, therefore we need to create a query for the user to narrow down the problem.
 
-                // configure and calculate the query
-                final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation =
-                        new HeuristicQueryComputation<>(
-                                new HeuristicConfiguration<>((AbstractDiagnosisEngine<OWLLogicalAxiom>) engine, monitor));
+                    // configure and calculate the query
+                    final HeuristicQueryComputation<OWLLogicalAxiom> queryComputation =
+                            new HeuristicQueryComputation<>(
+                                    new HeuristicConfiguration<>((AbstractDiagnosisEngine<OWLLogicalAxiom>) engine, monitor));
 
-                logger.info("{} calculating query from {} diagnoses ...", this, newDiagnoses.size());
-                queryComputation.initialize(newDiagnoses);
+                    logger.info("{} calculating query from {} diagnoses ...", this, newDiagnoses.size());
+                    queryComputation.initialize(newDiagnoses);
 
-                // get the calculated query
-                if (queryComputation.hasNext()) {
-                    query = queryComputation.next();
+                    // get the calculated query
+                    if (queryComputation.hasNext()) {
+                        query = queryComputation.next();
+                        diagnoses = newDiagnoses;
+                        state = SessionState.STARTED;
+                        logger.info("{} calculated query {}", this, query);
+                        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+                    } else {
+                        throw new RuntimeException("No query could be calculated.");
+                    }
+                } else if (newDiagnoses.size() == 1) {
+                    // we found the diagnosis with the faulty axioms
+                    // therefore there is no query generation necessary anymore
+
+                    logger.info("{} found final diagnosis! {}", this, newDiagnoses);
+                    query = null;
                     diagnoses = newDiagnoses;
                     state = SessionState.STARTED;
-                    logger.info("{} calculated query {}", this, query);
-                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+                    final int size = newDiagnoses.iterator().next().getFormulas().size();
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                            "The debugger identified <strong>" + size +
+                                    " faulty " + (size > 1 ? "axioms" : "axiom") + "</strong>.<br/><br/>" +
+                                    "<strong>Modify</strong> or <strong>Delete</strong> " + ((size > 1) ? "them" : "it") + " to repair the ontology.");
                 } else {
-                    throw new RuntimeException("No query could be calculated.");
+                    // diagnoses.size() == 0: the ontology is consistent and coherent and has therefore no diagnoses
+                    logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
+                    query = null;
+                    diagnoses = null;
+                    state = SessionState.STARTED;
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                            "The ontology is coherent and consistent!");
                 }
-            } else if (newDiagnoses.size() == 1) {
-                // we found the diagnosis with the faulty axioms
-                // therefore there is no query generation necessary anymore
-
-                logger.info("{} found final diagnosis! {}", this, newDiagnoses);
-                query = null;
-                diagnoses = newDiagnoses;
-                state = SessionState.STARTED;
-                final int size = newDiagnoses.iterator().next().getFormulas().size();
-                return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
-                                "The debugger identified <strong>" + size +
-                                " faulty " + (size > 1 ? "axioms" : "axiom") + "</strong>.<br/><br/>" +
-                                "<strong>Modify</strong> or <strong>Delete</strong> " + ((size > 1) ? "them" : "it") + " to repair the ontology.");
-            } else {
-                // diagnoses.size() == 0: the ontology is consistent and coherent and has therefore no diagnoses
-                logger.info("{} no diagnoses found -> ontology is consistent and coherent!", this);
-                query = null;
-                diagnoses = null;
-                state = SessionState.STARTED;
-                return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
-                        "The ontology is coherent and consistent!");
+            } catch (RuntimeException | DiagnosisException e) {
+                throw new ActionExecutionException(e);
             }
-        } catch (RuntimeException | DiagnosisException e) {
-            throw new ActionExecutionException(e);
         }
     }
 
@@ -391,16 +393,18 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult stop(@Nonnull UserId userId) {
-        if (getUserId() == null)
-            this.userId = userId;
+        synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
 
-        if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                    "A debugging session is already running for this project by user " + getUserId());
+            if (!userId.equals(getUserId()))
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                        "A debugging session is already running for this project by user " + getUserId());
 
-        keepSessionAlive();
-        stop();
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+            keepSessionAlive();
+            stop();
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
     }
 
     /**
@@ -412,54 +416,56 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) {
-        if (getUserId() == null)
-            this.userId = userId;
+        synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
 
-        if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                    "A debugging session is already running for this project by user " + getUserId());
+            if (!userId.equals(getUserId()))
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                        "A debugging session is already running for this project by user " + getUserId());
 
-        // verify that the session state in STARTED state
-        if (state != SessionState.STARTED)
-            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
+            // verify that the session state in STARTED state
+            if (state != SessionState.STARTED)
+                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
 
-        // check the preconditions for a repair action
-        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
-            throw new RuntimeException("A repair is not allowed!");
+            // check the preconditions for a repair action
+            if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
+                throw new RuntimeException("A repair is not allowed!");
 
-        keepSessionAlive();
+            keepSessionAlive();
 
-        // get the final diagnosis and apply are remove axioms change operation for them
-        final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
+            // get the final diagnosis and apply are remove axioms change operation for them
+            final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
 
-        final DebuggingSession debuggingSession = this;
+            final DebuggingSession debuggingSession = this;
 
-        final ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
+            final ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
 
-            @Override
-            public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
-                final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
-                diagnosis.getFormulas().forEach(axiom -> changeList.removeAxiom(ontologyID, axiom));
-                return changeList.build(true);
-            }
+                @Override
+                public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
+                    final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
+                    diagnosis.getFormulas().forEach(axiom -> changeList.removeAxiom(ontologyID, axiom));
+                    return changeList.build(true);
+                }
 
-            @Override
-            public Boolean getRenamedResult(Boolean result, RenameMap renameMap) {
-                return true;
-            }
+                @Override
+                public Boolean getRenamedResult(Boolean result, RenameMap renameMap) {
+                    return true;
+                }
 
-            @Nonnull
-            @Override
-            public String getMessage(ChangeApplicationResult<Boolean> result) {
-                return "Repair action of " + debuggingSession;
-            }
-        };
+                @Nonnull
+                @Override
+                public String getMessage(ChangeApplicationResult<Boolean> result) {
+                    return "Repair action of " + debuggingSession;
+                }
+            };
 
-        applyChanges.applyChanges(getUserId(), changeListGenerator);
+            applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-        this.diagnoses = null;
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
-                "The ontology has been successfully repaired!");
+            this.diagnoses = null;
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+                    "The ontology has been successfully repaired!");
+        }
     }
 
     /**
@@ -471,67 +477,68 @@ public class DebuggingSession implements HasDispose {
      * @deprecated to be deleted
      */
     public DebuggingSessionStateResult deleteRepairAxiom(@Nonnull UserId userId, @Nonnull HasApplyChanges applyChanges, @Nonnull SafeHtml axiomToDelete) {
+        synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
 
-        if (getUserId() == null)
-            this.userId = userId;
+            if (!userId.equals(getUserId()))
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                        "A debugging session is already running for this project by user " + getUserId());
 
-        if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                    "A debugging session is already running for this project by user " + getUserId());
+            // verify that the session state in STARTED state
+            if (state != SessionState.STARTED)
+                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
 
-        // verify that the session state in STARTED state
-        if (state != SessionState.STARTED)
-            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus repair is not allowed.");
+            // check the preconditions for a repair action
+            if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
+                throw new RuntimeException("A repair is not allowed!");
 
-        // check the preconditions for a repair action
-        if (!(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1))
-            throw new RuntimeException("A repair is not allowed!");
+            keepSessionAlive();
 
-        keepSessionAlive();
+            // get the final diagnosis and apply are remove axioms change operation for them
+            final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
 
-        // get the final diagnosis and apply are remove axioms change operation for them
-        final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
+            final DebuggingSession debuggingSession = this;
 
-        final DebuggingSession debuggingSession = this;
+            final ChangeListGenerator<OWLLogicalAxiom> changeListGenerator = new ChangeListGenerator<>() {
 
-        final ChangeListGenerator<OWLLogicalAxiom> changeListGenerator = new ChangeListGenerator<>() {
+                @Override
+                public OntologyChangeList<OWLLogicalAxiom> generateChanges(ChangeGenerationContext context) {
+                    final OntologyChangeList.Builder<OWLLogicalAxiom> changeList = new OntologyChangeList.Builder<>();
+                    final OWLLogicalAxiom axiomToRemove = lookupAxiomInCollection(axiomToDelete, diagnosis.getFormulas());
 
-            @Override
-            public OntologyChangeList<OWLLogicalAxiom> generateChanges(ChangeGenerationContext context) {
-                final OntologyChangeList.Builder<OWLLogicalAxiom> changeList = new OntologyChangeList.Builder<>();
-                final OWLLogicalAxiom axiomToRemove = lookupAxiomInCollection(axiomToDelete, diagnosis.getFormulas());
+                    if (axiomToRemove != null) {
+                        changeList.removeAxiom(ontologyID, axiomToRemove);
+                        return changeList.build(axiomToRemove);
+                    } else
+                        throw new RuntimeException("No matching axiom found in diagnosis to delete!");
+                }
 
-                if (axiomToRemove != null) {
-                    changeList.removeAxiom(ontologyID, axiomToRemove);
-                    return changeList.build(axiomToRemove);
-                } else
-                    throw new RuntimeException("No matching axiom found in diagnosis to delete!");
-            }
+                @Override
+                public OWLLogicalAxiom getRenamedResult(OWLLogicalAxiom axiom, RenameMap renameMap) {
+                    return axiom;
+                }
 
-            @Override
-            public OWLLogicalAxiom getRenamedResult(OWLLogicalAxiom axiom, RenameMap renameMap) {
-                return axiom;
-            }
+                @Nonnull
+                @Override
+                public String getMessage(ChangeApplicationResult<OWLLogicalAxiom> result) {
+                    return "Repair action of " + debuggingSession;
+                }
+            };
 
-            @Nonnull
-            @Override
-            public String getMessage(ChangeApplicationResult<OWLLogicalAxiom> result) {
-                return "Repair action of " + debuggingSession;
-            }
-        };
+            final ChangeApplicationResult<OWLLogicalAxiom> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-        final ChangeApplicationResult<OWLLogicalAxiom> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
+            // remove the deleted axiom also from the diagnosis
+            diagnosis.getFormulas().remove(result.getSubject());
+            if (diagnosis.getFormulas().isEmpty())
+                diagnoses = null;
 
-        // remove the deleted axiom also from the diagnosis
-        diagnosis.getFormulas().remove(result.getSubject());
-        if (diagnosis.getFormulas().isEmpty())
-            diagnoses = null;
+            // and remove the deleted axiom also from diagnosis model
+            getDiagnosisModel().getPossiblyFaultyFormulas().remove(result.getSubject());
 
-        // and remove the deleted axiom also from diagnosis model
-        getDiagnosisModel().getPossiblyFaultyFormulas().remove(result.getSubject());
-
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
                     "The ontology has been successfully repaired!");
+        }
     }
 
     /**
@@ -542,21 +549,23 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      */
     public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) {
-        if (getUserId() == null)
-            this.userId = userId;
+        synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
 
-        if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                    "A debugging session is already running for this project by user " + getUserId());
+            if (!userId.equals(getUserId()))
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                        "A debugging session is already running for this project by user " + getUserId());
 
-        // verify that the session state in STARTED state
-        if (state == SessionState.STARTED || state == SessionState.COMPUTING)
-            throw new RuntimeException("Debugging session is in " + state + " and thus changing of the background is not allowed.");
+            // verify that the session state in STARTED state
+            if (state == SessionState.STARTED || state == SessionState.COMPUTING)
+                throw new RuntimeException("Debugging session is in " + state + " and thus changing of the background is not allowed.");
 
-        boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
-        if (!hasMoved)
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+            boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
+            if (!hasMoved)
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
     }
 
     /**
@@ -591,40 +600,41 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the frontend if the deletion was successful and representing the current state of the backend.
      */
     public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) {
+        synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
 
-        if (getUserId() == null)
-            this.userId = userId;
+            if (!userId.equals(getUserId()))
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                        "A debugging session is already running for this project by user " + getUserId());
 
-        if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                    "A debugging session is already running for this project by user " + getUserId());
+            // a testcase can be removed anytime thus no session state check here
 
-        // a testcase can be removed anytime thus no session state check here
+            keepSessionAlive();
 
-        keepSessionAlive();
+            // search and remove in positive test cases
+            final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
+            if (positiveTestcase != null) {
+                getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
 
-        // search and remove in positive test cases
-        final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
-        if (positiveTestcase != null) {
-            getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
+                if (state == SessionState.STARTED)
+                    return calculateQuery(userId, null); // in a running session, lets recompute the query
+                else
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+            }
 
-            if (state == SessionState.STARTED)
-                return calculateQuery(userId, null); // in a running session, lets recompute the query
-            else
-                return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+            // search and remove in negative test cases
+            final OWLLogicalAxiom negativeTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getNotEntailedExamples());
+            if (negativeTestcase != null) {
+                getDiagnosisModel().getNotEntailedExamples().remove(negativeTestcase);
+                if (state == SessionState.STARTED)
+                    return calculateQuery(userId, null); // in a running session, lets recompute the query
+                else
+                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+            }
+
+            return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
         }
-
-        // search and remove in negative test cases
-        final OWLLogicalAxiom negativeTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getNotEntailedExamples());
-        if (negativeTestcase != null) {
-            getDiagnosisModel().getNotEntailedExamples().remove(negativeTestcase);
-            if (state == SessionState.STARTED)
-                return calculateQuery(userId, null); // in a running session, lets recompute the query
-            else
-                return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
-        }
-
-        return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
     }
 
     /**
@@ -637,27 +647,29 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the frontend if addition was successful and representing the current state of the backend.
      */
     public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) {
-        if (getUserId() == null)
-            this.userId = userId;
+        synchronized (this) {
+            if (getUserId() == null)
+                this.userId = userId;
 
-        if (!userId.equals(getUserId()))
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
-                    "A debugging session is already running for this project by user " + getUserId());
+            if (!userId.equals(getUserId()))
+                return DebuggingResultFactory.generateResult(this, Boolean.FALSE,
+                        "A debugging session is already running for this project by user " + getUserId());
 
-        // verify that the debugging session is not in a running state - addition of test cases is only possible before and after
-        if (state == SessionState.STARTED || state == SessionState.COMPUTING)
-            throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
+            // verify that the debugging session is not in a running state - addition of test cases is only possible before and after
+            if (state == SessionState.STARTED || state == SessionState.COMPUTING)
+                throw new RuntimeException("Debugging session is in unexpected state " + state + " and thus adding a test case is not allowed.");
 
-        keepSessionAlive();
+            keepSessionAlive();
 
-        final OWLLogicalAxiom axiom = OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
+            final OWLLogicalAxiom axiom = OWLLogicalAxiomSyntaxParser.parse(ontology, testCase);
 
-        if (isEntailed)
-            this.diagnosisModel.getEntailedExamples().add(axiom);
-        else
-            this.diagnosisModel.getNotEntailedExamples().add(axiom);
+            if (isEntailed)
+                this.diagnosisModel.getEntailedExamples().add(axiom);
+            else
+                this.diagnosisModel.getNotEntailedExamples().add(axiom);
 
-        return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
     }
 
     @Override
