@@ -4,8 +4,9 @@ import edu.stanford.bmir.protege.web.server.access.AccessManager;
 import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandler;
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.access.BuiltInAction;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.AddTestCaseAction;
+import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import org.semanticweb.owlapi.io.OWLParserException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +34,8 @@ public class AddTestCaseActionHandler extends AbstractProjectActionHandler<AddTe
     public DebuggingSessionStateResult execute(@Nonnull AddTestCaseAction action, @Nonnull ExecutionContext executionContext) {
         try {
             return session.addTestCase(executionContext.getUserId(), action.getTestCase(), action.isEntailed());
+        } catch (OWLParserException e) {
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         } catch (RuntimeException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         } catch (ConcurrentUserException e) {

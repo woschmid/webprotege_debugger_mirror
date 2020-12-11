@@ -30,6 +30,7 @@ import org.exquisite.core.query.Query;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicConfiguration;
 import org.exquisite.core.query.querycomputation.heuristic.HeuristicQueryComputation;
 import org.exquisite.core.solver.ExquisiteOWLReasoner;
+import org.semanticweb.owlapi.io.OWLParserException;
 import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -586,7 +587,7 @@ public class DebuggingSession implements HasDispose {
      * @param isEntailed The type of test case. <code>true</code> means <i>entailed</i>, <code>false</code> means <i>non-entailed</i>.
      * @return A result for the frontend if addition was successful and representing the current state of the backend.
      */
-    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) throws ConcurrentUserException, UnsatisfiedPreconditionException {
+    public DebuggingSessionStateResult addTestCase(@Nonnull UserId userId, @Nonnull String testCase, boolean isEntailed) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLParserException {
         synchronized (this) {
             checkUser(userId);
 
