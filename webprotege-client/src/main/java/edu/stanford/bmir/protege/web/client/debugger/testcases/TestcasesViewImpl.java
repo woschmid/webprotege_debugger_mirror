@@ -88,6 +88,18 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
         this.addtestcasesNHandler = addTestcasesHandler;
     }
 
+    @Override
+    public void disableTestcasesButtons() {
+        addTestcasesButton.setVisible(false);
+        addNTestcasesButton.setVisible(false);
+    }
+
+    @Override
+    public void enableTestcasesButtons() {
+        addTestcasesButton.setVisible(true);
+        addNTestcasesButton.setVisible(true);
+    }
+
 //    @Override
 //    public void setAddTestcasesHandler(AddtestcasesHandler addtestcasesHandler) {
 //        this.addtestcasesHandler = addtestcasesHandler;

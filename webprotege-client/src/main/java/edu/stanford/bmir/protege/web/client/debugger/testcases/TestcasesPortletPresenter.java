@@ -1,5 +1,7 @@
 package edu.stanford.bmir.protege.web.client.debugger.testcases;
 
+import edu.stanford.bmir.gwtcodemirror.client.AutoCompletionCallback;
+import edu.stanford.bmir.gwtcodemirror.client.EditorPosition;
 import edu.stanford.bmir.protege.web.client.debugger.ManchesterSyntaxEditor.DebuggerManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
@@ -37,10 +39,16 @@ public class TestcasesPortletPresenter extends AbstractWebProtegePortletPresente
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
         debuggerManchesterSyntaxFrameEditorEPresenter.start(eventBus);
+        debuggerManchesterSyntaxFrameEditorEPresenter.getView().setAutoCompletionHandler(this::nullFunction);
         debuggerManchesterSyntaxFrameEditorEPresenter.start(eventBus);
+        debuggerManchesterSyntaxFrameEditorNPresenter.getView().setAutoCompletionHandler(this::nullFunction);
         testcasesPresenter.start(portletUi, eventBus);
         testcasesPresenter.setDebuggerManchesterSyntaxFrameEditorEPresenter(this.debuggerManchesterSyntaxFrameEditorEPresenter);
         testcasesPresenter.setDebuggerManchesterSyntaxFrameEditorNPresenter(this.debuggerManchesterSyntaxFrameEditorNPresenter);
 
     }
+
+    private void nullFunction(String s, EditorPosition editorPosition, int i, AutoCompletionCallback autoCompletionCallback) {
+    }
+
 }

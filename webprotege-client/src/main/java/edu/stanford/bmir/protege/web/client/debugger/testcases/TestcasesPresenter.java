@@ -28,6 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static edu.stanford.bmir.protege.web.shared.debugger.SessionState.CHECKED;
+import static edu.stanford.bmir.protege.web.shared.debugger.SessionState.INIT;
+
 /**
  * Matthew Horridge
  * Stanford Center for Biomedical Informatics Research
@@ -97,6 +100,11 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
+        if (debuggingSessionStateResult.getSessionState() == INIT || debuggingSessionStateResult.getSessionState() == CHECKED){
+            view.enableTestcasesButtons();
+        }else{
+            view.disableTestcasesButtons();
+        }
         setTestCasesStatement(debuggingSessionStateResult.getPositiveTestCases(),debuggingSessionStateResult.getNegativeTestCases());
     }
 
@@ -143,9 +151,9 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     private void manchesterEditorE() {
-        debuggerManchesterSyntaxFrameEditorEPresenter.getView().setValue("Class: ");
+        debuggerManchesterSyntaxFrameEditorEPresenter.clearSubject();
         ModalPresenter modalPresenter = modalManager.createPresenter();
-        modalPresenter.setTitle("Manchester Editor");
+        modalPresenter.setTitle("Add Entailed Testcase");
         modalPresenter.setView(debuggerManchesterSyntaxFrameEditorEPresenter.getView());
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.addButton(DialogButton.OK);
@@ -161,7 +169,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
                         progressDisplay) {
                     @Override
                     public String getProgressDisplayTitle() {
-                        return "Add Testcase";
+                        return "Adding positive testcase";
                     }
 
                     @Override
@@ -177,9 +185,9 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     private void manchesterEditorN() {
-        debuggerManchesterSyntaxFrameEditorNPresenter.getView().setValue("Class: ");
+        debuggerManchesterSyntaxFrameEditorNPresenter.clearSubject();
         ModalPresenter modalPresenter = modalManager.createPresenter();
-        modalPresenter.setTitle("Manchester Editor");
+        modalPresenter.setTitle("Add Non-Entailed Testcase");
         modalPresenter.setView(debuggerManchesterSyntaxFrameEditorNPresenter.getView());
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
@@ -196,7 +204,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
                         progressDisplay) {
                     @Override
                     public String getProgressDisplayTitle() {
-                        return "Repairing";
+                        return "Adding negative testcase";
                     }
 
                     @Override

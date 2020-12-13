@@ -172,13 +172,7 @@ public class QueriesPresenter extends DebuggerPresenter {
     private void reload(){
         GWT.log("[QueriesPresenter]reload Debugging!!!!!");
         this.dsm.execute(new ReloadDebuggerAction(projectId), debuggingSessionStateResult -> {
-            if (!debuggingSessionStateResult.getUserId().equals(loggedInUserProvider.getCurrentUserId())){
-                messageBox.showAlert("Can not start!","This session is started by other user: " + debuggingSessionStateResult.getUserId().getUserName());
-                setEnabledButton("locked");
-            }else {
-                handlerDebugging(debuggingSessionStateResult);
-            }
-
+            handlerDebugging(debuggingSessionStateResult);
         });
     }
     private void submitDebugging() {

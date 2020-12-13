@@ -59,8 +59,6 @@ public class BackgroundPresenter extends DebuggerPresenter {
                                DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
-//        this.errorDisplay = errorDisplay;
-//        this.progressDisplay = progressDisplay;
         this.dsm = dispatchServiceManager;
         this.statementPresenter1 = statementPresenter1;
         this.statementPresenter2 = statementPresenter2;
@@ -80,8 +78,6 @@ public class BackgroundPresenter extends DebuggerPresenter {
         statementPresenter2 = new StatementPresenter();
         statementPresenter2.start(view.getNonEntailedcriteriaContainer());
 
-//        statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerFaultyAxiomRemove);
-//        statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerBackgroundAxiomRemove);
         statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerReplaceAxiom);
         statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerReplaceAxiom);
 
@@ -124,19 +120,6 @@ public class BackgroundPresenter extends DebuggerPresenter {
         statementPresenter2.addPossibleFaultyAxioms( backgroundAxioms, new ArrayList<>(), isChecked);
     }
 
-//    private void setAxiomsToViews(PossiblyFaultyAxioms possiblyFaultyAxioms, CorrectAxioms correctAxioms) {
-//        statementPresenter1.addPossibleFaultyAxioms( new ArrayList<>(),possiblyFaultyAxioms.getAxioms());
-//        statementPresenter2.addPossibleFaultyAxioms( correctAxioms.getAxioms(), new ArrayList<>());
-//    }
-
-    public void handlerFaultyAxiomRemove(SafeHtml axiom){
-        if (axiom != null) {
-            backgroundAxioms.add(axiom);
-            possibleFaultyAxioms.remove(axiom);
-            setAxiomsToViews();
-        }
-    }
-
     public void handlerReplaceAxiom(SafeHtml axiom){
         GWT.log("[BackgroundPresenter]Replace Button pressed!!!!!");
 
@@ -155,21 +138,9 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                         handlerDebugging(debuggingSessionStateResult);
-//                        setAxiomsToViews(debuggingSessionStateResult.getPossiblyFaultyAxioms(),debuggingSessionStateResult.getCorrectAxioms());
                     }
                 });
     }
-
-//    public void handlerBackgroundAxiomRemove(SafeHtml axiom){
-//        if (axiom != null) {
-//            backgroundAxioms.remove((axiom));
-//            possibleFaultyAxioms.add(axiom);
-//            setAxiomsToViews();
-//        }
-//    }
-
-
-
 
     public void clearAxiomTable() {
         backgroundAxioms.clear();

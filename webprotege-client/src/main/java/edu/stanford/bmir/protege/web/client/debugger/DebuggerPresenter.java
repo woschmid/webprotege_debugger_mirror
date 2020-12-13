@@ -75,7 +75,7 @@ public abstract class DebuggerPresenter{
             isStop = true;
         }
         if (!debuggingSessionStateResult.isOk()) {
-            messageBox.showAlert("Can not start!", debuggingSessionStateResult.getMessage());
+            messageBox.showAlert("Error", debuggingSessionStateResult.getMessage());
             setEnabledButton("locked");
         } else {
             if (debuggingSessionStateResult.getMessage() != null) {

@@ -18,4 +18,8 @@ public interface TestcasesView extends DebuggerView {
 
     public void setAddTestcasesNHandler(AddtestcasesNHandler addTestcasesHandler);
 
+    public void disableTestcasesButtons();
+
+    public void enableTestcasesButtons();
+
 }
