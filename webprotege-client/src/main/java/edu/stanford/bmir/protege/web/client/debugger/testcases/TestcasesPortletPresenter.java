@@ -40,7 +40,7 @@ public class TestcasesPortletPresenter extends AbstractWebProtegePortletPresente
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
         debuggerManchesterSyntaxFrameEditorEPresenter.start(eventBus);
         debuggerManchesterSyntaxFrameEditorEPresenter.getView().setAutoCompletionHandler(this::nullFunction);
-        debuggerManchesterSyntaxFrameEditorEPresenter.start(eventBus);
+        debuggerManchesterSyntaxFrameEditorNPresenter.start(eventBus);
         debuggerManchesterSyntaxFrameEditorNPresenter.getView().setAutoCompletionHandler(this::nullFunction);
         testcasesPresenter.start(portletUi, eventBus);
         testcasesPresenter.setDebuggerManchesterSyntaxFrameEditorEPresenter(this.debuggerManchesterSyntaxFrameEditorEPresenter);

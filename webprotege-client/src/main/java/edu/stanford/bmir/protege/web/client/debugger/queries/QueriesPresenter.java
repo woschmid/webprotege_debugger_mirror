@@ -313,6 +313,13 @@ public class QueriesPresenter extends DebuggerPresenter {
                 view.enablebutton("repair");
                 view.changeStartButton(true);
                 break;
+            case "init":
+                view.enablebutton("start");
+                view.disablebutton("stop");
+                view.disablebutton("submit");
+                view.disablebutton("repair");
+                view.changeStartButton(false);
+                break;
         }
     }
 
