@@ -24,7 +24,6 @@ public class DebuggerResultManager {
     }
 
     public void setDebuggingSessionStateResult(DebuggingSessionStateResult debuggingSessionStateResult) {
-        GWT.log("[DebuggerResultManager] get result "+ debuggingSessionStateResult);
         this.debuggingSessionStateResult = debuggingSessionStateResult;
     }
 
@@ -43,7 +42,6 @@ public class DebuggerResultManager {
     }
     public void changeButtonStatus(){
         SessionState state = debuggingSessionStateResult.getSessionState();
-        GWT.log("[DebuggerResultManager] get result "+ debuggingSessionStateResult.getSessionState());
         for (DebuggerPresenter debuggerpresenter:
                 presenterList) {
             if(state == SessionState.STARTED || state == SessionState.COMPUTING){
@@ -52,6 +50,8 @@ public class DebuggerResultManager {
                 debuggerpresenter.setEnabledButton("stop");
             }else if (state == SessionState.INIT){
                 debuggerpresenter.setEnabledButton("init");
+            }else if (state == SessionState.CHECKED){
+                debuggerpresenter.setEnabledButton("check");
             }
         }
 

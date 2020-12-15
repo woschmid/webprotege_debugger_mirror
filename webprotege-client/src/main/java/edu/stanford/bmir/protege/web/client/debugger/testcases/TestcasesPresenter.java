@@ -5,7 +5,6 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
-import edu.stanford.bmir.protege.web.client.debugger.ManchesterSyntaxEditor.DebuggerManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
@@ -28,8 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static edu.stanford.bmir.protege.web.shared.debugger.SessionState.CHECKED;
-import static edu.stanford.bmir.protege.web.shared.debugger.SessionState.INIT;
+import static edu.stanford.bmir.protege.web.shared.debugger.SessionState.*;
 
 /**
  * Matthew Horridge
@@ -100,7 +98,7 @@ public class TestcasesPresenter extends DebuggerPresenter {
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
-        if (debuggingSessionStateResult.getSessionState() == INIT || debuggingSessionStateResult.getSessionState() == CHECKED){
+        if (debuggingSessionStateResult.getSessionState() == INIT || debuggingSessionStateResult.getSessionState() == CHECKED || debuggingSessionStateResult.getSessionState() == STOPPED ){
             view.enableTestcasesButtons();
         }else{
             view.disableTestcasesButtons();
@@ -144,14 +142,15 @@ public class TestcasesPresenter extends DebuggerPresenter {
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        GWT.log("[TestcasesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult.getNegativeTestCases());
                         handlerDebugging(debuggingSessionStateResult);
                     }
                 });
     }
 
-    private void manchesterEditorE() {
-        debuggerManchesterSyntaxFrameEditorEPresenter.clearSubject();
+    private void manchesterEditorE(boolean clearConcept) {
+        if (clearConcept){
+            debuggerManchesterSyntaxFrameEditorEPresenter.clearSubject();
+        }
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Add Entailed Testcase");
         modalPresenter.setView(debuggerManchesterSyntaxFrameEditorEPresenter.getView());
@@ -178,14 +177,19 @@ public class TestcasesPresenter extends DebuggerPresenter {
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        if (!debuggingSessionStateResult.isOk()){
+                            manchesterEditorE(false);
+                        }
                         handlerDebugging(debuggingSessionStateResult);
                     }
                 });
         closer.closeModal();
     }
 
-    private void manchesterEditorN() {
-        debuggerManchesterSyntaxFrameEditorNPresenter.clearSubject();
+    private void manchesterEditorN(boolean clearConcept) {
+        if (clearConcept){
+            debuggerManchesterSyntaxFrameEditorNPresenter.clearSubject();
+        }
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Add Non-Entailed Testcase");
         modalPresenter.setView(debuggerManchesterSyntaxFrameEditorNPresenter.getView());
@@ -213,6 +217,9 @@ public class TestcasesPresenter extends DebuggerPresenter {
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        if (!debuggingSessionStateResult.isOk()){
+                            manchesterEditorN(false);
+                        }
                         handlerDebugging(debuggingSessionStateResult);
                     }
                 });

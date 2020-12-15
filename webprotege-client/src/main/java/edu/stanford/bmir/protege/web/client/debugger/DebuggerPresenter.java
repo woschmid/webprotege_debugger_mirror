@@ -3,6 +3,7 @@ package edu.stanford.bmir.protege.web.client.debugger;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
+import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
@@ -70,29 +71,23 @@ public abstract class DebuggerPresenter{
     public abstract void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult);
 
     protected void handlerDebugging(DebuggingSessionStateResult debuggingSessionStateResult) {
-        boolean isStop = false;
-        if (debuggingSessionStateResult.getSessionState() == SessionState.STOPPED) {
-            isStop = true;
-        }
         if (!debuggingSessionStateResult.isOk()) {
             messageBox.showAlert("Error", debuggingSessionStateResult.getMessage());
-            setEnabledButton("locked");
-        } else {
+        }else{
             if (debuggingSessionStateResult.getMessage() != null) {
                 messageBox.showAlert("Information", debuggingSessionStateResult.getMessage());
             }
-            GWT.log("[QueriesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult);
-            debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
-            showResults(debuggingSessionStateResult, isStop);
-            checkFinal(debuggingSessionStateResult);
         }
+        GWT.log("[QueriesPresenter]debuggingSessionStateResult is "+ debuggingSessionStateResult);
+        debuggerResultManager.setDebuggingSessionStateResult(debuggingSessionStateResult);
+        showResults();
+        checkFinal(debuggingSessionStateResult);
+
 
     }
 
-    protected void showResults(DebuggingSessionStateResult debuggingSessionStateResult, boolean isStop) {
-        if(!isStop){
-            debuggerResultManager.updateContent();
-        }
+    protected void showResults() {
+        debuggerResultManager.updateContent();
         debuggerResultManager.changeButtonStatus();
     }
 

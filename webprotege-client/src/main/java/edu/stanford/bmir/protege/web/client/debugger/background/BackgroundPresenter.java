@@ -35,18 +35,10 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
     private DispatchServiceManager dsm;
 
-    AcceptsOneWidget container;
-
     StatementPresenter statementPresenter1;
     StatementPresenter statementPresenter2;
 
     private final DebuggerResultManager debuggerResultManager;
-
-
-
-//    DispatchErrorMessageDisplay errorDisplay;
-//
-//    ProgressDisplay progressDisplay;
 
     @Nonnull
     private ProjectId projectId;

@@ -63,10 +63,10 @@ public class TestcasesViewImpl extends Composite implements TestcasesView{
     protected void helpButtonClick(ClickEvent event) { Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/acquired-test-cases","_blank",""); }
 
     @UiHandler("addTestcasesButton")
-    protected void addTestcasesButtonClick(ClickEvent event) { addtestcasesEHandler.addTestcases(); }
+    protected void addTestcasesButtonClick(ClickEvent event) { addtestcasesEHandler.addTestcases(true); }
 
     @UiHandler("addNTestcasesButton")
-    protected void addNTestcasesButtonClick(ClickEvent event) { addtestcasesNHandler.addTestcases(); }
+    protected void addNTestcasesButtonClick(ClickEvent event) { addtestcasesNHandler.addTestcases(true); }
 
     @Nonnull
     public AcceptsOneWidget getEntailedCriteriaContainer() {

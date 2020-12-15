@@ -50,16 +50,10 @@ public class RepairsPresenter extends DebuggerPresenter {
     @Nonnull
     private final ModalManager modalManager;
 
-    @Nonnull
-    private ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
-
-
     @Inject
     public RepairsPresenter(@Nonnull ProjectId projectId,
-                            DispatchServiceManager dispatchServiceManager,
                             ModalManager modalManager,
                             DispatchServiceManager dsm,
-                            ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter,
                             MessageBox messageBox, StatementPresenter statementPresenter,
                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, RepairsView view, LoggedInUserProvider loggedInUserProvider) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
@@ -67,7 +61,6 @@ public class RepairsPresenter extends DebuggerPresenter {
         this.dsm = dsm;
         this.statementPresenter = statementPresenter;
         this.debuggerResultManager = debuggerResultManager;
-        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
         this.modalManager = modalManager;
         this.projectId = projectId;
     }
@@ -75,58 +68,16 @@ public class RepairsPresenter extends DebuggerPresenter {
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         super.start(container,eventBus);
-//        statementPresenter.addManchesterEditorHandler(this::manchesterEditor);
-//        statementPresenter.addDeleteRepairHandler(this::deleteRepairAxiom);
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
     }
 
-//    private void manchesterEditor() {
-//        GWT.log("[RepairInterfacePresenter]+++++++++++++++++++ " + manchesterSyntaxFrameEditorPresenter.getView().getValue());
-//        manchesterSyntaxFrameEditorPresenter.getView().setValue("Class: ");
-//        ModalPresenter modalPresenter = modalManager.createPresenter();
-//        modalPresenter.setTitle("Manchester Editor");
-//        modalPresenter.setView(manchesterSyntaxFrameEditorPresenter.getView());
-//        modalPresenter.setEscapeButton(DialogButton.CANCEL);
-//        modalPresenter.setPrimaryButton(DialogButton.OK);
-//        modalPresenter.setButtonHandler(DialogButton.OK,
-//                this::handleModalButton);
-//        modalManager.showModal(modalPresenter);
-//
-//    }
-//
-//    private void deleteRepairAxiom(SafeHtml selectedAxiom){
-//        this.dsm.execute(new DeleteRepairAxiomAction(projectId,selectedAxiom),
-//                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-//                        progressDisplay) {
-//                    @Override
-//                    public String getProgressDisplayTitle() {
-//                        return "Repairing";
-//                    }
-//
-//                    @Override
-//                    public String getProgressDisplayMessage() {
-//                        return "Please wait";
-//                    }
-//
-//                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-//                        statementPresenter.clearAxoim();
-//                        setAxioms(debuggingSessionStateResult);
-//                    }
-//                });
-//    }
-//
-//    private void handleModalButton(ModalCloser closer) {
-//        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditorPresenter.getView().getValue());
-//        closer.closeModal();
-//    }
 
     @Override
     public void setEnabledButton(String buttonTyp) {}
 
-//    public void remove
 
     public void clearAxiomTable() {
         statementPresenter.clearAxoim();

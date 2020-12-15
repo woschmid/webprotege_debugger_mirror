@@ -163,7 +163,6 @@ public class QueriesPresenter extends DebuggerPresenter {
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                         handlerDebugging(debuggingSessionStateResult);
-                        debuggerResultManager.clearAxioms();
                     }
                 });
 
@@ -319,6 +318,13 @@ public class QueriesPresenter extends DebuggerPresenter {
                 view.disablebutton("submit");
                 view.disablebutton("repair");
                 view.changeStartButton(false);
+                break;
+            case "check":
+                view.enablebutton("start");
+                view.disablebutton("stop");
+                view.disablebutton("submit");
+                view.disablebutton("repair");
+                view.changeStartButton(true);
                 break;
         }
     }
