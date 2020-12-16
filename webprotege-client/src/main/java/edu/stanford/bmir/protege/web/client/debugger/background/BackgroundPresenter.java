@@ -77,8 +77,11 @@ public class BackgroundPresenter extends DebuggerPresenter {
     boolean isChecked = true;
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
 
-        if(debuggingSessionStateResult.getSessionState()!=SessionState.CHECKED)
+        if(debuggingSessionStateResult.getSessionState() == SessionState.STARTED || debuggingSessionStateResult.getSessionState() == SessionState.COMPUTING ) {
             isChecked = false;
+        } else{
+            isChecked = true;
+        }
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }

@@ -54,22 +54,6 @@ public class StatementViewImpl extends Composite{
         }
     };
 
-//    private DeleteRepairHandler deleteRepairHandler = new DeleteRepairHandler() {
-//        @Override
-//        public void DeleteRepair(SafeHtml selectedAxiom) {
-//
-//        }
-//    };
-//
-//    ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
-//        @Override
-//        public void addManchesterEditor() {
-//
-//        }
-//    };
-
-
-
     @UiField
     protected FlexTable table;
 
