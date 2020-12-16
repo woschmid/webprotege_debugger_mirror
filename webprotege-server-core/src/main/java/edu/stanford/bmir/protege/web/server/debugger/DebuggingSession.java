@@ -407,8 +407,58 @@ public class DebuggingSession implements HasDispose {
                 @Override
                 public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
                     final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
-                    diagnosis.getFormulas().forEach(axiom -> changeList.removeAxiom(ontologyID, axiom));
+                    deleteRepairAxioms(changeList, repairDetails.getAxiomsToDelete());
+                    modifyRepairAxioms(changeList, repairDetails.getAxiomsToModify());
                     return changeList.build(true);
+                }
+
+                /**
+                 * Helper method to prepare the changelist with RemoveAxiomChanges for repair axioms to remove.
+                 *
+                 * @param changeList The changelist.
+                 * @param safeHtmls A list of SafeHtml representations from repair axioms to remove.
+                 */
+                private void deleteRepairAxioms(@Nonnull final OntologyChangeList.Builder<Boolean> changeList,
+                                                @Nonnull final Set<SafeHtml> safeHtmls) {
+                    final Set<OWLLogicalAxiom> axiomsToDelete = new HashSet<>();
+                    final Set<OWLLogicalAxiom> diagnosisAxioms = diagnosis.getFormulas();
+                    for (SafeHtml safeHtml : safeHtmls) {
+                        final OWLLogicalAxiom axiom = lookupAxiomInCollection(safeHtml, diagnosisAxioms);
+                        if (axiom != null)
+                            axiomsToDelete.add(axiom);
+                        else
+                            logger.warn("{} was not found in diagnosis for repair action!", safeHtml);
+                    }
+                    axiomsToDelete.forEach(axiom -> changeList.removeAxiom(ontologyID, axiom));
+                }
+
+                /**
+                 * Helper method to prepare the changelist with RemoveAxiomChanges and AddAxiomChanges for
+                 * all repair axioms that needs to be modified.
+                 *
+                 * @param changeList The changelist.
+                 * @param axiomsToModify A map of safeHtml representations of axioms and their modified version.
+                 */
+                private void modifyRepairAxioms(@Nonnull final OntologyChangeList.Builder<Boolean> changeList,
+                                                @Nonnull final Map<SafeHtml, String> axiomsToModify) {
+
+                    for (Map.Entry<SafeHtml, String> entry : axiomsToModify.entrySet()) {
+                        try {
+                            final OWLLogicalAxiom modifiedAxiom = OWLLogicalAxiomSyntaxParser.parse(ontology, entry.getValue());
+                            final OWLLogicalAxiom axiomToRemove = lookupAxiomInCollection(entry.getKey(), diagnosis.getFormulas());
+                            if (axiomToRemove != null) {
+                                changeList.removeAxiom(ontologyID, axiomToRemove);
+                                changeList.addAxiom(ontologyID, modifiedAxiom);
+                            } else {
+                                // cannot be modified because axiom to remove was not found
+                                logger.warn("{} was not found in diagnosis for repair action!", entry.getKey());
+                            }
+                        } catch (OWLParserException ex) {
+                            // cannot be modified because string for new axiom was not correct
+                            logger.warn("{} incorrect for repair action because {}", entry.getValue(), ex.getMessage());
+                        }
+                    }
+
                 }
 
                 @Override
@@ -425,9 +475,7 @@ public class DebuggingSession implements HasDispose {
 
             applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-            this.diagnoses = null;
-            return DebuggingResultFactory.generateResult(this, Boolean.TRUE,
-                    "The ontology has been successfully repaired!");
+            return calculateQuery(userId,null);
         }
     }
 
