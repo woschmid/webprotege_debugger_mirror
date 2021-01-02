@@ -31,8 +31,15 @@ public class RepairInterfaceViewImpl extends Composite{
         }
     };
     ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
+
         @Override
-        public void addManchesterEditor() {
+        public void addManchesterEditor(SafeHtml selectedAxiom, int row, Button r) {
+
+        }
+    };
+    RedoRepairHandler redoRepairHandler = new RedoRepairHandler() {
+        @Override
+        public void RedoRepair(SafeHtml selectedAxiom) {
 
         }
     };
@@ -55,25 +62,37 @@ public class RepairInterfaceViewImpl extends Composite{
             int row = table.getRowCount();
             Label statement = new HTML(axiom);
             Button buttonM = new Button("Modify");
-//            StringBuilder sbP = getStyle(Icon.TRUE);
             buttonM.setTitle("Modify");
-//            buttonM.setHTML(sbP.toString());
             Button buttonD = new Button("Delete");
             buttonD.setTitle("Delete");
-//            StringBuilder sbN = getStyle(Icon.FALSE);
-//            buttonD.setHTML(sbN.toString());
+            Button buttonR = new Button("Redo");
+            buttonD.setTitle("Re");
 
             buttonM.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
-                    manchesterEditorHandler.addManchesterEditor();
+                    manchesterEditorHandler.addManchesterEditor(axiom, row, buttonR);
                 }
             });
 
             buttonD.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
+                    table.removeAllRows();
+                    table.setWidget(row,0,statement);
+                    table.setWidget(row,1,buttonR);
                     deleteRepairHandler.DeleteRepair(axiom);
+                }
+            });
+
+            buttonR.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent clickEvent) {
+                    table.removeAllRows();
+                    table.setWidget(row,0,statement);
+                    table.setWidget(row,1, buttonM);
+                    table.setWidget(row,2, buttonD);
+                    redoRepairHandler.RedoRepair(axiom);
                 }
             });
             table.setWidget(row,0,statement);
@@ -98,11 +117,19 @@ public class RepairInterfaceViewImpl extends Composite{
         return sb;
     }
 
+    public void changAxoim(int row, Button buttonR){
+        table.setWidget(row,3,buttonR);
+    }
+
     public void setManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler) {
         this.manchesterEditorHandler = manchesterEditorHandler;
     }
 
     public void setDeleteRepairHandler(DeleteRepairHandler deleteRepairHandler) {
         this.deleteRepairHandler = deleteRepairHandler;
+    }
+
+    public void setRedoRepairHandler(RedoRepairHandler redoRepairHandler){
+        this.redoRepairHandler = redoRepairHandler;
     }
 }

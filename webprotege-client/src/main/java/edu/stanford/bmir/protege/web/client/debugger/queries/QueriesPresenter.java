@@ -20,6 +20,7 @@ import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalButtonHandler;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
@@ -61,6 +62,10 @@ public class QueriesPresenter extends DebuggerPresenter {
     private final ConfigureDebuggerView configureDebuggerView;
 
     @Nonnull  RepairInterfacePresenter repairInterfacePresenter;
+
+    interface HandleModalButton extends ModalButtonHandler{
+        void handleModalButton(@Nonnull ModalCloser closer);
+    }
 
 
     @Inject
@@ -204,18 +209,34 @@ public class QueriesPresenter extends DebuggerPresenter {
         repairInterfacePresenter.start(eventBus,debuggerResultManager.getDebuggingSessionStateResult());
         modalPresenter.setView(repairInterfacePresenter.getView());
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        HandleModalButton r = (ModalCloser closer) ->
+        {
+            closer.closeModal();
+            GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
+            this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails()),
+                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                            progressDisplay) {
+                        @Override
+                        public String getProgressDisplayTitle() {
+                            return "Repairing";
+                        }
+
+                        @Override
+                        public String getProgressDisplayMessage() {
+                            return "Please wait";
+                        }
+
+                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                            handlerDebugging(debuggingSessionStateResult);
+                        }
+                    });
+        };
         modalPresenter.setPrimaryButton(DialogButton.OK);
-        modalPresenter.setButtonHandler(DialogButton.OK,
-                this::reload);
+        modalPresenter.setButtonHandler(DialogButton.OK, r);
         modalManager.showModal(modalPresenter);
 
 //        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
 
-    }
-
-    private void reload(ModalCloser modalCloser) {
-        modalCloser.closeModal();
-        reload();
     }
 
     private void runRepair(){
