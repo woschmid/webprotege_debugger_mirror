@@ -60,6 +60,15 @@
                         <g:Label text="Possibly Faulty Axioms" addStyleNames="{style.form-label}"/>
                     </g:cell>
                     <g:cell horizontalAlignment="ALIGN_RIGHT">
+                        <g:CheckBox ui:field="ABox" text="A-Box"  addStyleNames=" {wp.buttons.button}"/>
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_RIGHT">
+                        <g:CheckBox ui:field="TBox" text="T-Box"  addStyleNames=" {wp.buttons.button}"/>
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_RIGHT">
+                        <g:CheckBox ui:field="RBox" text="R-Box"  addStyleNames=" {wp.buttons.button}"/>
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_RIGHT">
                         <g:Button ui:field="helpButton" text="Help"  addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.questionSmall}"/>
                     </g:cell>
                 </g:HorizontalPanel>

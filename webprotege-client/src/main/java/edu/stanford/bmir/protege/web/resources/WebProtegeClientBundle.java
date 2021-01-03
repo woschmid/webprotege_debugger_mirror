@@ -670,7 +670,6 @@ public interface WebProtegeClientBundle extends ClientBundle {
         @ClassName("wp-btn-g--question-small")
         String questionSmall();
 
-
         @ClassName("wp-btn-g--changes")
         String changes();
 
