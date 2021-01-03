@@ -1,6 +1,7 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairInterface;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -13,6 +14,8 @@ import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.gwt.dom.client.Style.TextDecoration.*;
 
 
 public class RepairInterfaceViewImpl extends Composite{
@@ -78,6 +81,7 @@ public class RepairInterfaceViewImpl extends Composite{
             buttonD.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
+                    statement.getElement().getStyle().setTextDecoration(LINE_THROUGH);
                     table.removeAllRows();
                     table.setWidget(row,0,statement);
                     table.setWidget(row,1,buttonR);
@@ -88,6 +92,7 @@ public class RepairInterfaceViewImpl extends Composite{
             buttonR.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
+                    statement.getElement().getStyle().setTextDecoration(NONE);
                     table.removeAllRows();
                     table.setWidget(row,0,statement);
                     table.setWidget(row,1, buttonM);
