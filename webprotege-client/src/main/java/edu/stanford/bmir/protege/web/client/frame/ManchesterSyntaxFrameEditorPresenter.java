@@ -137,6 +137,7 @@ public class ManchesterSyntaxFrameEditorPresenter implements HasSubject<OWLEntit
     }
 
     public void setSubject(final OWLEntity subject) {
+        GWT.log("set Subject: "+  subject);
         applyChangesWithoutCommitMessage();
         replaceTextWithFrameRendering(subject);
     }
@@ -165,7 +166,7 @@ public class ManchesterSyntaxFrameEditorPresenter implements HasSubject<OWLEntit
     private void updateState() {
         setEnabled(false);
         permissionChecker.hasPermission(EDIT_ONTOLOGY,
-                                        canEdit -> setEnabled(canEdit));
+                this::setEnabled);
     }
 
 

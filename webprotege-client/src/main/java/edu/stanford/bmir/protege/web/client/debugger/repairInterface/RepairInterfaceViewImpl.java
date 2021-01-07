@@ -36,7 +36,7 @@ public class RepairInterfaceViewImpl extends Composite{
     ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
 
         @Override
-        public void addManchesterEditor(SafeHtml selectedAxiom, int row, Button r) {
+        public void addManchesterEditor(SafeHtml selectedAxiom, String axiom, int row, Button r) {
 
         }
     };
@@ -74,7 +74,7 @@ public class RepairInterfaceViewImpl extends Composite{
             buttonM.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent clickEvent) {
-                    manchesterEditorHandler.addManchesterEditor(axiom, row, buttonR);
+                    manchesterEditorHandler.addManchesterEditor(axiom, statement.getText(), row, buttonR);
                 }
             });
 
@@ -82,9 +82,9 @@ public class RepairInterfaceViewImpl extends Composite{
                 @Override
                 public void onClick(ClickEvent clickEvent) {
                     statement.getElement().getStyle().setTextDecoration(LINE_THROUGH);
-                    table.removeAllRows();
                     table.setWidget(row,0,statement);
                     table.setWidget(row,1,buttonR);
+                    table.remove(buttonD);
                     deleteRepairHandler.DeleteRepair(axiom);
                 }
             });
@@ -93,7 +93,7 @@ public class RepairInterfaceViewImpl extends Composite{
                 @Override
                 public void onClick(ClickEvent clickEvent) {
                     statement.getElement().getStyle().setTextDecoration(NONE);
-                    table.removeAllRows();
+                    table.remove(buttonR);
                     table.setWidget(row,0,statement);
                     table.setWidget(row,1, buttonM);
                     table.setWidget(row,2, buttonD);
@@ -122,7 +122,9 @@ public class RepairInterfaceViewImpl extends Composite{
         return sb;
     }
 
-    public void changAxoim(int row, Button buttonR){
+    public void changAxoim(String correctAxiom, int row, Button buttonR){
+        Label statement = new Label(correctAxiom);
+        table.setWidget(row,0,statement);
         table.setWidget(row,3,buttonR);
     }
 

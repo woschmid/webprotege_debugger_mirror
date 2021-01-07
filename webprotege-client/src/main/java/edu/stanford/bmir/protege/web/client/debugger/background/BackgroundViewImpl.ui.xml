@@ -49,9 +49,6 @@
         }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main}">
-<!--        <div class="wp.style.formGroup} {style.typeGroup}">-->
-<!--            <g:Label text="Background Knowledge" addStyleNames="{wp.style.formLabel}"/>-->
-<!--        </div>-->
         <g:VerticalPanel addStyleNames="{style.individualsList}">
             <g:cell height="50%">
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
