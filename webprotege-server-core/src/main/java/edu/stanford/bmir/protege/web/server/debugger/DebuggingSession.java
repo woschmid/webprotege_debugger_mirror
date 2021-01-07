@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.app.WebProtegeProperties;
 import edu.stanford.bmir.protege.web.server.change.HasApplyChanges;
@@ -13,7 +14,6 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.RepairDetails;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
@@ -385,11 +385,12 @@ public class DebuggingSession implements HasDispose {
      * Repairs the final diagnosis.
      *
      * @param userId The user who wants to repair the debugging session.
-     * @param repairDetails Some repair details (which axioms to delete, which to modify)
+     * @param axiomsToModify Some repair details (which axioms to delete, which to modify)
+     * @param axiomsToDelete Some repair details (which axioms to delete, which to modify)
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, RepairDetails repairDetails, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, ImmutableMap<SafeHtml, String> axiomsToModify, ImmutableSet<SafeHtml> axiomsToDelete, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLOntologyCreationException {
         synchronized (this) {
             checkUser(userId);
 
@@ -407,8 +408,8 @@ public class DebuggingSession implements HasDispose {
                 @Override
                 public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
                     final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
-                    deleteRepairAxioms(changeList, repairDetails.getAxiomsToDelete());
-                    modifyRepairAxioms(changeList, repairDetails.getAxiomsToModify());
+                    deleteRepairAxioms(changeList, axiomsToDelete);
+                    modifyRepairAxioms(changeList, axiomsToModify);
                     return changeList.build(true);
                 }
 
@@ -473,9 +474,11 @@ public class DebuggingSession implements HasDispose {
                 }
             };
 
-            applyChanges.applyChanges(getUserId(), changeListGenerator);
+            final ChangeApplicationResult<Boolean> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-            return calculateQuery(userId,null);
+            stop();
+            return checkOntology(userId);
+            // return calculateQuery(userId,null);
         }
     }
 

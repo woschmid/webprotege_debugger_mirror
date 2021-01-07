@@ -7,13 +7,11 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.IsWidget;
 import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfacePresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
-import edu.stanford.bmir.protege.web.client.debugger.statement.StatementView;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
@@ -25,8 +23,6 @@ import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
-import edu.stanford.bmir.protege.web.client.portlet.HasPortletActions;
-import edu.stanford.bmir.protege.web.client.portlet.PortletAction;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
@@ -213,7 +209,7 @@ public class QueriesPresenter extends DebuggerPresenter {
         {
             closer.closeModal();
             GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
-            this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails()),
+            this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
                     new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                             progressDisplay) {
                         @Override
@@ -238,7 +234,7 @@ public class QueriesPresenter extends DebuggerPresenter {
 //        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
 
     }
-
+/*
     private void runRepair(){
         this.dsm.execute(new RepairAction(projectId),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
@@ -258,7 +254,7 @@ public class QueriesPresenter extends DebuggerPresenter {
                     }
                 });
     }
-
+*/
     private ImmutableMap<SafeHtml, Boolean> getAnswers() {
         Map<SafeHtml, Boolean> allSelectQueries = getStatementPresenter().getTableInfo();
         GWT.log("[QueriesPresenter] Selected Queries are "+ allSelectQueries.toString());

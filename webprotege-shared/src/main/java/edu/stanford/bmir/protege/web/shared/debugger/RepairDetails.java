@@ -1,5 +1,7 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -34,13 +36,15 @@ public class RepairDetails implements IsSerializable {
     }
 
     @Nonnull
-    public Set<SafeHtml> getAxiomsToDelete() {
-        return axiomsToDelete;
+    public ImmutableSet<SafeHtml> getAxiomsToDelete() {
+        // return axiomsToDelete;
+        return new ImmutableSet.Builder<SafeHtml>().addAll(axiomsToDelete).build();
     }
 
     @Nonnull
-    public Map<SafeHtml, String> getAxiomsToModify() {
-        return axiomsToModify;
+    public ImmutableMap<SafeHtml, String> getAxiomsToModify() {
+        // return axiomsToModify;
+        return new ImmutableMap.Builder<SafeHtml, String>().putAll(axiomsToModify).build();
     }
 
     @Override

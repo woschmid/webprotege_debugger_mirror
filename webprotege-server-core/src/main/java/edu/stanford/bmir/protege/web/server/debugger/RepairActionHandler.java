@@ -6,6 +6,7 @@ import edu.stanford.bmir.protege.web.server.dispatch.AbstractProjectActionHandle
 import edu.stanford.bmir.protege.web.server.dispatch.ExecutionContext;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.RepairAction;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -39,13 +40,15 @@ public class RepairActionHandler extends AbstractProjectActionHandler<RepairActi
     @Override
     public DebuggingSessionStateResult execute(@Nonnull RepairAction action, @Nonnull ExecutionContext executionContext) {
         try {
-            return session.repair(executionContext.getUserId(), action.getRepairDetails(), applyChanges);
+            return session.repair(executionContext.getUserId(), action.getAxiomsToModify(), action.getAxiomsToDelete(), applyChanges);
         } catch (RuntimeException e) {
             // session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         } catch (ConcurrentUserException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         } catch (UnsatisfiedPreconditionException e) {
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
+        } catch (OWLOntologyCreationException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

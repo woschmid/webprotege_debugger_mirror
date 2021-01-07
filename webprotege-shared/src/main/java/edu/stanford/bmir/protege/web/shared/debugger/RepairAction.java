@@ -1,5 +1,8 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -7,22 +10,20 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
-import static com.google.common.base.MoreObjects.toStringHelper;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class RepairAction implements ProjectAction<DebuggingSessionStateResult> {
 
     private ProjectId projectId;
 
-    private RepairDetails repairDetails;
+    private ImmutableMap<SafeHtml, String> axiomsToModify;
 
-    @Deprecated public RepairAction(@Nonnull ProjectId projectId) {
-        this.projectId = checkNotNull(projectId);
-    }
+    private ImmutableSet<SafeHtml> axiomsToDelete;
 
-    public RepairAction(@Nonnull ProjectId projectId, @Nonnull RepairDetails repairDetails) {
+    public RepairAction(@Nonnull ProjectId projectId,
+                        @Nonnull ImmutableMap<SafeHtml, String> axiomsToModify,
+                        @Nonnull ImmutableSet<SafeHtml> axiomsToDelete) {
         this.projectId = projectId;
-        this.repairDetails = repairDetails;
+        this.axiomsToModify = axiomsToModify;
+        this.axiomsToDelete = axiomsToDelete;
     }
 
     @GwtSerializationConstructor
@@ -35,8 +36,13 @@ public class RepairAction implements ProjectAction<DebuggingSessionStateResult> 
     }
 
     @Nonnull
-    public RepairDetails getRepairDetails() {
-        return repairDetails;
+    public ImmutableMap<SafeHtml, String> getAxiomsToModify() {
+        return axiomsToModify;
+    }
+
+    @Nonnull
+    public ImmutableSet<SafeHtml> getAxiomsToDelete() {
+        return axiomsToDelete;
     }
 
     @Override
@@ -44,19 +50,13 @@ public class RepairAction implements ProjectAction<DebuggingSessionStateResult> 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RepairAction that = (RepairAction) o;
-        return Objects.equals(projectId, that.projectId) && Objects.equals(repairDetails, that.repairDetails);
+        return Objects.equals(projectId, that.projectId) && Objects.equals(axiomsToModify, that.axiomsToModify) && Objects.equals(axiomsToDelete, that.axiomsToDelete);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, repairDetails);
+        return Objects.hash(projectId, axiomsToModify, axiomsToDelete);
     }
 
-    @Override
-    public String toString() {
-        return toStringHelper("RepairAction")
-                .addValue(projectId)
-                .addValue(repairDetails)
-                .toString();
-    }
+
 }
