@@ -7,10 +7,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Author: Matthew Horridge<br> Stanford University<br> Bio-Medical Informatics Research Group<br> Date: 12/09/2013
@@ -61,7 +58,7 @@ public class StatementPresenter {
         widgets.add(view);
     }
 
-    public void addQueriesStatement(Set<SafeHtml> msg){
+    public void addQueriesStatement(Collection<SafeHtml> msg){
         view.addQueriesStatement(msg);
     }
 

@@ -1,7 +1,6 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairInterface;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -11,11 +10,10 @@ import com.google.gwt.user.client.ui.*;
 import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
 import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
-import static com.google.gwt.dom.client.Style.TextDecoration.*;
+import static com.google.gwt.dom.client.Style.TextDecoration.LINE_THROUGH;
+import static com.google.gwt.dom.client.Style.TextDecoration.NONE;
 
 
 public class RepairInterfaceViewImpl extends Composite{
@@ -58,7 +56,7 @@ public class RepairInterfaceViewImpl extends Composite{
         return table;
     }
 
-    public void setAxioms(Set<SafeHtml> axiomStatement){
+    public void setAxioms(Collection<SafeHtml> axiomStatement){
         table.clear();
         for (SafeHtml axiom :
                 axiomStatement) {

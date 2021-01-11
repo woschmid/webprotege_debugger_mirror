@@ -3,19 +3,16 @@ package edu.stanford.bmir.protege.web.client.debugger.statement;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.OnlyToBeUsedInGeneratedCodeStringBlessedAsSafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
-import edu.stanford.bmir.protege.web.client.debugger.statement.DeleteRepairHandler;
-import edu.stanford.bmir.protege.web.client.debugger.statement.ManchesterEditorHandler;
 import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
 import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -69,7 +66,7 @@ public class StatementViewImpl extends Composite{
     }
 
     List<SafeHtml> queryAxioms = new ArrayList<>();
-    public void addQueriesStatement(Set<SafeHtml> axiomStatement){
+    public void addQueriesStatement(Collection<SafeHtml> axiomStatement){
         List<CheckBox> listcheckbox= new ArrayList<>();
         for (SafeHtml axiom :
                 axiomStatement) {

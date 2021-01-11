@@ -32,7 +32,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class QueriesPresenter extends DebuggerPresenter {
 
@@ -282,7 +281,7 @@ public class QueriesPresenter extends DebuggerPresenter {
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         Query msg = debuggingSessionStateResult.getQuery();
         if (msg != null) {
-            Set<SafeHtml> items = msg.getAxioms();
+            List<SafeHtml> items = msg.getAxioms();
             getStatementPresenter().addQueriesStatement(items);
         }
     }

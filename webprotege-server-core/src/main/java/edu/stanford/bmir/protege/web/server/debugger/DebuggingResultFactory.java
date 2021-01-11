@@ -50,9 +50,11 @@ public class DebuggingResultFactory {
     }
 
     @Nonnull
-    private static Set<SafeHtml> renderAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull RenderingManager renderingManager) {
-        final Set<SafeHtml> renderedAxioms = new HashSet<>();
-        for (OWLLogicalAxiom axiom : axioms)
+    private static List<SafeHtml> renderAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull RenderingManager renderingManager) {
+        final List<SafeHtml> renderedAxioms = new ArrayList<>();
+        final Set<OWLLogicalAxiom> sortedAxioms = new TreeSet<>(axioms);
+
+        for (OWLLogicalAxiom axiom : sortedAxioms)
             renderedAxioms.add(renderingManager.getHtmlBrowserText(axiom));
         return renderedAxioms;
     }

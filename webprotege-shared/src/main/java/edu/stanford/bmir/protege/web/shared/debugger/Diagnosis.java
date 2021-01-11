@@ -5,23 +5,22 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 
 import javax.annotation.Nonnull;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class Diagnosis implements IsSerializable {
 
-    private Set<SafeHtml> axioms;
+    private List<SafeHtml> axioms;
 
     @GwtSerializationConstructor
     private Diagnosis() {}
 
-    public Diagnosis(@Nonnull Set<SafeHtml> axioms) {
-        this.axioms = new HashSet<>(axioms);
+    public Diagnosis(@Nonnull List<SafeHtml> axioms) {
+        this.axioms = axioms;
     }
 
     @Nonnull
-    public Set<SafeHtml> getAxioms() {
+    public List<SafeHtml> getAxioms() {
         return axioms;
     }
 

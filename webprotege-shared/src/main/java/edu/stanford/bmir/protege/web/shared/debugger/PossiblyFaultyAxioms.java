@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class PossiblyFaultyAxioms implements IsSerializable {
 
@@ -17,7 +16,7 @@ public class PossiblyFaultyAxioms implements IsSerializable {
     @GwtSerializationConstructor
     private PossiblyFaultyAxioms() {}
 
-    public PossiblyFaultyAxioms(@Nonnull Set<SafeHtml> axioms) {
+    public PossiblyFaultyAxioms(@Nonnull List<SafeHtml> axioms) {
         this.axioms = new ArrayList<>(axioms);
     }
 
