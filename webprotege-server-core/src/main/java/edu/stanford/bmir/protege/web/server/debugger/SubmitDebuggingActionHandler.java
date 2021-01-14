@@ -36,12 +36,10 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
     public DebuggingSessionStateResult execute(@Nonnull SubmitDebuggingAction action, @Nonnull ExecutionContext executionContext) {
         try {
             return session.calculateQuery(executionContext.getUserId(), action.getAnswers());
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | AxiomNotFoundException e) {
             session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (ConcurrentUserException e) {
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (UnsatisfiedPreconditionException e) {
+        } catch (ConcurrentUserException | UnsatisfiedPreconditionException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

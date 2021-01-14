@@ -40,9 +40,7 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
         } catch (RuntimeException | OWLOntologyCreationException e) {
             session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (ConcurrentUserException e) {
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (UnsatisfiedPreconditionException e) {
+        } catch (ConcurrentUserException | UnsatisfiedPreconditionException | AxiomNotFoundException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

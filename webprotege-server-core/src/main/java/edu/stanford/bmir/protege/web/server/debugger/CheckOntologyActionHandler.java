@@ -40,9 +40,7 @@ public class CheckOntologyActionHandler extends AbstractProjectActionHandler<Che
         } catch (RuntimeException | OWLOntologyCreationException e) {
             session.stop();
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (ConcurrentUserException e) {
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (UnsatisfiedPreconditionException e) {
+        } catch (ConcurrentUserException | UnsatisfiedPreconditionException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

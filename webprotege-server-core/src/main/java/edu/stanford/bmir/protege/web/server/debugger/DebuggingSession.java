@@ -5,9 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.server.app.WebProtegeProperties;
+import edu.stanford.bmir.protege.web.server.change.ChangeApplicationResult;
 import edu.stanford.bmir.protege.web.server.change.HasApplyChanges;
-import edu.stanford.bmir.protege.web.server.change.*;
-import edu.stanford.bmir.protege.web.server.owlapi.RenameMap;
 import edu.stanford.bmir.protege.web.server.project.ProjectDisposablesManager;
 import edu.stanford.bmir.protege.web.server.project.ProjectManager;
 import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
@@ -256,7 +255,7 @@ public class DebuggingSession implements HasDispose {
      * @return A result for the front end representing the current state of the backend.
      * @throws OWLOntologyCreationException occurred
      */
-    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException, ConcurrentUserException, UnsatisfiedPreconditionException {
+    public DebuggingSessionStateResult start(@Nonnull UserId userId) throws OWLOntologyCreationException, ConcurrentUserException, UnsatisfiedPreconditionException, AxiomNotFoundException {
         synchronized (this) {
             checkUser(userId);
 
@@ -291,8 +290,9 @@ public class DebuggingSession implements HasDispose {
      * @param userId he user who wants to submit the answers and get the next query.
      * @param answers String representations of axioms from previous queries and their answers if given. Can be <code>null</code>.
      * @return A result for the front end representing the current state of the backend.
+     * @throws AxiomNotFoundException if axiom for answer cannot be found
      */
-    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) throws ConcurrentUserException, UnsatisfiedPreconditionException {
+    public DebuggingSessionStateResult calculateQuery(@Nonnull UserId userId, @Nullable ImmutableMap<SafeHtml, Boolean> answers) throws ConcurrentUserException, UnsatisfiedPreconditionException, AxiomNotFoundException {
         synchronized (this) {
             try {
                 checkUser(userId);
@@ -390,7 +390,7 @@ public class DebuggingSession implements HasDispose {
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, ImmutableMap<SafeHtml, String> axiomsToModify, ImmutableSet<SafeHtml> axiomsToDelete, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLOntologyCreationException {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, ImmutableMap<SafeHtml, String> axiomsToModify, ImmutableSet<SafeHtml> axiomsToDelete, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLOntologyCreationException, RepairException {
         synchronized (this) {
             checkUser(userId);
 
@@ -401,84 +401,15 @@ public class DebuggingSession implements HasDispose {
             // get the final diagnosis and apply are remove axioms change operation for them
             final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
 
-            final DebuggingSession debuggingSession = this;
+            final RepairChangeListGenerator changeListGenerator = new RepairChangeListGenerator(this, diagnosis, axiomsToModify, axiomsToDelete);
 
-            final ChangeListGenerator<Boolean> changeListGenerator = new ChangeListGenerator<>() {
+            final ChangeApplicationResult<RepairChangeResult> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
 
-                @Override
-                public OntologyChangeList<Boolean> generateChanges(ChangeGenerationContext context) {
-                    final OntologyChangeList.Builder<Boolean> changeList = new OntologyChangeList.Builder<>();
-                    deleteRepairAxioms(changeList, axiomsToDelete);
-                    modifyRepairAxioms(changeList, axiomsToModify);
-                    return changeList.build(true);
-                }
-
-                /**
-                 * Helper method to prepare the changelist with RemoveAxiomChanges for repair axioms to remove.
-                 *
-                 * @param changeList The changelist.
-                 * @param safeHtmls A list of SafeHtml representations from repair axioms to remove.
-                 */
-                private void deleteRepairAxioms(@Nonnull final OntologyChangeList.Builder<Boolean> changeList,
-                                                @Nonnull final Set<SafeHtml> safeHtmls) {
-                    final Set<OWLLogicalAxiom> axiomsToDelete = new HashSet<>();
-                    final Set<OWLLogicalAxiom> diagnosisAxioms = diagnosis.getFormulas();
-                    for (SafeHtml safeHtml : safeHtmls) {
-                        final OWLLogicalAxiom axiom = lookupAxiomInCollection(safeHtml, diagnosisAxioms);
-                        if (axiom != null)
-                            axiomsToDelete.add(axiom);
-                        else
-                            logger.warn("{} was not found in diagnosis for repair action!", safeHtml);
-                    }
-                    axiomsToDelete.forEach(axiom -> changeList.removeAxiom(ontologyID, axiom));
-                }
-
-                /**
-                 * Helper method to prepare the changelist with RemoveAxiomChanges and AddAxiomChanges for
-                 * all repair axioms that needs to be modified.
-                 *
-                 * @param changeList The changelist.
-                 * @param axiomsToModify A map of safeHtml representations of axioms and their modified version.
-                 */
-                private void modifyRepairAxioms(@Nonnull final OntologyChangeList.Builder<Boolean> changeList,
-                                                @Nonnull final Map<SafeHtml, String> axiomsToModify) {
-
-                    for (Map.Entry<SafeHtml, String> entry : axiomsToModify.entrySet()) {
-                        try {
-                            final OWLLogicalAxiom modifiedAxiom = OWLLogicalAxiomSyntaxParser.parse(ontology, entry.getValue());
-                            final OWLLogicalAxiom axiomToRemove = lookupAxiomInCollection(entry.getKey(), diagnosis.getFormulas());
-                            if (axiomToRemove != null) {
-                                changeList.removeAxiom(ontologyID, axiomToRemove);
-                                changeList.addAxiom(ontologyID, modifiedAxiom);
-                            } else {
-                                // cannot be modified because axiom to remove was not found
-                                logger.warn("{} was not found in diagnosis for repair action!", entry.getKey());
-                            }
-                        } catch (OWLParserException ex) {
-                            // cannot be modified because string for new axiom was not correct
-                            logger.warn("{} incorrect for repair action because {}", entry.getValue(), ex.getMessage());
-                        }
-                    }
-
-                }
-
-                @Override
-                public Boolean getRenamedResult(Boolean result, RenameMap renameMap) {
-                    return true;
-                }
-
-                @Nonnull
-                @Override
-                public String getMessage(ChangeApplicationResult<Boolean> result) {
-                    return "Repair action of " + debuggingSession;
-                }
-            };
-
-            final ChangeApplicationResult<Boolean> result = applyChanges.applyChanges(getUserId(), changeListGenerator);
-
-            stop();
-            return checkOntology(userId);
-            // return calculateQuery(userId,null);
+            if (result.getSubject().isValid()) {
+                stop();
+                return checkOntology(userId);
+            } else
+                throw result.getSubject().getException();
         }
     }
 
@@ -488,17 +419,17 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to move the axiom before starting a debugging session.
      * @param axiom The user who wants to stop a debugging session.
      * @return A result for the front end representing the current state of the backend.
+     * @throws AxiomNotFoundException if axiom cannot be found.
      */
-    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) throws ConcurrentUserException, UnsatisfiedPreconditionException {
+    public DebuggingSessionStateResult moveAxiomTo(UserId userId, SafeHtml axiom) throws ConcurrentUserException, UnsatisfiedPreconditionException, AxiomNotFoundException {
         synchronized (this) {
             checkUser(userId);
 
             // verify that the session state in STARTED state
             verifyPreCondition(state == SessionState.STARTED || state == SessionState.COMPUTING);
 
-            boolean hasMoved = moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
-            if (!hasMoved)
-                return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Move operation was not successful");
+            moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
+
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
     }
@@ -509,22 +440,21 @@ public class DebuggingSession implements HasDispose {
      * @param axiomAsString A SafeHtml representation of the axiom to move.
      * @param list1 List of axiom possibly containing the axiom to move from or move to.
      * @param list2 List of axiom possibly containing the axiom to move from or move to.
-     * @return <code>true</code> if the axiom was found in one of the lists and moved to the other. <code>false</code> otherwise.
+     * @throws AxiomNotFoundException if no axiom found.
      */
-    private boolean moveBetween(@Nonnull SafeHtml axiomAsString, @Nonnull List<OWLLogicalAxiom> list1, @Nonnull List<OWLLogicalAxiom> list2) {
-        OWLLogicalAxiom a = lookupAxiomInCollection(axiomAsString, list1);
-        if (a != null) {
+    private void moveBetween(@Nonnull SafeHtml axiomAsString, @Nonnull List<OWLLogicalAxiom> list1, @Nonnull List<OWLLogicalAxiom> list2) throws AxiomNotFoundException {
+        try {
+            OWLLogicalAxiom a = lookupAxiomInCollection(axiomAsString, list1);
             list1.remove(a);
             list2.add(a);
-            return true;
-        }
-        a = lookupAxiomInCollection(axiomAsString, list2);
-        if (a != null) {
+            return;
+        } catch (AxiomNotFoundException e) { /* no comment */ }
+
+        {
+            OWLLogicalAxiom a = lookupAxiomInCollection(axiomAsString, list2);
             list2.remove(a);
             list1.add(a);
-            return true;
         }
-        return false;
     }
 
     /**
@@ -534,34 +464,31 @@ public class DebuggingSession implements HasDispose {
      * @param testCase The SafeHtml representation of the testcase to be removed.
      * @return A result for the frontend if the deletion was successful and representing the current state of the backend.
      */
-    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) throws ConcurrentUserException, UnsatisfiedPreconditionException {
+    public DebuggingSessionStateResult removeTestCase(@Nonnull UserId userId, @Nonnull SafeHtml testCase) throws ConcurrentUserException, UnsatisfiedPreconditionException, AxiomNotFoundException {
         synchronized (this) {
             checkUser(userId);
 
             // a testcase can be removed anytime thus no session state check here
 
             // search and remove in positive test cases
-            final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
-            if (positiveTestcase != null) {
+            try {
+                final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
                 getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
 
                 if (state == SessionState.STARTED)
                     return calculateQuery(userId, null); // in a running session, lets recompute the query
                 else
                     return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
-            }
+            } catch (AxiomNotFoundException e) { /* can happen */ }
+
 
             // search and remove in negative test cases
             final OWLLogicalAxiom negativeTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getNotEntailedExamples());
-            if (negativeTestcase != null) {
-                getDiagnosisModel().getNotEntailedExamples().remove(negativeTestcase);
-                if (state == SessionState.STARTED)
-                    return calculateQuery(userId, null); // in a running session, lets recompute the query
-                else
-                    return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
-            }
-
-            return DebuggingResultFactory.generateResult(this, Boolean.FALSE, "Testcase could not be found!");
+            getDiagnosisModel().getNotEntailedExamples().remove(negativeTestcase);
+            if (state == SessionState.STARTED)
+                return calculateQuery(userId, null); // in a running session, lets recompute the query
+            else
+                return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
     }
 
@@ -662,19 +589,15 @@ public class DebuggingSession implements HasDispose {
      *
      * @param answers String representations of axioms from the previous query and the answers (either true or false) given to them.
      */
-    private void addAnswersToDiagnosisModel(@Nonnull ImmutableMap<SafeHtml, Boolean> answers) {
+    private void addAnswersToDiagnosisModel(@Nonnull ImmutableMap<SafeHtml, Boolean> answers) throws AxiomNotFoundException {
         final DiagnosisModel<OWLLogicalAxiom> diagnosisModel = engine.getSolver().getDiagnosisModel();
         for (Map.Entry<SafeHtml, Boolean> answer : answers.entrySet()) {
             // look up the axiom representing this string
             final OWLLogicalAxiom axiom = lookupAxiomInCollection(answer.getKey(), query.formulas);
-            // if no axiom could be found, we have to throw an exception
-            if (axiom != null) {
-                if (answer.getValue())
-                    diagnosisModel.getEntailedExamples().add(axiom);
-                else
-                    diagnosisModel.getNotEntailedExamples().add(axiom);
-            } else
-                throw new ActionExecutionException(new RuntimeException("Axiom could not be not found"));
+            if (answer.getValue())
+                diagnosisModel.getEntailedExamples().add(axiom);
+            else
+                diagnosisModel.getNotEntailedExamples().add(axiom);
 
         }
     }
@@ -685,12 +608,14 @@ public class DebuggingSession implements HasDispose {
      * @param axiomAsString The SafeHtml representation of the axiom to search for.
      * @param collection The collection searched within.
      * @return The axiom if a fitting or <code>null</code> if no axiom fitting the string representation was found.
+     * @throws AxiomNotFoundException If no appropriate axiom matching the SafeHtml representation was found in the collection.
      */
-    @Nullable private OWLLogicalAxiom lookupAxiomInCollection(@Nonnull final SafeHtml axiomAsString, @Nonnull Collection<OWLLogicalAxiom> collection) {
+    @Nonnull protected OWLLogicalAxiom lookupAxiomInCollection(@Nonnull final SafeHtml axiomAsString, @Nonnull Collection<OWLLogicalAxiom> collection) throws AxiomNotFoundException{
         for (OWLLogicalAxiom axiom : collection)
             if (axiomAsString.equals(renderingManager.getHtmlBrowserText(axiom)))
                 return axiom;
-        return null;
+        logger.error("lookup failed for {} in {}", axiomAsString, collection);
+        throw new AxiomNotFoundException(axiomAsString);
     }
 
     private void loadOntology() {
@@ -707,4 +632,13 @@ public class DebuggingSession implements HasDispose {
         this.diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
         logger.info("Diagnosis model created {})", this.diagnosisModel);
     }
+
+    protected OWLOntology getOntology() {
+        return ontology;
+    }
+
+    protected OWLOntologyID getOntologyID() {
+        return ontologyID;
+    }
+
 }

@@ -33,12 +33,7 @@ public class RemoveTestCaseActionHandler extends AbstractProjectActionHandler<Re
     public DebuggingSessionStateResult execute(@Nonnull RemoveTestCaseAction action, @Nonnull ExecutionContext executionContext) {
         try {
             return session.removeTestCase(executionContext.getUserId(), action.getTestCase());
-        } catch (RuntimeException e) {
-            // session.stop();
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (ConcurrentUserException e) {
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
-        } catch (UnsatisfiedPreconditionException e) {
+        } catch (RuntimeException | ConcurrentUserException | UnsatisfiedPreconditionException | AxiomNotFoundException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
