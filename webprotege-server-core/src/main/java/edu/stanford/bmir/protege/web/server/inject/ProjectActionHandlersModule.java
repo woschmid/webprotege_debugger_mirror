@@ -657,4 +657,9 @@ public class ProjectActionHandlersModule {
         return handler;
     }
 
+    @Provides @IntoSet
+    public ProjectActionHandler provideCheckAxiomSyntaxActionHandler(CheckAxiomSyntaxActionHandler handler) {
+        return handler;
+    }
+
 }

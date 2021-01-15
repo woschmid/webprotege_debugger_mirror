@@ -7,6 +7,9 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
+/**
+ * Action that checks the correctness of a syntax of an owl axiom represented as string.
+ */
 public class CheckAxiomSyntaxAction implements ProjectAction<DebuggingSessionStateResult> {
 
     @Nonnull private ProjectId projectId;

@@ -425,7 +425,7 @@ public class DebuggingSession implements HasDispose {
         synchronized (this) {
             checkUser(userId);
 
-            // verify that the session state in STARTED state
+            // verify that the session is NOT in STARTED yet
             verifyPreCondition(state == SessionState.STARTED || state == SessionState.COMPUTING);
 
             moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
@@ -515,6 +515,29 @@ public class DebuggingSession implements HasDispose {
             else
                 this.diagnosisModel.getNotEntailedExamples().add(axiom);
 
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
+    }
+
+    /**
+     * Checks the syntax and semantic correctness of an axiom represented in inline Manchester Syntax.
+     * @param userId The id of the user who wants to check the syntax.
+     * @param axiom A string representation of the axiom to be checked.
+     * @return The current state of the backend for the frontend if the check was successful.
+     * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
+     * @throws UnsatisfiedPreconditionException If the precondition for this action is not fulfilled.
+     * @throws OWLParserException Indicates that a parse error happened when trying to parse the string and thus the syntax is not valid.
+     */
+    public DebuggingSessionStateResult checkAxiomSyntax(@Nonnull UserId userId, @Nonnull String axiom) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLParserException {
+        synchronized (this) {
+            checkUser(userId);
+
+            // verify that the session is in STARTED state
+            verifyPreCondition(state != SessionState.STARTED);
+
+            OWLLogicalAxiomSyntaxParser.parse(ontology, axiom);
+
+            // no exception occurred, thus the string is a syntactically valid axiom expression
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
     }
