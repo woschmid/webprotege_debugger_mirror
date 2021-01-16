@@ -71,8 +71,8 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     @UiHandler("startButton")
     protected void handleStartDebugging(ClickEvent clickEvent) {
+        GWT.log("[QueriesViewImpl]Check Button pressed!!!!!" + startButton.getText());
         if (startButton.getText().equals(CHECK)){
-            // TODO: 2020/10/27 pre-processing handler
             checkOntologyHandler.handlerCheckontology();
             changeStartButton(true);
         }else{
@@ -84,7 +84,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     public void changeStartButton(boolean start){
         if (start){
-            // TODO: 2020/10/27 pre-processing handler
             startButton.setText(START);
             startButton.setTitle("Start Debugger");
         }else{
@@ -120,7 +119,7 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     public void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler){ this.submitDebuggingHandler = checkNotNull(handler);}
 
     @Override
-    public void setCheckOntologyHandler(CheckOntologyHandler checkOntologyHandler) { this.checkOntologyHandler = checkOntologyHandler; }
+    public void setCheckOntologyHandler(@Nonnull CheckOntologyHandler checkOntologyHandler) { this.checkOntologyHandler = checkOntologyHandler; }
 
     @Override
     public void setEditSettingHandler(@Nonnull EditSettingHandler editSettingHandler) { this.editSettingHandler = editSettingHandler; }

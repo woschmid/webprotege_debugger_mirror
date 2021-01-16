@@ -35,9 +35,6 @@ import java.util.Map;
 
 public class QueriesPresenter extends DebuggerPresenter {
 
-    @Nonnull
-    ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
-
     private StatementPresenter statementPresenter;
 
     private QueriesView view;
@@ -65,7 +62,6 @@ public class QueriesPresenter extends DebuggerPresenter {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.loggedInUserProvider = loggedInUserProvider;
-//        this.debuggerResultManager = debuggerResultManager;
         this.dsm = dispatchServiceManager;
         this.statementPresenter = statementPresenter;
         this.view = view;
@@ -109,7 +105,7 @@ public class QueriesPresenter extends DebuggerPresenter {
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!" + debuggingSessionStateResult);
+                        GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!" + debuggingSessionStateResult.getSessionState());
                         handlerDebugging(debuggingSessionStateResult);
                     }
                 });
@@ -131,7 +127,7 @@ public class QueriesPresenter extends DebuggerPresenter {
                     }
 
                     public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!" + debuggingSessionStateResult);
+                        GWT.log("[DebuggerPresenter]Start Debugging Button pressed!!!!!" + debuggingSessionStateResult.getSessionState());
                         handlerDebugging(debuggingSessionStateResult);
                     }
                 });
@@ -162,9 +158,8 @@ public class QueriesPresenter extends DebuggerPresenter {
 
     private void reload(){
         GWT.log("[QueriesPresenter]reload Debugging!!!!!");
-        this.dsm.execute(new ReloadDebuggerAction(projectId), debuggingSessionStateResult -> {
-            handlerDebugging(debuggingSessionStateResult);
-        });
+        this.dsm.execute(new ReloadDebuggerAction(projectId),
+                this::handlerDebugging);
     }
     private void submitDebugging() {
         GWT.log("[QueriesPresenter]Submit Debugging Button pressed!!!!!");
@@ -300,7 +295,4 @@ public class QueriesPresenter extends DebuggerPresenter {
         closer.closeModal();
     }
 
-    public void setManchesterSyntaxFrameEditorPresenter(ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter) {
-        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
-    }
 }

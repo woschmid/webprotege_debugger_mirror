@@ -6,6 +6,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Button;
+import edu.stanford.bmir.protege.web.client.debugger.AutoConfigAxiom;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
@@ -52,21 +53,6 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
 
     private Map<SafeHtml, String> axiomsToModify = new HashMap<>();
 
-    @Override
-    public void clearAxiomTable() {
-
-    }
-
-    @Override
-    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult) {
-
-    }
-
-    @Override
-    public void setEnabledButton(String buttonTyp) {
-
-    }
-
     interface HandleModalButton extends ModalButtonHandler{
         void handleModalButton(@Nonnull ModalCloser closer);
     }
@@ -111,6 +97,8 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
     }
 
     private void manchesterEditor(SafeHtml selectedAxiom, String axiom, int row,Button buttonM, Button buttonR) {
+        AutoConfigAxiom autoConfigAxiom= new AutoConfigAxiom(axiom);
+        axiom = autoConfigAxiom.fixAxiom();
         manchesterSyntaxFrameEditor.clearValue();
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalManager.showModal(modalPresenter);
@@ -119,34 +107,39 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
         manchesterSyntaxFrameEditor.setValue(axiom);
         GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditor.getValue());
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        String finalAxiom = axiom;
         HandleModalButton r = (ModalCloser closer) ->
         {
-            this.dsm.execute(new CheckAxiomSyntaxAction(projectId, axiom),
-                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                            progressDisplay) {
-                        @Override
-                        public String getProgressDisplayTitle() {
-                            return "Checking Syntax";
-                        }
+            if (manchesterSyntaxFrameEditor.getValue().isPresent()){
+                String changedAxiom = manchesterSyntaxFrameEditor.getValue().get();
+                if (!finalAxiom.equals(changedAxiom)){
+                    this.dsm.execute(new CheckAxiomSyntaxAction(projectId, finalAxiom),
+                            new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                                    progressDisplay) {
+                                @Override
+                                public String getProgressDisplayTitle() {
+                                    return "Checking Syntax";
+                                }
 
-                        @Override
-                        public String getProgressDisplayMessage() {
-                            return "Please wait";
-                        }
+                                @Override
+                                public String getProgressDisplayMessage() {
+                                    return "Please wait";
+                                }
 
-                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                            handlerDebugging(debuggingSessionStateResult);
-                            if(debuggingSessionStateResult.isOk() && manchesterSyntaxFrameEditor.getValue().isPresent()){
-                                    axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
-                                    view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row, buttonM, buttonR);
-                                    closer.closeModal();
-                            }
-                        }
-                    });
-            GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditor.getValue());
-
-
-
+                                public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                                    handlerDebugging(debuggingSessionStateResult);
+                                    if(debuggingSessionStateResult.isOk() ){
+                                        axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
+                                        view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row, buttonM, buttonR);
+                                        closer.closeModal();
+                                    }
+                                }
+                            });
+                    GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditor.getValue());
+                }else {
+                    closer.closeModal();
+                }
+            }
         };
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK, r);
@@ -175,5 +168,20 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
 
     public RepairInterfaceViewImpl getView() {
         return view;
+    }
+
+    @Override
+    public void clearAxiomTable() {
+
+    }
+
+    @Override
+    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult) {
+
+    }
+
+    @Override
+    public void setEnabledButton(String buttonTyp) {
+
     }
 }

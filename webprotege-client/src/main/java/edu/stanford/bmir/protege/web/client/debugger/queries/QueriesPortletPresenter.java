@@ -15,24 +15,19 @@ import javax.inject.Inject;
 @Portlet(id = "portlet.Queries", title = "Debugging Session")
 public class QueriesPortletPresenter extends AbstractWebProtegePortletPresenter {
 
-    @Nonnull
-    public ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
 
     @Nonnull
     QueriesPresenter queriesPresenter;
 
     @Inject
-    public QueriesPortletPresenter(@Nonnull SelectionModel selectionModel,@Nonnull ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer
+    public QueriesPortletPresenter(@Nonnull SelectionModel selectionModel, @Nonnull ProjectId projectId, @Nonnull DisplayNameRenderer displayNameRenderer
                                 , @Nonnull QueriesPresenter queriesPresenter) {
         super(selectionModel, projectId, displayNameRenderer);
         this.queriesPresenter = queriesPresenter;
-        this.manchesterSyntaxFrameEditorPresenter = manchesterSyntaxFrameEditorPresenter;
     }
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        manchesterSyntaxFrameEditorPresenter.start(eventBus);
         queriesPresenter.start(portletUi, eventBus);
-        queriesPresenter.setManchesterSyntaxFrameEditorPresenter(this.manchesterSyntaxFrameEditorPresenter);
     }
 }
