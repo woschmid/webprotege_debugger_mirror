@@ -6,7 +6,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Button;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
+import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorImpl;
@@ -16,11 +20,10 @@ import edu.stanford.bmir.protege.web.client.library.modal.ModalButtonHandler;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
+import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.DirtyChangedEvent;
-import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
-import edu.stanford.bmir.protege.web.shared.debugger.RepairDetails;
+import edu.stanford.bmir.protege.web.shared.debugger.*;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -31,7 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class RepairInterfacePresenter{
+public class RepairInterfacePresenter extends DebuggerPresenter {
     @Nonnull
     private final ModalManager modalManager;
 
@@ -48,6 +51,21 @@ public class RepairInterfacePresenter{
     private Set<SafeHtml> axiomsToDelete = new HashSet<>();
 
     private Map<SafeHtml, String> axiomsToModify = new HashMap<>();
+
+    @Override
+    public void clearAxiomTable() {
+
+    }
+
+    @Override
+    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult) {
+
+    }
+
+    @Override
+    public void setEnabledButton(String buttonTyp) {
+
+    }
 
     interface HandleModalButton extends ModalButtonHandler{
         void handleModalButton(@Nonnull ModalCloser closer);
@@ -68,15 +86,17 @@ public class RepairInterfacePresenter{
                                     @Nonnull DispatchErrorMessageDisplay errorDisplay,
                                     @Nonnull ProgressDisplay progressDisplay,
                                     @Nonnull ProjectId projectId,
+                                    MessageBox messageBox, StatementPresenter statementPresenter,
+                                    RepairInterfaceViewImpl view, DebuggerResultManager debuggerResultManager,
                                     @Nonnull ManchesterSyntaxFrameEditorImpl manchesterSyntaxFrameEditor) {
-
+        super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.errorDisplay =  errorDisplay;
         this.progressDisplay = progressDisplay;
         this.dsm = dsm;
         this.loggedInUserProvider = loggedInUserProvider;
         this.projectId = projectId;
         this.modalManager = modalManager;
-        view = new RepairInterfaceViewImpl();
+        this.view = view;
         this.manchesterSyntaxFrameEditor = manchesterSyntaxFrameEditor;
     }
 
@@ -101,14 +121,30 @@ public class RepairInterfacePresenter{
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         HandleModalButton r = (ModalCloser closer) ->
         {
+            this.dsm.execute(new CheckAxiomSyntaxAction(projectId, axiom),
+                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                            progressDisplay) {
+                        @Override
+                        public String getProgressDisplayTitle() {
+                            return "Checking Syntax";
+                        }
+
+                        @Override
+                        public String getProgressDisplayMessage() {
+                            return "Please wait";
+                        }
+
+                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                            handlerDebugging(debuggingSessionStateResult);
+                            if(debuggingSessionStateResult.isOk() && manchesterSyntaxFrameEditor.getValue().isPresent()){
+                                    axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
+                                    view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row, buttonM, buttonR);
+                                    closer.closeModal();
+                            }
+                        }
+                    });
             GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditor.getValue());
-            if (manchesterSyntaxFrameEditor.getValue().isPresent()){
-                axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
-                view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row, buttonM, buttonR);
-                closer.closeModal();
-            }else{
-                closer.closeModal();
-            }
+
 
 
         };

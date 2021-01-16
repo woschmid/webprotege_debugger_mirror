@@ -533,7 +533,7 @@ public class DebuggingSession implements HasDispose {
             checkUser(userId);
 
             // verify that the session is in STARTED state
-            verifyPreCondition(state != SessionState.STARTED);
+//            verifyPreCondition(state != SessionState.STARTED);
 
             OWLLogicalAxiomSyntaxParser.parse(ontology, axiom);
 

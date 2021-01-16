@@ -15,6 +15,8 @@ import edu.stanford.bmir.protege.web.client.debugger.background.BackgroundView;
 import edu.stanford.bmir.protege.web.client.debugger.background.BackgroundViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesView;
 import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesViewImpl;
+import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfaceView;
+import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfaceViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsView;
 import edu.stanford.bmir.protege.web.client.debugger.repairs.RepairsViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.testcases.TestcasesView;
@@ -489,6 +491,10 @@ public class ClientProjectModule {
 
     @Provides
     QueriesView provideQeriesView(QueriesViewImpl impl) { return impl; }
+
+    @Provides
+    RepairInterfaceView provideRepairInterfaceView(RepairInterfaceViewImpl impl) { return impl; }
+
 
     @Provides
     RepairsView provideRepairsView(RepairsViewImpl impl) { return impl; }

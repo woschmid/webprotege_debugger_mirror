@@ -7,18 +7,30 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
 import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 
+import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Set;
 
 import static com.google.gwt.dom.client.Style.TextDecoration.LINE_THROUGH;
 import static com.google.gwt.dom.client.Style.TextDecoration.NONE;
 
 
-public class RepairInterfaceViewImpl extends Composite{
+public class RepairInterfaceViewImpl extends Composite implements RepairInterfaceView{
 
 
+    @Override
+    public SimplePanel getCriteriaContainer() {
+        return null;
+    }
+
+    @Override
+    public void setAxioms(Set<SafeHtml> axiomStatement) {
+
+    }
 
     interface RepairInterfaceViewImplUiBinder extends UiBinder<HTMLPanel, RepairInterfaceViewImpl> {
 
@@ -35,6 +47,7 @@ public class RepairInterfaceViewImpl extends Composite{
 
     };
 
+    @Inject
     public RepairInterfaceViewImpl(){
         DiffClientBundle.INSTANCE.style().ensureInjected();
         initWidget(ourUiBinder.createAndBindUi(this));
