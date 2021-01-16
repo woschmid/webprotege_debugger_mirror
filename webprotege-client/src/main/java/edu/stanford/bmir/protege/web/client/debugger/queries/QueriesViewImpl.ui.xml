@@ -85,9 +85,6 @@
             <g:cell horizontalAlignment="ALIGN_LEFT" >
                 <g:Button ui:field="stopButton" text="Stop"  title="Stop Debugger" addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
             </g:cell>
-            <g:cell horizontalAlignment="ALIGN_LEFT" >
-                <g:Button ui:field="repairButton" text="Repair" title="Repair Conflicts" addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
-            </g:cell>
             <g:cell horizontalAlignment="ALIGN_RIGHT" width="100%" >
                 <g:Button ui:field="submitButton" text="Submit" title="Submit selected queries" addStyleNames="{style.newTabButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
             </g:cell>

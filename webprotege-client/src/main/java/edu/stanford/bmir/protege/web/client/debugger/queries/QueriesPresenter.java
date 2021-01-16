@@ -56,17 +56,11 @@ public class QueriesPresenter extends DebuggerPresenter {
     @Nonnull
     private final ConfigureDebuggerView configureDebuggerView;
 
-    @Nonnull  RepairInterfacePresenter repairInterfacePresenter;
-
-    interface HandleModalButton extends ModalButtonHandler{
-        void handleModalButton(@Nonnull ModalCloser closer);
-    }
-
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
                             DispatchServiceManager dispatchServiceManager,
-                            MessageBox messageBox, StatementPresenter statementPresenter, RepairInterfacePresenter repairInterfacePresenter,
+                            MessageBox messageBox, StatementPresenter statementPresenter,
                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
@@ -77,7 +71,6 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.view = view;
         this.modalManager = modalManager;
         this.configureDebuggerView = configureDebuggerView;
-        this.repairInterfacePresenter = repairInterfacePresenter;
         statementPresenter.addCheckBoxClickhandler(this::CheckCheckBox);
     }
 
@@ -94,7 +87,6 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.view.setStartDebuggingHandler(this::startDebugging);
         this.view.setStopDebuggingHandler(this::stopDebugging);
         this.view.setSubmitDebuggingHandler(this::submitDebugging);
-        this.view.setRepairDebuggingHandler(this::RepairDebugging);
         this.view.setCheckOntologyHandler(this::checkOntology);
         this.view.setEditSettingHandler(this::ConfigureTimeout);
         this.view.setHelpHandler(this::showHelp);
@@ -197,63 +189,6 @@ public class QueriesPresenter extends DebuggerPresenter {
 
     }
 
-    private void RepairDebugging() {
-        GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
-        ModalPresenter modalPresenter = modalManager.createPresenter();
-        modalPresenter.setTitle("Repair");
-        repairInterfacePresenter.start(eventBus,debuggerResultManager.getDebuggingSessionStateResult());
-        modalPresenter.setView(repairInterfacePresenter.getView());
-        modalPresenter.setEscapeButton(DialogButton.CANCEL);
-        HandleModalButton r = (ModalCloser closer) ->
-        {
-            closer.closeModal();
-            GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
-            this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
-                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                            progressDisplay) {
-                        @Override
-                        public String getProgressDisplayTitle() {
-                            return "Repairing";
-                        }
-
-                        @Override
-                        public String getProgressDisplayMessage() {
-                            return "Please wait";
-                        }
-
-                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                            handlerDebugging(debuggingSessionStateResult);
-                        }
-                    });
-        };
-        modalPresenter.setPrimaryButton(DialogButton.OK);
-        modalPresenter.setButtonHandler(DialogButton.OK, r);
-        modalManager.showModal(modalPresenter);
-
-//        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
-
-    }
-/*
-    private void runRepair(){
-        this.dsm.execute(new RepairAction(projectId),
-                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                        progressDisplay) {
-                    @Override
-                    public String getProgressDisplayTitle() {
-                        return "Repairing";
-                    }
-
-                    @Override
-                    public String getProgressDisplayMessage() {
-                        return "Please wait";
-                    }
-
-                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        handlerDebugging(debuggingSessionStateResult);
-                    }
-                });
-    }
-*/
     private ImmutableMap<SafeHtml, Boolean> getAnswers() {
         Map<SafeHtml, Boolean> allSelectQueries = getStatementPresenter().getTableInfo();
         GWT.log("[QueriesPresenter] Selected Queries are "+ allSelectQueries.toString());

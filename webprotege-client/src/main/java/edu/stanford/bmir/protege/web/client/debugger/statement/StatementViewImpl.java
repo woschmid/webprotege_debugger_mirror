@@ -7,6 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.client.debugger.statement.RepairDebuggingHandler;
 import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
 import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
@@ -18,6 +19,8 @@ import java.util.Set;
 
 
 public class StatementViewImpl extends Composite{
+
+
 
     interface StatementViewImplUiBinder extends UiBinder<HTMLPanel, StatementViewImpl> {
 
@@ -47,6 +50,13 @@ public class StatementViewImpl extends Composite{
     DeleteTestCasesHandler deleteTestCasesHandler= new DeleteTestCasesHandler() {
         @Override
         public void DeleteTestCases(SafeHtml axiom) {
+
+        }
+    };
+
+    RepairDebuggingHandler repairDebuggingHandler = new RepairDebuggingHandler() {
+        @Override
+        public void handleRepairDebugging(Diagnosis diagnosis) {
 
         }
     };
@@ -127,32 +137,20 @@ public class StatementViewImpl extends Composite{
             int row = table.getRowCount();
             Label repair = new Label("Repair #"+(numOfRepairs++));
             repair.getElement().getStyle().setColor("blue");
+            Button repairButton = new Button("R");
             table.setWidget(row,0,repair);
+            repairButton.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent clickEvent) {
+                    repairDebuggingHandler.handleRepairDebugging(diagnosis);
+                }
+            });
+            table.setWidget(row,1,repairButton);
+
             int numbAxioms = 1;
             for(SafeHtml axiom: diagnosis.getAxioms()){
                 Label statement = new HTML(axiom);
                 table.setWidget(row+numbAxioms,0,statement);
-//                if (diagnoseStatement.size()== 1){
-//                    Button buttonM = new Button("Modify");
-//                    buttonM.setTitle("Modify");
-//                    Button buttonD = new Button("Delete");
-//                    buttonD.setTitle("Delete");
-//                    buttonM.addClickHandler(new ClickHandler() {
-//                        @Override
-//                        public void onClick(ClickEvent clickEvent) {
-//                            manchesterEditorHandler.addManchesterEditor();
-//                        }
-//                    });
-//
-//                    buttonD.addClickHandler(new ClickHandler() {
-//                        @Override
-//                        public void onClick(ClickEvent clickEvent) {
-//                            deleteRepairHandler.DeleteRepair(axiom);
-//                        }
-//                    });
-//                    table.setWidget(row+numbAxioms,1,buttonM);
-//                    table.setWidget(row+numbAxioms,2,buttonD);
-//                }
                 numbAxioms++;
             }
 
@@ -239,9 +237,9 @@ public class StatementViewImpl extends Composite{
         this.deleteTestCasesHandler = deleteTestCasesHandler;
     }
 
-//    public void setManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler) {
-//        this.manchesterEditorHandler = manchesterEditorHandler;
-//    }
+    public void setManchesterEditorHandler(RepairDebuggingHandler repairDebuggingHandler) {
+        this. repairDebuggingHandler = repairDebuggingHandler;
+    }
 //
 //    public void setDeleteRepairHandler(DeleteRepairHandler deleteRepairHandler) {
 //        this.deleteRepairHandler = deleteRepairHandler;

@@ -19,8 +19,6 @@ public interface QueriesView extends DebuggerView {
 
     void setSubmitDebuggingHandler(@Nonnull SubmitDebuggingHandler handler);
 
-    void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler);
-
     void setCheckOntologyHandler(@Nonnull CheckOntologyHandler handler);
 
     void setEditSettingHandler(@Nonnull EditSettingHandler handler);

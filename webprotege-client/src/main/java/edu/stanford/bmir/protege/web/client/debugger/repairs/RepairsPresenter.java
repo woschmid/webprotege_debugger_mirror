@@ -1,16 +1,26 @@
 package edu.stanford.bmir.protege.web.client.debugger.repairs;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
+import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesPresenter;
+import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfacePresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
+import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalButtonHandler;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
+import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
+import edu.stanford.bmir.protege.web.shared.debugger.RepairAction;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -37,15 +47,24 @@ public class RepairsPresenter extends DebuggerPresenter {
     private final DebuggerResultManager debuggerResultManager;
 
     @Nonnull
+    RepairInterfacePresenter repairInterfacePresenter;
+
+    @Nonnull
     private ProjectId projectId;
 
     @Nonnull
     private final ModalManager modalManager;
 
+    WebProtegeEventBus eventBus;
+
+    interface HandleModalButton extends ModalButtonHandler {
+        void handleModalButton(@Nonnull ModalCloser closer);
+    }
+
     @Inject
     public RepairsPresenter(@Nonnull ProjectId projectId,
                             ModalManager modalManager,
-                            DispatchServiceManager dsm,
+                            DispatchServiceManager dsm, RepairInterfacePresenter repairInterfacePresenter,
                             MessageBox messageBox, StatementPresenter statementPresenter,
                             DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, RepairsView view, LoggedInUserProvider loggedInUserProvider) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
@@ -55,15 +74,57 @@ public class RepairsPresenter extends DebuggerPresenter {
         this.debuggerResultManager = debuggerResultManager;
         this.modalManager = modalManager;
         this.projectId = projectId;
+        this.repairInterfacePresenter = repairInterfacePresenter;
     }
 
 
     public void start(AcceptsOneWidget container, WebProtegeEventBus eventBus) {
         super.start(container,eventBus);
+        this.eventBus = eventBus;
+        statementPresenter.addRepairDebuggingHandler(this::RepairDebugging);
     }
 
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
+    }
+
+    private void RepairDebugging(Diagnosis diagnosis) {
+        GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
+        ModalPresenter modalPresenter = modalManager.createPresenter();
+        modalPresenter.setTitle("Repair");
+        repairInterfacePresenter.start(eventBus,debuggerResultManager.getDebuggingSessionStateResult());
+        repairInterfacePresenter.setAxioms(diagnosis);
+        modalPresenter.setView(repairInterfacePresenter.getView());
+        modalPresenter.setEscapeButton(DialogButton.CANCEL);
+        HandleModalButton r = (ModalCloser closer) ->
+        {
+            closer.closeModal();
+            GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
+            this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
+                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                            progressDisplay) {
+                        @Override
+                        public String getProgressDisplayTitle() {
+                            return "Repairing";
+                        }
+
+                        @Override
+                        public String getProgressDisplayMessage() {
+                            return "Please wait";
+                        }
+
+                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                            handlerDebugging(debuggingSessionStateResult);
+                        }
+                    });
+            repairInterfacePresenter.removeRepairDetails();
+        };
+        modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(DialogButton.OK, r);
+        modalManager.showModal(modalPresenter);
+
+//        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
+
     }
 
 

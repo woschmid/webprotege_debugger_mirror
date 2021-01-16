@@ -43,9 +43,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     protected Button submitButton;
 
     @UiField
-    protected Button repairButton;
-
-    @UiField
     protected Button stopButton;
 
     interface QeriesViewImplUiBinder extends UiBinder<HTMLPanel, QueriesViewImpl> {
@@ -61,10 +58,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     };
 
     private SubmitDebuggingHandler submitDebuggingHandler = () -> {
-    };
-
-
-    private RepairDebuggingHandler repairDebuggingHandler = () -> {
     };
 
     private CheckOntologyHandler checkOntologyHandler = () -> {};
@@ -117,9 +110,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
     @UiHandler("submitButton")
     protected void submitButtonClick(ClickEvent event) { submitDebuggingHandler.handleSubmitDebugging(); }
 
-    @UiHandler("repairButton")
-    protected void RepairButtonClick(ClickEvent event) { repairDebuggingHandler.handleRepairDebugging(); }
-
     @Override
     public void setStartDebuggingHandler(@Nonnull StartDebuggingHandler handler) { this.startDebuggingHandler = checkNotNull(handler); }
 
@@ -131,9 +121,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
 
     @Override
     public void setCheckOntologyHandler(CheckOntologyHandler checkOntologyHandler) { this.checkOntologyHandler = checkOntologyHandler; }
-
-    @Override
-    public void setRepairDebuggingHandler(@Nonnull RepairDebuggingHandler handler) { this.repairDebuggingHandler = checkNotNull(handler);}
 
     @Override
     public void setEditSettingHandler(@Nonnull EditSettingHandler editSettingHandler) { this.editSettingHandler = editSettingHandler; }
@@ -158,9 +145,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
             case "submit":
                 submitButton.setEnabled(false);
                 break;
-            case "repair":
-                repairButton.setEnabled(false);
-                break;
         }
     }
 
@@ -174,9 +158,6 @@ public class QueriesViewImpl extends Composite implements QueriesView {
                 break;
             case "submit":
                 submitButton.setEnabled(true);
-                break;
-            case "repair":
-                repairButton.setEnabled(true);
                 break;
         }
     }

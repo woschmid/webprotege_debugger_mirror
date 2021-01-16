@@ -4,8 +4,10 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.RootPanel;
+import edu.stanford.bmir.protege.web.client.debugger.statement.RepairDebuggingHandler;
 import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.*;
 
@@ -40,14 +42,9 @@ public class StatementPresenter {
         view.setDeleteTestCasesHandler(deleteTestCasesHandler);
     }
 
-//    public void addManchesterEditorHandler(ManchesterEditorHandler manchesterEditorHandler){
-//        view.setManchesterEditorHandler(manchesterEditorHandler);
-//    }
-//
-//    public void addDeleteRepairHandler(DeleteRepairHandler deleteRepairHandler){
-//        view.setDeleteRepairHandler(deleteRepairHandler);
-//    }
-
+    public void addRepairDebuggingHandler(RepairDebuggingHandler repairDebuggingHandler){
+        view.setManchesterEditorHandler(repairDebuggingHandler);
+    }
 
     public void start(AcceptsOneWidget container) {
         this.container = container;

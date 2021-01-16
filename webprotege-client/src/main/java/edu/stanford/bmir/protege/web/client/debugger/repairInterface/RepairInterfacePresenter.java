@@ -19,6 +19,7 @@ import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.DirtyChangedEvent;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 import edu.stanford.bmir.protege.web.shared.debugger.RepairDetails;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
@@ -83,14 +84,13 @@ public class RepairInterfacePresenter{
     }
 
     public void start(WebProtegeEventBus eventBus, DebuggingSessionStateResult debuggingSessionStateResult) {
-//        manchesterSyntaxFrameEditorPresenter.start(eventBus);
         view.setManchesterEditorHandler(this::manchesterEditor);
         view.setDeleteRepairHandler(this::deleteRepairAxiom);
         view.setRedoRepairHandler(this::redoRepair);
-        setAxioms(debuggingSessionStateResult);
     }
-    public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
-        view.setAxioms(debuggingSessionStateResult.getDiagnoses().get(0).getAxioms());
+
+    public void setAxioms(Diagnosis diagnosis){
+        view.setAxioms(diagnosis.getAxioms());
     }
 
     private void manchesterEditor(SafeHtml selectedAxiom, String axiom, int row, Button buttonR) {
@@ -133,6 +133,11 @@ public class RepairInterfacePresenter{
     public RepairDetails getRepairDetails() {
         RepairDetails repairDetails = new RepairDetails(axiomsToDelete,axiomsToModify);
         return repairDetails;
+    }
+
+    public void removeRepairDetails(){
+        axiomsToModify.clear();
+        axiomsToDelete.clear();
     }
 
     public RepairInterfaceViewImpl getView() {

@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
  */
 public interface RepairsView extends DebuggerView {
 
+
     interface ExecuteQueryHandler {
         void handleExecute();
     }
