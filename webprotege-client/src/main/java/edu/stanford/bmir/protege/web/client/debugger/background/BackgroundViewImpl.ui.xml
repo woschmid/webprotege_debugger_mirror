@@ -75,7 +75,7 @@
             </g:FlowPanel>
             </g:cell>
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Background" addStyleNames="{style.form-label}"/>
+                <g:Label text="Correct Axioms" addStyleNames="{style.form-label}"/>
                 <!--            <g:VerticalPanel ui:field="table" />-->
                 <g:SimplePanel ui:field="NonEntailedcriteriaContainer" />
             </g:FlowPanel>

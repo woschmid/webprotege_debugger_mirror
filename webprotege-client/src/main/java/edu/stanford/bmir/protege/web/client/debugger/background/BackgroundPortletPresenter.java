@@ -11,7 +11,7 @@ import edu.stanford.webprotege.shared.annotations.Portlet;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-@Portlet(id = "portlet.Background", title = "Background")
+@Portlet(id = "portlet.Background", title = "Ontology Axioms")
 
 public class BackgroundPortletPresenter extends AbstractWebProtegePortletPresenter {
 
