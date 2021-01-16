@@ -45,9 +45,9 @@ public class RepairInterfacePresenter{
 
     private ProgressDisplay progressDisplay;
 
-    private Set<SafeHtml> axiomsToDelete = new HashSet<SafeHtml>();
+    private Set<SafeHtml> axiomsToDelete = new HashSet<>();
 
-    private Map<SafeHtml, String> axiomsToModify = new HashMap<SafeHtml, String>();
+    private Map<SafeHtml, String> axiomsToModify = new HashMap<>();
 
     interface HandleModalButton extends ModalButtonHandler{
         void handleModalButton(@Nonnull ModalCloser closer);
@@ -60,8 +60,6 @@ public class RepairInterfacePresenter{
     private RepairInterfaceViewImpl view;
 
     @Nonnull
-    ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter;
-    @Nonnull
     ManchesterSyntaxFrameEditorImpl manchesterSyntaxFrameEditor;
 
     @Inject
@@ -70,7 +68,6 @@ public class RepairInterfacePresenter{
                                     @Nonnull DispatchErrorMessageDisplay errorDisplay,
                                     @Nonnull ProgressDisplay progressDisplay,
                                     @Nonnull ProjectId projectId,
-                                    @Nonnull ManchesterSyntaxFrameEditorPresenter manchesterSyntaxFrameEditorPresenter,
                                     @Nonnull ManchesterSyntaxFrameEditorImpl manchesterSyntaxFrameEditor) {
 
         this.errorDisplay =  errorDisplay;
@@ -93,7 +90,7 @@ public class RepairInterfacePresenter{
         view.setAxioms(diagnosis.getAxioms());
     }
 
-    private void manchesterEditor(SafeHtml selectedAxiom, String axiom, int row, Button buttonR) {
+    private void manchesterEditor(SafeHtml selectedAxiom, String axiom, int row,Button buttonM, Button buttonR) {
         manchesterSyntaxFrameEditor.clearValue();
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalManager.showModal(modalPresenter);
@@ -105,9 +102,14 @@ public class RepairInterfacePresenter{
         HandleModalButton r = (ModalCloser closer) ->
         {
             GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditor.getValue());
-            axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
-            view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row,  buttonR);
-            closer.closeModal();
+            if (manchesterSyntaxFrameEditor.getValue().isPresent()){
+                axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
+                view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row, buttonM, buttonR);
+                closer.closeModal();
+            }else{
+                closer.closeModal();
+            }
+
 
         };
         modalPresenter.setPrimaryButton(DialogButton.OK);
@@ -116,6 +118,7 @@ public class RepairInterfacePresenter{
     }
 
     private void deleteRepairAxiom(SafeHtml selectedAxiom){
+        axiomsToModify.remove(selectedAxiom);
         axiomsToDelete.add(selectedAxiom);
     }
 
@@ -124,15 +127,9 @@ public class RepairInterfacePresenter{
         axiomsToModify.remove(selectedAxiom);
     }
 
-    private void handleModalButton(ModalCloser closer) {
-        GWT.log("[handleModalButton]Get entity: "+ manchesterSyntaxFrameEditor.getValue());
-        closer.closeModal();
-    }
-
 
     public RepairDetails getRepairDetails() {
-        RepairDetails repairDetails = new RepairDetails(axiomsToDelete,axiomsToModify);
-        return repairDetails;
+        return new RepairDetails(axiomsToDelete,axiomsToModify);
     }
 
     public void removeRepairDetails(){

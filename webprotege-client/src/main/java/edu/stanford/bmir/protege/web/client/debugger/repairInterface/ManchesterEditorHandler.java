@@ -5,5 +5,5 @@ import com.google.gwt.user.client.ui.Button;
 
 
 public interface ManchesterEditorHandler {
-    void addManchesterEditor(SafeHtml selectedAxiom, String axiom, int row, Button r);
+    void addManchesterEditor(SafeHtml selectedAxiom, String axiom, int row,Button m, Button r);
 }

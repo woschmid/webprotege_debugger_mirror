@@ -98,7 +98,7 @@ public class RepairsPresenter extends DebuggerPresenter {
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         HandleModalButton r = (ModalCloser closer) ->
         {
-            closer.closeModal();
+
             GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
             this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
                     new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
@@ -114,6 +114,9 @@ public class RepairsPresenter extends DebuggerPresenter {
                         }
 
                         public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                            if (debuggingSessionStateResult.isOk()){
+                                closer.closeModal();
+                            }
                             handlerDebugging(debuggingSessionStateResult);
                         }
                     });

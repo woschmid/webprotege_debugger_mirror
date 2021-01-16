@@ -25,24 +25,14 @@ public class RepairInterfaceViewImpl extends Composite{
     }
     private static RepairInterfaceViewImplUiBinder ourUiBinder = GWT.create(RepairInterfaceViewImplUiBinder.class);
 
-    private DeleteRepairHandler deleteRepairHandler = new DeleteRepairHandler() {
-        @Override
-        public void DeleteRepair(SafeHtml selectedAxiom) {
+    private DeleteRepairHandler deleteRepairHandler = selectedAxiom -> {
 
-        }
     };
-    ManchesterEditorHandler manchesterEditorHandler = new ManchesterEditorHandler() {
+    public ManchesterEditorHandler manchesterEditorHandler = (selectedAxiom, axiom, row, m, r) -> {
 
-        @Override
-        public void addManchesterEditor(SafeHtml selectedAxiom, String axiom, int row, Button r) {
-
-        }
     };
-    RedoRepairHandler redoRepairHandler = new RedoRepairHandler() {
-        @Override
-        public void RedoRepair(SafeHtml selectedAxiom) {
+    RedoRepairHandler redoRepairHandler = selectedAxiom -> {
 
-        }
     };
 
     public RepairInterfaceViewImpl(){
@@ -69,34 +59,23 @@ public class RepairInterfaceViewImpl extends Composite{
             Button buttonR = new Button("Redo");
             buttonD.setTitle("Re");
 
-            buttonM.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    manchesterEditorHandler.addManchesterEditor(axiom, statement.getText(), row, buttonR);
-                }
+            buttonM.addClickHandler(clickEvent -> manchesterEditorHandler.addManchesterEditor(axiom, statement.getText(), row,buttonM, buttonR));
+
+            buttonD.addClickHandler(clickEvent -> {
+                statement.getElement().getStyle().setTextDecoration(LINE_THROUGH);
+                table.setWidget(row,0,statement);
+                table.setWidget(row,1,buttonR);
+                table.remove(buttonD);
+                deleteRepairHandler.DeleteRepair(axiom);
             });
 
-            buttonD.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    statement.getElement().getStyle().setTextDecoration(LINE_THROUGH);
-                    table.setWidget(row,0,statement);
-                    table.setWidget(row,1,buttonR);
-                    table.remove(buttonD);
-                    deleteRepairHandler.DeleteRepair(axiom);
-                }
-            });
-
-            buttonR.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    statement.getElement().getStyle().setTextDecoration(NONE);
-                    table.remove(buttonR);
-                    table.setWidget(row,0,statement);
-                    table.setWidget(row,1, buttonM);
-                    table.setWidget(row,2, buttonD);
-                    redoRepairHandler.RedoRepair(axiom);
-                }
+            buttonR.addClickHandler(clickEvent -> {
+                statement.getElement().getStyle().setTextDecoration(NONE);
+                table.remove(buttonR);
+                table.setWidget(row,0,statement);
+                table.setWidget(row,1, buttonM);
+                table.setWidget(row,2, buttonD);
+                redoRepairHandler.RedoRepair(axiom);
             });
             table.setWidget(row,0,statement);
             table.setWidget(row,1, buttonM);
@@ -120,8 +99,9 @@ public class RepairInterfaceViewImpl extends Composite{
         return sb;
     }
 
-    public void changAxoim(String correctAxiom, int row, Button buttonR){
+    public void changAxoim(String correctAxiom, int row, Button buttonM, Button buttonR){
         Label statement = new Label(correctAxiom);
+        table.remove(buttonM);
         table.setWidget(row,0,statement);
         table.setWidget(row,3,buttonR);
     }
