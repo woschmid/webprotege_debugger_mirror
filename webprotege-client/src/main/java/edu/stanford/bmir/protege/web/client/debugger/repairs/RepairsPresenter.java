@@ -99,32 +99,29 @@ public class RepairsPresenter extends DebuggerPresenter {
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         HandleModalButton r = (ModalCloser closer) ->
         {
-            if(repairInterfacePresenter.getRepairDetails().getAxiomsToModify().isEmpty() && repairInterfacePresenter.getRepairDetails().getAxiomsToDelete().isEmpty()){
-                messageBox.showAlert("No Changing", "Please modify or delete at least an axiom.");
-            }else{
-                GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
-                this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
-                        new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                                progressDisplay) {
-                            @Override
-                            public String getProgressDisplayTitle() {
-                                return "Repairing";
-                            }
 
-                            @Override
-                            public String getProgressDisplayMessage() {
-                                return "Please wait";
-                            }
+            GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
+            this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
+                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                            progressDisplay) {
+                        @Override
+                        public String getProgressDisplayTitle() {
+                            return "Repairing";
+                        }
 
-                            public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                                if (debuggingSessionStateResult.isOk()){
-                                    closer.closeModal();
-                                }
-                                handlerDebugging(debuggingSessionStateResult);
+                        @Override
+                        public String getProgressDisplayMessage() {
+                            return "Please wait";
+                        }
+
+                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                            if (debuggingSessionStateResult.isOk()){
+                                closer.closeModal();
                             }
-                        });
-                repairInterfacePresenter.removeRepairDetails();
-            }
+                            handlerDebugging(debuggingSessionStateResult);
+                        }
+                    });
+            repairInterfacePresenter.removeRepairDetails();
         };
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK, r);
