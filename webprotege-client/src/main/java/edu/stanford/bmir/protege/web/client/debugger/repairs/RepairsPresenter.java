@@ -63,10 +63,10 @@ public class RepairsPresenter extends DebuggerPresenter {
 
     @Inject
     public RepairsPresenter(@Nonnull ProjectId projectId,
-                            ModalManager modalManager,
-                            DispatchServiceManager dsm, RepairInterfacePresenter repairInterfacePresenter,
+                            @Nonnull ModalManager modalManager,
+                            DispatchServiceManager dsm, @Nonnull RepairInterfacePresenter repairInterfacePresenter,
                             MessageBox messageBox, StatementPresenter statementPresenter,
-                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, RepairsView view, LoggedInUserProvider loggedInUserProvider) {
+                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, @Nonnull RepairsView view, LoggedInUserProvider loggedInUserProvider) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.view = view;
         this.dsm = dsm;
@@ -92,7 +92,8 @@ public class RepairsPresenter extends DebuggerPresenter {
         GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Repair");
-        repairInterfacePresenter.start(eventBus,debuggerResultManager.getDebuggingSessionStateResult());
+        repairInterfacePresenter.clearAxiomTable();
+        repairInterfacePresenter.start(eventBus);
         repairInterfacePresenter.setAxioms(diagnosis);
         modalPresenter.setView(repairInterfacePresenter.getView());
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
@@ -125,9 +126,6 @@ public class RepairsPresenter extends DebuggerPresenter {
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK, r);
         modalManager.showModal(modalPresenter);
-
-//        messageBox.showYesNoConfirmBox("Repair Ontology", "Do repairing?",this::runRepair );
-
     }
 
 

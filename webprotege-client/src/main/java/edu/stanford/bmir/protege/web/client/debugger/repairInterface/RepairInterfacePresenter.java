@@ -86,7 +86,7 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
         this.manchesterSyntaxFrameEditor = manchesterSyntaxFrameEditor;
     }
 
-    public void start(WebProtegeEventBus eventBus, DebuggingSessionStateResult debuggingSessionStateResult) {
+    public void start(WebProtegeEventBus eventBus) {
         view.setManchesterEditorHandler(this::manchesterEditor);
         view.setDeleteRepairHandler(this::deleteRepairAxiom);
         view.setRedoRepairHandler(this::redoRepair);
@@ -172,7 +172,8 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
 
     @Override
     public void clearAxiomTable() {
-
+        removeRepairDetails();
+        view.table.removeAllRows();
     }
 
     @Override
