@@ -18,12 +18,26 @@ public class RepairAction implements ProjectAction<DebuggingSessionStateResult> 
 
     private ImmutableSet<SafeHtml> axiomsToDelete;
 
+    private Integer index;
+
+    @Deprecated
     public RepairAction(@Nonnull ProjectId projectId,
                         @Nonnull ImmutableMap<SafeHtml, String> axiomsToModify,
                         @Nonnull ImmutableSet<SafeHtml> axiomsToDelete) {
         this.projectId = projectId;
         this.axiomsToModify = axiomsToModify;
         this.axiomsToDelete = axiomsToDelete;
+        this.index = 0;
+    }
+
+    public RepairAction(@Nonnull ProjectId projectId,
+                        @Nonnull ImmutableMap<SafeHtml, String> axiomsToModify,
+                        @Nonnull ImmutableSet<SafeHtml> axiomsToDelete,
+                        @Nonnull Integer diagnosisIndex) {
+        this.projectId = projectId;
+        this.axiomsToModify = axiomsToModify;
+        this.axiomsToDelete = axiomsToDelete;
+        this.index = diagnosisIndex;
     }
 
     @GwtSerializationConstructor
@@ -45,18 +59,22 @@ public class RepairAction implements ProjectAction<DebuggingSessionStateResult> 
         return axiomsToDelete;
     }
 
+    @Nonnull
+    public Integer getIndex() {
+        return index;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RepairAction that = (RepairAction) o;
-        return Objects.equals(projectId, that.projectId) && Objects.equals(axiomsToModify, that.axiomsToModify) && Objects.equals(axiomsToDelete, that.axiomsToDelete);
+        return Objects.equals(projectId, that.projectId) && Objects.equals(axiomsToModify, that.axiomsToModify) && Objects.equals(axiomsToDelete, that.axiomsToDelete) && Objects.equals(index, that.index);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, axiomsToModify, axiomsToDelete);
+        return Objects.hash(projectId, axiomsToModify, axiomsToDelete, index);
     }
-
 
 }

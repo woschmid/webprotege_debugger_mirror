@@ -387,19 +387,22 @@ public class DebuggingSession implements HasDispose {
      * @param userId The user who wants to repair the debugging session.
      * @param axiomsToModify Some repair details (which axioms to delete, which to modify)
      * @param axiomsToDelete Some repair details (which axioms to delete, which to modify)
+     * @param index The index of the diagnosis to be repaired.
      * @param applyChanges Applying changes on
      * @return A result for the front end representing the current state of the backend.
      */
-    public DebuggingSessionStateResult repair(@Nonnull UserId userId, ImmutableMap<SafeHtml, String> axiomsToModify, ImmutableSet<SafeHtml> axiomsToDelete, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLOntologyCreationException, RepairException {
+    public DebuggingSessionStateResult repair(@Nonnull UserId userId, ImmutableMap<SafeHtml, String> axiomsToModify, ImmutableSet<SafeHtml> axiomsToDelete, Integer index, HasApplyChanges applyChanges) throws ConcurrentUserException, UnsatisfiedPreconditionException, OWLOntologyCreationException, RepairException {
         synchronized (this) {
             checkUser(userId);
 
             // verify that the session state in STARTED state
             // and check the preconditions for a repair action
-            verifyPreCondition(state != SessionState.STARTED || !(query == null && diagnoses != null && ontologyID != null && diagnoses.size() == 1));
+            verifyPreCondition(state != SessionState.STARTED
+                    ||
+                    !(ontologyID != null && diagnoses != null && diagnoses.size() >= 1 && index >= 0 && index < diagnoses.size()));
 
-            // get the final diagnosis and apply are remove axioms change operation for them
-            final Diagnosis<OWLLogicalAxiom> diagnosis = diagnoses.iterator().next();
+            // get the diagnosis and apply change operation for them
+            Diagnosis<OWLLogicalAxiom> diagnosis = new ArrayList<>(diagnoses).get(index);
 
             final RepairChangeListGenerator changeListGenerator = new RepairChangeListGenerator(this, diagnosis, axiomsToModify, axiomsToDelete);
 

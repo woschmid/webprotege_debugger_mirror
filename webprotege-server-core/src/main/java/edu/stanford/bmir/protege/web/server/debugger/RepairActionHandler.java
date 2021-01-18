@@ -40,7 +40,7 @@ public class RepairActionHandler extends AbstractProjectActionHandler<RepairActi
     @Override
     public DebuggingSessionStateResult execute(@Nonnull RepairAction action, @Nonnull ExecutionContext executionContext) {
         try {
-            return session.repair(executionContext.getUserId(), action.getAxiomsToModify(), action.getAxiomsToDelete(), applyChanges);
+            return session.repair(executionContext.getUserId(), action.getAxiomsToModify(), action.getAxiomsToDelete(), action.getIndex(), applyChanges);
         } catch (RuntimeException | ConcurrentUserException | UnsatisfiedPreconditionException | OWLOntologyCreationException | RepairException e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
