@@ -88,7 +88,7 @@ public class RepairsPresenter extends DebuggerPresenter {
         statementPresenter.addRepairsStatement(debuggingSessionStateResult.getDiagnoses());
     }
 
-    private void RepairDebugging(Diagnosis diagnosis) {
+    private void RepairDebugging(Diagnosis diagnosis, int index) {
         GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!");
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Repair");
@@ -103,7 +103,7 @@ public class RepairsPresenter extends DebuggerPresenter {
                 messageBox.showAlert("No Changing", "Please modify or delete at least an axiom.");
             }else{
                 GWT.log("[QueriesPresenter]Repair Debugging Button pressed!!!!!" + repairInterfacePresenter.getRepairDetails());
-                this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete()),
+                this.dsm.execute(new RepairAction(projectId, repairInterfacePresenter.getRepairDetails().getAxiomsToModify(), repairInterfacePresenter.getRepairDetails().getAxiomsToDelete(),index),
                         new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                                 progressDisplay) {
                             @Override

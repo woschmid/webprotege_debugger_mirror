@@ -113,7 +113,7 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
             if (manchesterSyntaxFrameEditor.getValue().isPresent()){
                 String changedAxiom = manchesterSyntaxFrameEditor.getValue().get();
                 if (!finalAxiom.equals(changedAxiom)){
-                    this.dsm.execute(new CheckAxiomSyntaxAction(projectId, finalAxiom),
+                    this.dsm.execute(new CheckAxiomSyntaxAction(projectId, changedAxiom),
                             new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                                     progressDisplay) {
                                 @Override
@@ -129,8 +129,8 @@ public class RepairInterfacePresenter extends DebuggerPresenter {
                                 public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
                                     handlerDebugging(debuggingSessionStateResult);
                                     if(debuggingSessionStateResult.isOk() ){
-                                        axiomsToModify.put(selectedAxiom, manchesterSyntaxFrameEditor.getValue().get());
-                                        view.changAxoim(manchesterSyntaxFrameEditor.getValue().get(),row, buttonM, buttonR);
+                                        axiomsToModify.put(selectedAxiom,changedAxiom);
+                                        view.changAxoim(changedAxiom,row, buttonM, buttonR);
                                         closer.closeModal();
                                     }
                                 }

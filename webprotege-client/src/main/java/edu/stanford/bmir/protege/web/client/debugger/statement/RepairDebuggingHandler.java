@@ -4,6 +4,6 @@ import edu.stanford.bmir.protege.web.shared.debugger.Diagnosis;
 
 public interface RepairDebuggingHandler {
 
-    void handleRepairDebugging(Diagnosis diagnosis);
+    void handleRepairDebugging(Diagnosis diagnosis, int index);
 
 }

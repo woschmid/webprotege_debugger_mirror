@@ -27,38 +27,23 @@ public class StatementViewImpl extends Composite{
     }
     private static StatementViewImplUiBinder ourUiBinder = GWT.create(StatementViewImplUiBinder.class);
 
-    private CheckCheckBoxHandler checkCheckBox = new CheckCheckBoxHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent, CheckBox checkBoxOther, List<CheckBox> list) {
+    private CheckCheckBoxHandler checkCheckBox = (clickEvent, checkBoxOther, list) -> {
 
-        }
     };
-    FaultyAxiomRemoveHandler faultyAxiomRemoveHandler = new FaultyAxiomRemoveHandler() {
-        @Override
-        public void handlerFaultyAxiomRemove(SafeHtml axiom) {
+    FaultyAxiomRemoveHandler faultyAxiomRemoveHandler = axiom -> {
 
-        }
     };
 
-    BackgroundAxiomRemoveHandler backgroundAxiomRemoveHandler = new BackgroundAxiomRemoveHandler() {
-        @Override
-        public void handlerBackgroundAxiomRemove(SafeHtml axiom) {
+    BackgroundAxiomRemoveHandler backgroundAxiomRemoveHandler = axiom -> {
 
-        }
     };
 
-    DeleteTestCasesHandler deleteTestCasesHandler= new DeleteTestCasesHandler() {
-        @Override
-        public void DeleteTestCases(SafeHtml axiom) {
+    DeleteTestCasesHandler deleteTestCasesHandler= axiom -> {
 
-        }
     };
 
-    RepairDebuggingHandler repairDebuggingHandler = new RepairDebuggingHandler() {
-        @Override
-        public void handleRepairDebugging(Diagnosis diagnosis) {
+    RepairDebuggingHandler repairDebuggingHandler = (diagnosis, index) -> {
 
-        }
     };
 
     @UiField
@@ -94,19 +79,9 @@ public class StatementViewImpl extends Composite{
             listcheckbox.add(checkBoxP);
             listcheckbox.add(checkBoxN);
 
-            checkBoxN.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    checkCheckBox.onClick(clickEvent,checkBoxP, listcheckbox);
-                }
-            });
+            checkBoxN.addClickHandler(clickEvent -> checkCheckBox.onClick(clickEvent,checkBoxP, listcheckbox));
 
-            checkBoxP.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    checkCheckBox.onClick(clickEvent,checkBoxN, listcheckbox);
-                }
-            });
+            checkBoxP.addClickHandler(clickEvent -> checkCheckBox.onClick(clickEvent,checkBoxN, listcheckbox));
             table.setWidget(row,0,statement);
             table.setWidget(row,1, checkBoxP);
             table.setWidget(row,2, checkBoxN);
@@ -135,16 +110,12 @@ public class StatementViewImpl extends Composite{
         for (Diagnosis diagnosis :
                 diagnoseStatement) {
             int row = table.getRowCount();
+            Button repairButton = new Button("R");
+            int finalNumOfRepairs = numOfRepairs;
+            repairButton.addClickHandler(clickEvent -> repairDebuggingHandler.handleRepairDebugging(diagnosis, finalNumOfRepairs -1));
             Label repair = new Label("Repair #"+(numOfRepairs++));
             repair.getElement().getStyle().setColor("blue");
-            Button repairButton = new Button("R");
             table.setWidget(row,0,repair);
-            repairButton.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    repairDebuggingHandler.handleRepairDebugging(diagnosis);
-                }
-            });
             table.setWidget(row,1,repairButton);
 
             int numbAxioms = 1;
@@ -168,12 +139,7 @@ public class StatementViewImpl extends Composite{
             button.setHTML(sbN.toString());
             table.setWidget(row, 0, statement);
             table.setWidget(row,1, button);
-            button.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent clickEvent) {
-                    deleteTestCasesHandler.DeleteTestCases(axiom);
-                }
-            });
+            button.addClickHandler(clickEvent -> deleteTestCasesHandler.DeleteTestCases(axiom));
         }
     }
 
@@ -195,12 +161,7 @@ public class StatementViewImpl extends Composite{
                 table.setWidget(row, 0, statement);
                 if (isChecked){table.setWidget(row, 1, button);}
 
-                button.addClickHandler(new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent clickEvent) {
-                        backgroundAxiomRemoveHandler.handlerBackgroundAxiomRemove(axiom);
-                    }
-                });
+                button.addClickHandler(clickEvent -> backgroundAxiomRemoveHandler.handlerBackgroundAxiomRemove(axiom));
             }
         }
 
@@ -215,12 +176,7 @@ public class StatementViewImpl extends Composite{
                 table.setWidget(row, 0, statement);
                 if (isChecked){table.setWidget(row, 1, button);}
 
-                button.addClickHandler(new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent clickEvent) {
-                        faultyAxiomRemoveHandler.handlerFaultyAxiomRemove(axiom);
-                    }
-                });
+                button.addClickHandler(clickEvent -> faultyAxiomRemoveHandler.handlerFaultyAxiomRemove(axiom));
             }
         }
     }
