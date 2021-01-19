@@ -2,11 +2,11 @@ package edu.stanford.bmir.protege.web.server.debugger;
 
 public class SearchFilter {
 
-    private boolean aBox = false;
+    private boolean aBox = true;
 
-    private boolean tBox = false;
+    private boolean tBox = true;
 
-    private boolean rBox = false;
+    private boolean rBox = true;
 
     public boolean isABox() {
         return aBox;
@@ -33,8 +33,8 @@ public class SearchFilter {
     }
 
     public void reset() {
-        aBox = false;
-        tBox = false;
-        rBox = false;
+        aBox = true;
+        tBox = true;
+        rBox = true;
     }
 }
