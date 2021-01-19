@@ -95,6 +95,11 @@ public class DebuggingSession implements HasDispose {
      */
     private static final Long SESSION_KEEPALIVE_IN_MILLIS = 10L * 60L * 1000L; // 10 minutes
 
+    /**
+     * Searchfilter.
+     */
+    private SearchFilter filter;
+
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
                             @Nonnull RevisionManager revisionManager,
@@ -111,6 +116,8 @@ public class DebuggingSession implements HasDispose {
         this.state = SessionState.INIT;
         this.query = null;
         this.diagnoses = null;
+
+        this.filter = new SearchFilter();
 
         keepSessionAlive();
 
@@ -186,6 +193,9 @@ public class DebuggingSession implements HasDispose {
         return renderingManager;
     }
 
+    public SearchFilter getSearchFilter() {
+        return filter;
+    }
 
     /**
      * Checks the ontology before starting a debugging session.
@@ -545,6 +555,21 @@ public class DebuggingSession implements HasDispose {
         }
     }
 
+    public DebuggingSessionStateResult setSearchFilter(@Nonnull UserId userId, boolean aBox, boolean tBox, boolean rBox) throws ConcurrentUserException {
+        synchronized (this) {
+            checkUser(userId);
+
+            // the search filter can be set anytime thus no session state check here
+
+            // update filter
+            filter.setABox(aBox);
+            filter.setTBox(tBox);
+            filter.setRBox(rBox);
+
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
+    }
+
     @Override
     public void dispose() {
         logger.info("Disposing {}", this);
@@ -607,6 +632,7 @@ public class DebuggingSession implements HasDispose {
         query = null;
         diagnoses = null;
         consistencyCheckResult = null;
+        filter.reset();
         loadOntology();
     }
 

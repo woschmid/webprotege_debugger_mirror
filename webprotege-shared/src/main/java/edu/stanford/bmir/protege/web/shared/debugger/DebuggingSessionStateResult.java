@@ -59,10 +59,27 @@ public class DebuggingSessionStateResult implements Result {
      */
     @Nullable private String message;
 
+    /**
+     * Applied filter for Possibly Faulty Axioms.
+     */
+    private boolean aBoxFilter, tBoxFilter, rBoxFilter;
+
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
-    public DebuggingSessionStateResult(@Nonnull Boolean isOk, @Nullable UserId userId, @Nullable Query query, @Nullable List<Diagnosis> diagnoses, @Nullable List<TestCase> positiveTestCases, @Nullable List<TestCase> negativeTestCases, @Nullable PossiblyFaultyAxioms possiblyFaultyAxioms, @Nullable CorrectAxioms correctAxioms, @Nullable SessionState sessionState, @Nullable String msg) {
+    public DebuggingSessionStateResult(@Nonnull Boolean isOk,
+                                       @Nullable UserId userId,
+                                       @Nullable Query query,
+                                       @Nullable List<Diagnosis> diagnoses,
+                                       @Nullable List<TestCase> positiveTestCases,
+                                       @Nullable List<TestCase> negativeTestCases,
+                                       @Nullable PossiblyFaultyAxioms possiblyFaultyAxioms,
+                                       @Nullable CorrectAxioms correctAxioms,
+                                       @Nullable SessionState sessionState,
+                                       @Nullable String msg,
+                                       boolean aBox,
+                                       boolean tBox,
+                                       boolean rBox) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
@@ -73,6 +90,9 @@ public class DebuggingSessionStateResult implements Result {
         this.correctAxioms = correctAxioms;
         this.sessionState = sessionState;
         this.message = msg;
+        this.aBoxFilter = aBox;
+        this.tBoxFilter = tBox;
+        this.rBoxFilter = rBox;
     }
 
     @Nonnull
@@ -123,5 +143,17 @@ public class DebuggingSessionStateResult implements Result {
     @Nullable
     public SessionState getSessionState() {
         return sessionState;
+    }
+
+    public boolean isABox() {
+        return aBoxFilter;
+    }
+
+    public boolean isTBox() {
+        return tBoxFilter;
+    }
+
+    public boolean isRBox() {
+        return rBoxFilter;
     }
 }

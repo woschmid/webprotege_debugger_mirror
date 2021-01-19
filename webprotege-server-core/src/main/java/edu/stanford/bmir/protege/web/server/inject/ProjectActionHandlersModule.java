@@ -662,4 +662,9 @@ public class ProjectActionHandlersModule {
         return handler;
     }
 
+    @Provides @IntoSet
+    public ProjectActionHandler provideSetFilterActionHandler(SetFilterActionHandler handler) {
+        return handler;
+    }
+
 }
