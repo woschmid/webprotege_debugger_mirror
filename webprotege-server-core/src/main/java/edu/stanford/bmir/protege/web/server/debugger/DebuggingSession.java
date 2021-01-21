@@ -98,7 +98,7 @@ public class DebuggingSession implements HasDispose {
     /**
      * Searchfilter.
      */
-    private SearchFilter filter;
+    private final SearchFilter filter;
 
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
@@ -555,6 +555,15 @@ public class DebuggingSession implements HasDispose {
         }
     }
 
+    /**
+     * Sets the search filter for the to be shown possibly faulty axioms in the frontend.
+     * @param userId The id of the user who wants to change the search filter.
+     * @param aBox <code>true</code> if a-box axioms to be shown.
+     * @param tBox <code>true</code> if t-box axioms to be shown.
+     * @param rBox <code>true</code> if r-box axioms to be shown.
+     * @return The current state of the backend for the frontend.
+     * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
+     */
     public DebuggingSessionStateResult setSearchFilter(@Nonnull UserId userId, boolean aBox, boolean tBox, boolean rBox) throws ConcurrentUserException {
         synchronized (this) {
             checkUser(userId);

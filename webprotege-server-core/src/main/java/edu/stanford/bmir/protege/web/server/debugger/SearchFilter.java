@@ -1,5 +1,8 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+/**
+ * A Search Filter for presentation of A-Box, T-Box and/or R-Box axioms.
+ */
 public class SearchFilter {
 
     private boolean aBox = true;

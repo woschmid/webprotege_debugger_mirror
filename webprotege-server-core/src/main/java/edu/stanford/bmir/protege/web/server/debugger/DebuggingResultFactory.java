@@ -8,6 +8,7 @@ import edu.stanford.bmir.protege.web.shared.debugger.PossiblyFaultyAxioms;
 import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import javax.annotation.Nonnull;
@@ -68,14 +69,21 @@ public class DebuggingResultFactory {
         final Set<OWLLogicalAxiom> sortedAxioms = new TreeSet<>(axioms);
 
         for (OWLLogicalAxiom axiom : sortedAxioms) {
-            if (checkSearchFilter(axiom,filter)) // applies the search filter here
+            if (filter == null || doesSearchFilterMatch(axiom,filter))
                 renderedAxioms.add(renderingManager.getHtmlBrowserText(axiom));
         }
         return renderedAxioms;
     }
 
-    private static boolean checkSearchFilter(OWLLogicalAxiom axiom, SearchFilter filter) {
-        return true; // TODO implement
+    private static boolean doesSearchFilterMatch(@Nonnull OWLLogicalAxiom axiom, @Nonnull SearchFilter filter) {
+        final AxiomType<?> axiomType = axiom.getAxiomType();
+        return (
+                (filter.isTBox() && AxiomType.TBoxAxiomTypes.contains(axiomType))
+                ||
+                (filter.isABox() && AxiomType.ABoxAxiomTypes.contains(axiomType))
+                ||
+                (filter.isRBox() && AxiomType.RBoxAxiomTypes.contains(axiomType))
+                );
     }
 
     @Nullable

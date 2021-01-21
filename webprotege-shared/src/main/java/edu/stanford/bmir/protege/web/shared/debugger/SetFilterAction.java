@@ -9,6 +9,9 @@ import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
+/**
+ * Sets the search filter for the possibly faulty axioms to be shown.
+ */
 public class SetFilterAction implements ProjectAction<DebuggingSessionStateResult> {
 
     private ProjectId projectId;
