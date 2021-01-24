@@ -2,7 +2,6 @@ package edu.stanford.bmir.protege.web.client.debugger.background;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
-
 /**
  * Matthew Horridge
  * Stanford Center for Biomedical Informatics Research
@@ -10,8 +9,9 @@ import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
  */
 public interface BackgroundView extends DebuggerView {
 
-    public AcceptsOneWidget getEntailedCriteriaContainer();
+    AcceptsOneWidget getEntailedCriteriaContainer();
 
-    public AcceptsOneWidget getNonEntailedcriteriaContainer();
+    AcceptsOneWidget getNonEntailedcriteriaContainer();
 
+    void setFilterAxiomsHandler(FilterAxiomsHandler filterAxioms);
 }

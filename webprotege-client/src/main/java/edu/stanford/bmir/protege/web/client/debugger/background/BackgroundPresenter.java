@@ -48,7 +48,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
                                StatementPresenter statementPresenter1, StatementPresenter statementPresenter2,
                                DispatchServiceManager dispatchServiceManager,
                                MessageBox messageBox, StatementPresenter statementPresenter,
-                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, BackgroundView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
+                               DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, @Nonnull BackgroundView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.dsm = dispatchServiceManager;
@@ -73,15 +73,33 @@ public class BackgroundPresenter extends DebuggerPresenter {
         statementPresenter1.addFaultyAxiomRemoveHandler(this::handlerReplaceAxiom);
         statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerReplaceAxiom);
 
+        view.setFilterAxiomsHandler(this::filterAxioms);
+
+    }
+
+    public void filterAxioms(boolean Abox, boolean Tbox, boolean Rbox){
+        this.dsm.execute(new SetFilterAction( projectId, Abox, Tbox, Rbox),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Filter axioms";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
     }
     boolean isChecked = true;
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
 
-        if(debuggingSessionStateResult.getSessionState() == SessionState.STARTED || debuggingSessionStateResult.getSessionState() == SessionState.COMPUTING ) {
-            isChecked = false;
-        } else{
-            isChecked = true;
-        }
+        isChecked = debuggingSessionStateResult.getSessionState() != SessionState.STARTED && debuggingSessionStateResult.getSessionState() != SessionState.COMPUTING;
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
