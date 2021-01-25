@@ -10,15 +10,12 @@ import com.google.gwt.user.client.ui.CheckBox;
 import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
-import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfacePresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
-import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorPresenter;
 import edu.stanford.bmir.protege.web.client.library.dlg.DialogButton;
-import edu.stanford.bmir.protege.web.client.library.modal.ModalButtonHandler;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalCloser;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.modal.ModalPresenter;
@@ -109,6 +106,10 @@ public class QueriesPresenter extends DebuggerPresenter {
                         handlerDebugging(debuggingSessionStateResult);
                     }
                 });
+    }
+
+    public void stopDebuggingEvent() {
+        this.stopDebugging();
     }
 
     private void startDebugging() {
