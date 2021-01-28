@@ -64,6 +64,16 @@ public class DebuggingSessionStateResult implements Result {
      */
     private boolean aBoxFilter, tBoxFilter, rBoxFilter;
 
+    /**
+     * The page index of the currently shown pages. 0 = first page. Range [0..max:pages-1]
+     */
+    private int index = 0;
+
+    /**
+     * Number of pages with filtered possibly faulty axioms. 0 indicates no pages at all.
+     */
+    private int pages = 0;
+
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
@@ -79,7 +89,9 @@ public class DebuggingSessionStateResult implements Result {
                                        @Nullable String msg,
                                        boolean aBox,
                                        boolean tBox,
-                                       boolean rBox) {
+                                       boolean rBox,
+                                       int index,
+                                       int pages) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
@@ -93,6 +105,8 @@ public class DebuggingSessionStateResult implements Result {
         this.aBoxFilter = aBox;
         this.tBoxFilter = tBox;
         this.rBoxFilter = rBox;
+        this.index = index;
+        this.pages = pages;
     }
 
     @Nonnull
@@ -156,4 +170,13 @@ public class DebuggingSessionStateResult implements Result {
     public boolean isRBox() {
         return rBoxFilter;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
 }

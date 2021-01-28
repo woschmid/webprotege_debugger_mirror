@@ -14,6 +14,8 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * A factory for DebuggingSessionStateResult instances for returning results after actions.
@@ -43,8 +45,8 @@ public class DebuggingResultFactory {
         if (diagnosisModel != null) {
             positiveTestCases = renderTestCases(diagnosisModel.getEntailedExamples(), session.getRenderingManager());
             negativeTestCases = renderTestCases(diagnosisModel.getNotEntailedExamples(), session.getRenderingManager());
-            possiblyFaultyAxioms = new PossiblyFaultyAxioms(renderAxioms(diagnosisModel.getPossiblyFaultyFormulas(), session.getRenderingManager(), session.getSearchFilter()));
-            correctAxioms = new CorrectAxioms(renderAxioms(diagnosisModel.getCorrectFormulas(), session.getRenderingManager(), null));
+            possiblyFaultyAxioms = new PossiblyFaultyAxioms(renderAxioms(filterAndPaginateAxioms(diagnosisModel.getPossiblyFaultyFormulas(), session), session.getRenderingManager()));
+            correctAxioms = new CorrectAxioms(renderAxioms(filterAndPaginateAxioms(diagnosisModel.getCorrectFormulas(), session), session.getRenderingManager()));
         }
 
         return new DebuggingSessionStateResult(isOk,
@@ -59,20 +61,43 @@ public class DebuggingResultFactory {
                 StringUtil.escapeHtml(message),
                 session.getSearchFilter().isABox(),
                 session.getSearchFilter().isTBox(),
-                session.getSearchFilter().isRBox()
+                session.getSearchFilter().isRBox(),
+                session.getIndex(),
+                session.getPages()
         );
     }
 
     @Nonnull
-    private static List<SafeHtml> renderAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull RenderingManager renderingManager, @Nullable SearchFilter filter) {
+    private static List<SafeHtml> renderAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull RenderingManager renderingManager) {
         final List<SafeHtml> renderedAxioms = new ArrayList<>();
         final Set<OWLLogicalAxiom> sortedAxioms = new TreeSet<>(axioms);
 
-        for (OWLLogicalAxiom axiom : sortedAxioms) {
-            if (filter == null || doesSearchFilterMatch(axiom,filter))
-                renderedAxioms.add(renderingManager.getHtmlBrowserText(axiom));
-        }
+        for (OWLLogicalAxiom axiom : sortedAxioms)
+            renderedAxioms.add(renderingManager.getHtmlBrowserText(axiom));
+
         return renderedAxioms;
+    }
+
+    private static Collection<OWLLogicalAxiom> filterAndPaginateAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull DebuggingSession session) {
+
+        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection((Supplier<ArrayList<OWLLogicalAxiom>>) ArrayList<OWLLogicalAxiom>::new));
+        int size = list.size();
+
+        int maxIndex = (size / Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS);
+        if ( maxIndex > 0 && (size % Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS) == 0) maxIndex -= 1;
+        if (session.getIndex() > maxIndex)
+            session.setIndex(maxIndex);
+
+        int pages = (size / Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS) + 1;
+        if ( (size % Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS == 0) ) pages -= 1;
+        session.setPages(pages);
+
+        int fromIndex = Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS * session.getIndex(); // inclusive
+        int toIndex = fromIndex + Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS; // exclusive
+        if (toIndex > size)
+            toIndex = size;
+
+        return list.subList(fromIndex, toIndex);
     }
 
     private static boolean doesSearchFilterMatch(@Nonnull OWLLogicalAxiom axiom, @Nonnull SearchFilter filter) {
@@ -89,7 +114,7 @@ public class DebuggingResultFactory {
     @Nullable
     private static edu.stanford.bmir.protege.web.shared.debugger.Query renderQuery(@Nullable final Query<OWLLogicalAxiom> query, @Nonnull RenderingManager renderingManager) {
         if (query != null)
-            return new edu.stanford.bmir.protege.web.shared.debugger.Query(renderAxioms(query.formulas, renderingManager, null));
+            return new edu.stanford.bmir.protege.web.shared.debugger.Query(renderAxioms(query.formulas, renderingManager));
         return null;
     }
 
@@ -98,7 +123,7 @@ public class DebuggingResultFactory {
         List<edu.stanford.bmir.protege.web.shared.debugger.Diagnosis> d = new ArrayList<>();
         if (diagnoses != null) {
             for (org.exquisite.core.model.Diagnosis<OWLLogicalAxiom> di : diagnoses)
-                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(renderAxioms(di.getFormulas(), renderingManager, null)));
+                d.add(new edu.stanford.bmir.protege.web.shared.debugger.Diagnosis(renderAxioms(di.getFormulas(), renderingManager)));
         }
         return d;
     }

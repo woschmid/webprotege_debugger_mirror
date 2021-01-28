@@ -90,15 +90,19 @@ public class DebuggingSession implements HasDispose {
     private long lastActivityTimeInMillis;
 
     /**
-     * Keep alive time span of a debugging session from it's last activity.
-     * If this time span is exceeded the project (and it's debugging session) can be purged.
-     */
-    private static final Long SESSION_KEEPALIVE_IN_MILLIS = 10L * 60L * 1000L; // 10 minutes
-
-    /**
      * Searchfilter.
      */
     private final SearchFilter filter;
+
+    /**
+     * Page index for possibly faulty axioms.
+     */
+    private int index = 0;
+
+    /**
+     * Number of pages for possibly faulty axioms.
+     */
+    private int pages = 0;
 
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
@@ -139,7 +143,7 @@ public class DebuggingSession implements HasDispose {
                     (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING) // .. it must be running
                     &&
                     // .. and must have been used within a certain time slot
-                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < SESSION_KEEPALIVE_IN_MILLIS)) {
+                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < Preferences.SESSION_KEEPALIVE_IN_MILLIS)) {
 
                 logger.info("Keeping project {} loaded for running {} ...", projectId, this);
                 projectManager.ensureProjectIsLoaded(projectId, getUserId());
@@ -195,6 +199,23 @@ public class DebuggingSession implements HasDispose {
 
     public SearchFilter getSearchFilter() {
         return filter;
+    }
+
+    void setIndex(int index) {
+        this.index = index;
+    }
+
+    /** Return the currently set index for the shown possibly faulty axioms. */
+    public int getIndex() {
+        return index;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    void setPages(int pages) {
+        this.pages = pages;
     }
 
     /**
@@ -274,7 +295,7 @@ public class DebuggingSession implements HasDispose {
             verifyPreCondition((state != SessionState.CHECKED || this.consistencyCheckResult == null)
                     ||
                     (! (Boolean.FALSE.equals(this.consistencyCheckResult.isConsistent())
-                        || Boolean.FALSE.equals(consistencyCheckResult.isCoherent())) ));
+                            || Boolean.FALSE.equals(consistencyCheckResult.isCoherent())) ));
 
             // reduce to inconsistency for incoherent ontologies
             if (Boolean.FALSE.equals(consistencyCheckResult.isCoherent()))
@@ -575,6 +596,27 @@ public class DebuggingSession implements HasDispose {
             filter.setTBox(tBox);
             filter.setRBox(rBox);
 
+            // reset the index
+            index = 0;
+
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
+    }
+
+    /**
+     * Paginate through the shown possibly faulty axioms back and forward.
+     *
+     * @param userId The id of the user who wants to paginate through the shown possibly faulty axioms.
+     * @param step The step size. A positive number steps forward, a negative number steps backward. Internal checks prevent out of bounds pagination.
+     * @return The current state of the backend for the frontend.
+     * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
+     */
+    public DebuggingSessionStateResult paginate(@Nonnull UserId userId, int step) throws ConcurrentUserException {
+        synchronized (this) {
+            checkUser(userId);
+
+            index = Math.max(index + step, 0);
+
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
     }
@@ -642,6 +684,7 @@ public class DebuggingSession implements HasDispose {
         diagnoses = null;
         consistencyCheckResult = null;
         filter.reset();
+        index = 0;
         loadOntology();
     }
 
@@ -679,6 +722,9 @@ public class DebuggingSession implements HasDispose {
         throw new AxiomNotFoundException(axiomAsString);
     }
 
+    /**
+     * Loads the ontology and generates a diagnosis model from this ontology.
+     */
     private void loadOntology() {
         // loading ontology and generating diagnosis model
         final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
