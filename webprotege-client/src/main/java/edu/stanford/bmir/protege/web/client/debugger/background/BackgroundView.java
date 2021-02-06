@@ -14,4 +14,8 @@ public interface BackgroundView extends DebuggerView {
     AcceptsOneWidget getNonEntailedcriteriaContainer();
 
     void setFilterAxiomsHandler(FilterAxiomsHandler filterAxioms);
+
+    void setMoveAllAxiom(MoveAllAxiom moveAllAxiom);
+
+    void setChangePage(ChangePage changePage);
 }

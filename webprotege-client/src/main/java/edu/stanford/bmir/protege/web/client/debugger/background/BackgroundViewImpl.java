@@ -34,7 +34,21 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     @UiField
     CheckBox RBox;
 
+    @UiField
+    Button allDown;
+
+    @UiField
+    Button allUp;
+
     private FilterAxiomsHandler filterAxiomsHandler = (isAbox, isTbox, isRbox) -> {
+
+    };
+
+    private MoveAllAxiom moveAllAxiom = () -> {
+
+    };
+
+    private ChangePage changePage = () -> {
 
     };
 
@@ -81,6 +95,26 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
         filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox);
     }
 
+    @UiHandler("allDown")
+    protected void allDownButtonClick(ClickEvent event) {
+        moveAllAxiom.handleMoveAllAxiom();
+    }
+
+    @UiHandler("allUp")
+    protected void allUpButtonClick(ClickEvent event) {
+        moveAllAxiom.handleMoveAllAxiom();
+    }
+
+    @UiHandler("lastPage")
+    protected void LastPageButtonClick(ClickEvent event) {
+        changePage.handleChangePage();
+    }
+
+    @UiHandler("nextPage")
+    protected void NextPageButtonClick(ClickEvent event) {
+        changePage.handleChangePage();
+    }
+
 
     @UiHandler("helpButton")
     protected void helpButtonClick(ClickEvent event) { Window.open("https://git-ainf.aau.at/interactive-KB-debugging/debugger/-/wikis/input-ontology","_blank",""); }
@@ -97,5 +131,11 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     public void setFilterAxiomsHandler(@Nonnull FilterAxiomsHandler filterAxiomsHandler) {
         this.filterAxiomsHandler = filterAxiomsHandler;
+    }
+    public void setMoveAllAxiom(@Nonnull MoveAllAxiom moveAllAxiom) {
+        this.moveAllAxiom = moveAllAxiom;
+    }
+    public void setChangePage(@Nonnull ChangePage changePage) {
+        this.changePage = changePage;
     }
 }

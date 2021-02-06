@@ -47,6 +47,11 @@
         font-weight: bold;
         font-size: 17px;
         }
+        .executeButton {
+        <!--            align-self: flex-start;-->
+        flex-grow: 0;
+        flex-shrink: 0;
+        }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.main}">
         <g:VerticalPanel addStyleNames="{style.individualsList}">
@@ -70,13 +75,27 @@
                     </g:cell>
                 </g:HorizontalPanel>
                 <g:SimplePanel ui:field="EntailedcriteriaContainer" />
-<!--                <g:Label text="Possibly Faulty Axioms" addStyleNames="{style.searchBox}"/>-->
-<!--                <g:SimplePanel ui:field="EntailedcriteriaContainer" />-->
             </g:FlowPanel>
             </g:cell>
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
-                <g:Label text="Correct Axioms" addStyleNames="{style.form-label}"/>
-                <!--            <g:VerticalPanel ui:field="table" />-->
+                <g:HorizontalPanel width="100%">
+                    <g:cell horizontalAlignment="ALIGN_LEFT" >
+                        <g:Label text="Correct Axioms" addStyleNames="{style.form-label}"/>
+                    </g:cell>
+                    <g:cell>
+                        <g:Button ui:field="lastPage" text="LastPage"  addStyleNames=" {style.executeButton} {wp.buttons.button}"/>
+                    </g:cell>
+                    <g:cell>
+                        <g:Button ui:field="allDown" text="allDown"  addStyleNames=" {style.executeButton} {wp.buttons.button}"/>
+                    </g:cell>
+                    <g:cell>
+                        <g:Button ui:field="allUp" text="allUp"  addStyleNames=" {style.executeButton} {wp.buttons.button}"/>
+                    </g:cell>
+                    <g:cell>
+                        <g:Button ui:field="nextPage" text="nextPage"  addStyleNames=" {style.executeButton} {wp.buttons.button} }"/>
+                    </g:cell>
+
+                </g:HorizontalPanel>
                 <g:SimplePanel ui:field="NonEntailedcriteriaContainer" />
             </g:FlowPanel>
         </g:VerticalPanel>

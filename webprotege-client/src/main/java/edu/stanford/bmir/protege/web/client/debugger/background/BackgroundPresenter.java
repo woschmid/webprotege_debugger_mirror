@@ -74,7 +74,15 @@ public class BackgroundPresenter extends DebuggerPresenter {
         statementPresenter2.addBackgroundAxiomRemoveHandler(this::handlerReplaceAxiom);
 
         view.setFilterAxiomsHandler(this::filterAxioms);
+        view.setMoveAllAxiom(this::moveAllAxiom);
+        view.setChangePage(this::changePage);
 
+    }
+
+    private void changePage() {
+    }
+
+    private void moveAllAxiom() {
     }
 
     public void filterAxioms(boolean Abox, boolean Tbox, boolean Rbox){
