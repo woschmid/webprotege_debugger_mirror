@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.shared.debugger;
 
+import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -14,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PaginationAction implements ProjectAction<DebuggingSessionStateResult> {
 
-    private final ProjectId projectId;
+    private ProjectId projectId;
 
     /**
      * The step when paginating through the shown possibly faulty axioms.
@@ -22,7 +23,7 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
      * The paging will be checked serverside.
      * A step size of -1 means navigating one page back, and a size of 1 means navigating one page forward.
      */
-    private final int step;
+    private int step;
 
     /**
      *
@@ -34,6 +35,8 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
         this.projectId = checkNotNull(projectId);
         this.step = step;
     }
+    @GwtSerializationConstructor
+    public PaginationAction(){}
 
     @Nonnull
     @Override

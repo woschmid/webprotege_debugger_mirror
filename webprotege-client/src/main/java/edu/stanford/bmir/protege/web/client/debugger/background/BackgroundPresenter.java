@@ -79,7 +79,24 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
     }
 
-    private void changePage() {
+    private void changePage(int step) {
+        this.dsm.execute(new PaginationAction( projectId,step),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Reading Axioms";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
     }
 
     private void moveAllAxiom() {

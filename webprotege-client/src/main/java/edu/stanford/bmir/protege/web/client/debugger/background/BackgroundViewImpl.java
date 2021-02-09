@@ -48,7 +48,7 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     };
 
-    private ChangePage changePage = () -> {
+    private ChangePage changePage = (int step) -> {
 
     };
 
@@ -107,12 +107,12 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     @UiHandler("lastPage")
     protected void LastPageButtonClick(ClickEvent event) {
-        changePage.handleChangePage();
+        changePage.handleChangePage(-1);
     }
 
     @UiHandler("nextPage")
     protected void NextPageButtonClick(ClickEvent event) {
-        changePage.handleChangePage();
+        changePage.handleChangePage(1);
     }
 
 
