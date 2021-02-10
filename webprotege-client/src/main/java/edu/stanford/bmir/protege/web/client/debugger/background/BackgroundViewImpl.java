@@ -8,6 +8,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
+import edu.stanford.bmir.protege.web.client.pagination.PaginatorPresenter;
+import edu.stanford.bmir.protege.web.client.pagination.PaginatorView;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -18,6 +21,9 @@ import javax.inject.Inject;
  * 14 Jun 2018
  */
 public class BackgroundViewImpl extends Composite implements BackgroundView {
+
+
+    private final PaginatorPresenter paginatorPresenter;
 
     @UiField
     SimplePanel EntailedcriteriaContainer;
@@ -39,6 +45,9 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     @UiField
     Button allUp;
+
+    @UiField(provided = true)
+    protected PaginatorView paginator;
 
     private FilterAxiomsHandler filterAxiomsHandler = (isAbox, isTbox, isRbox) -> {
 
@@ -65,10 +74,12 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
 
     @Inject
-    public BackgroundViewImpl() {
+    public BackgroundViewImpl(PaginatorPresenter paginatorPresenter) {
+
+        this.paginatorPresenter = paginatorPresenter;
+        paginator = paginatorPresenter.getView();
         initWidget(ourUiBinder.createAndBindUi(this));
         ABox.setValue(true);
-
         TBox.setValue(true);
         RBox.setValue(true);
     }
@@ -137,5 +148,25 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     }
     public void setChangePage(@Nonnull ChangePage changePage) {
         this.changePage = changePage;
+    }
+
+    @Override
+    public void setPageCount(int pageCount) {
+        paginatorPresenter.setPageCount(pageCount);
+    }
+
+    @Override
+    public void setPageNumber(int pageNumber) {
+        paginatorPresenter.setPageNumber(pageNumber);
+    }
+
+    @Override
+    public int getPageNumber() {
+        return paginatorPresenter.getPageNumber();
+    }
+
+    @Override
+    public void setPageNumberChangedHandler(HasPagination.PageNumberChangedHandler handler) {
+        paginatorPresenter.setPageNumberChangedHandler(handler);
     }
 }

@@ -1,5 +1,6 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:pagination="urn:import:edu.stanford.bmir.protege.web.client.pagination"
 >
     <ui:with field="wp" type="edu.stanford.bmir.protege.web.resources.WebProtegeClientBundle"/>
     <ui:style>
@@ -75,6 +76,7 @@
                     </g:cell>
                 </g:HorizontalPanel>
                 <g:SimplePanel ui:field="EntailedcriteriaContainer" />
+                <pagination:PaginatorView ui:field="paginator"/>
             </g:FlowPanel>
             </g:cell>
             <g:FlowPanel addStyleNames="{style.viewGroup}" >
