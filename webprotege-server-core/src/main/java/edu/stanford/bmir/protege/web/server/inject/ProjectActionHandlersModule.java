@@ -648,6 +648,11 @@ public class ProjectActionHandlersModule {
     }
 
     @Provides @IntoSet
+    public ProjectActionHandler provideMoveAllActionHandler(MoveAllActionHandler handler) {
+        return handler;
+    }
+
+    @Provides @IntoSet
     public ProjectActionHandler provideRemoveTestCaseActionHandler(RemoveTestCaseActionHandler handler) {
         return handler;
     }

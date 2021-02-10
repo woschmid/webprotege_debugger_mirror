@@ -448,6 +448,35 @@ public class DebuggingSession implements HasDispose {
     }
 
     /**
+     * Moves all presented axioms from one to the other set.
+     *
+     * @param userId The user who wants to move axioms.
+     * @param isMoveDown <code>true</code> means the currently shown possible faulty axioms (i.e. moveDown),
+     *                   <code>false</code> means the correct axioms to be moved (i.e. moveUp).
+     * @return A result for the front end representing the current state of the backend.
+     * @throws ConcurrentUserException
+     * @throws UnsatisfiedPreconditionException
+     */
+    public DebuggingSessionStateResult moveAllAxiomsTo(UserId userId, Boolean isMoveDown) throws ConcurrentUserException, UnsatisfiedPreconditionException {
+        synchronized (this) {
+            checkUser(userId);
+
+            // verify that the session is NOT in STARTED yet
+            verifyPreCondition(state == SessionState.STARTED || state == SessionState.COMPUTING);
+
+            if (isMoveDown) {
+                // move all presented possibly faulty axioms to the correct axioms
+                // TODO
+            } else {
+                // move all presented correct axioms to the possibly faulty axioms
+                // TODO
+            }
+
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
+    }
+
+    /**
      * Moves an axiom between correct and possibly faulty axioms.
      *
      * @param userId The user who wants to move the axiom before starting a debugging session.
