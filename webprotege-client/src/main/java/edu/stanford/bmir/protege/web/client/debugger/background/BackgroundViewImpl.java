@@ -53,7 +53,7 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     };
 
-    private MoveAllAxiom moveAllAxiom = () -> {
+    private MoveAllAxiom moveAllAxiom = (boolean down) -> {
 
     };
 
@@ -108,12 +108,12 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     @UiHandler("allDown")
     protected void allDownButtonClick(ClickEvent event) {
-        moveAllAxiom.handleMoveAllAxiom();
+        moveAllAxiom.handleMoveAllAxiom(true);
     }
 
     @UiHandler("allUp")
     protected void allUpButtonClick(ClickEvent event) {
-        moveAllAxiom.handleMoveAllAxiom();
+        moveAllAxiom.handleMoveAllAxiom(false);
     }
 
     @UiHandler("lastPage")
