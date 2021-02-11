@@ -97,12 +97,22 @@ public class DebuggingSession implements HasDispose {
     /**
      * Page index for possibly faulty axioms.
      */
-    private int index = 0;
+    private int possiblyFaultyIndex = 0;
 
     /**
      * Number of pages for possibly faulty axioms.
      */
-    private int pages = 0;
+    private int possiblyFaultyPages = 0;
+
+    /**
+     * Page index for correct axioms.
+     */
+    private int correctIndex = 0;
+
+    /**
+     * Number of pages for correct axioms.
+     */
+    private int correctPages = 0;
 
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
@@ -201,21 +211,38 @@ public class DebuggingSession implements HasDispose {
         return filter;
     }
 
-    void setIndex(int index) {
-        this.index = index;
-    }
-
     /** Return the currently set index for the shown possibly faulty axioms. */
-    public int getIndex() {
-        return index;
+    public int getPossiblyFaultyIndex() {
+        return possiblyFaultyIndex;
     }
 
-    public int getPages() {
-        return pages;
+    void setPossiblyFaultyIndex(int possiblyFaultyIndex) {
+        this.possiblyFaultyIndex = possiblyFaultyIndex;
     }
 
-    void setPages(int pages) {
-        this.pages = pages;
+    public int getPossiblyFaultyPages() {
+        return possiblyFaultyPages;
+    }
+
+    void setPossiblyFaultyPages(int possiblyFaultyPages) {
+        this.possiblyFaultyPages = possiblyFaultyPages;
+    }
+
+    /** Return the currently set index for the shown correct axioms. */
+    public int getCorrectIndex() {
+        return correctIndex;
+    }
+
+    public void setCorrectIndex(int correctIndex) {
+        this.correctIndex = correctIndex;
+    }
+
+    public int getCorrectPages() {
+        return correctPages;
+    }
+
+    public void setCorrectPages(int correctPages) {
+        this.correctPages = correctPages;
     }
 
     /**
@@ -625,8 +652,11 @@ public class DebuggingSession implements HasDispose {
             filter.setTBox(tBox);
             filter.setRBox(rBox);
 
-            // reset the index
-            index = 0;
+            // reset the possiblyFaultyIndex
+            possiblyFaultyIndex = 0;
+
+            // reset the correctIndex
+            correctIndex = 0;
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
@@ -636,15 +666,21 @@ public class DebuggingSession implements HasDispose {
      * Paginate through the shown possibly faulty axioms back and forward.
      *
      * @param userId The id of the user who wants to paginate through the shown possibly faulty axioms.
+     * @param pageFlag The flag indicates which page shall be navigated.
+     *                 <code>true</code> indicates the possibly faulty axioms.
+     *                 <code>false</code> indicates the correct axioms.
      * @param step The step size. A positive number steps forward, a negative number steps backward. Internal checks prevent out of bounds pagination.
      * @return The current state of the backend for the frontend.
      * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
      */
-    public DebuggingSessionStateResult paginate(@Nonnull UserId userId, int step) throws ConcurrentUserException {
+    public DebuggingSessionStateResult paginate(@Nonnull UserId userId, Boolean pageFlag, int step) throws ConcurrentUserException {
         synchronized (this) {
             checkUser(userId);
 
-            index = Math.max(index + step, 0);
+            if (pageFlag)
+                possiblyFaultyIndex = Math.max(possiblyFaultyIndex + step, 0);
+            else
+                correctIndex = Math.max(correctIndex + step, 0);
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
@@ -713,7 +749,8 @@ public class DebuggingSession implements HasDispose {
         diagnoses = null;
         consistencyCheckResult = null;
         filter.reset();
-        index = 0;
+        possiblyFaultyIndex = 0;
+        correctIndex = 0;
         loadOntology();
     }
 

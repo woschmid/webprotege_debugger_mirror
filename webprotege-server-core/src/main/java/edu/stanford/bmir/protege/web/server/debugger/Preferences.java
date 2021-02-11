@@ -9,9 +9,14 @@ public class Preferences {
     static Long SESSION_KEEPALIVE_IN_MILLIS = 10L * 60L * 1000L; // 10 minutes
 
     /**
-    * The number of maximal shown visible possibly faulty axioms
+     * The number of maximal shown visible possibly faulty axioms
      */
     static int MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = 15;
+
+    /**
+     * The number of maximal shown visible correct axioms
+     */
+    static int MAX_VISIBLE_CORRECT_AXIOMS = 15;
 
 
     protected static void setSessionKeepaliveInMillis(Long sessionKeepaliveInMillis) {

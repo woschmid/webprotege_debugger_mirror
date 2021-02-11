@@ -65,14 +65,24 @@ public class DebuggingSessionStateResult implements Result {
     private boolean aBoxFilter, tBoxFilter, rBoxFilter;
 
     /**
-     * The page index of the currently shown pages. 0 = first page. Range [0..max:pages-1]
+     * The page index of the currently shown possibly faulty pages. 0 = first page. Range [0..max:possiblyFaultyPages-1]
      */
-    private int index = 0;
+    private int possiblyFaultyPageIndex = 0;
 
     /**
-     * Number of pages with filtered possibly faulty axioms. 0 indicates no pages at all.
+     * Number of pages with filtered possibly faulty axioms. 0 indicates no page at all.
      */
-    private int pages = 0;
+    private int possiblyFaultyPages = 0;
+
+    /**
+     * The page index of the currently shown correct pages. 0 = first page. Range [0..max:possiblyFaultyPages-1]
+     */
+    private int correctPageIndex = 0;
+
+    /**
+     * Number of pages with filtered correct axioms. 0 indicates no page at all.
+     */
+    private int correctPages = 0;
 
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
@@ -90,8 +100,10 @@ public class DebuggingSessionStateResult implements Result {
                                        boolean aBox,
                                        boolean tBox,
                                        boolean rBox,
-                                       int index,
-                                       int pages) {
+                                       int possiblyFaultyPageIndex,
+                                       int possiblyFaultyPages,
+                                       int correctPageIndex,
+                                       int correctPages) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
@@ -105,8 +117,10 @@ public class DebuggingSessionStateResult implements Result {
         this.aBoxFilter = aBox;
         this.tBoxFilter = tBox;
         this.rBoxFilter = rBox;
-        this.index = index;
-        this.pages = pages;
+        this.possiblyFaultyPageIndex = possiblyFaultyPageIndex;
+        this.possiblyFaultyPages = possiblyFaultyPages;
+        this.correctPageIndex = correctPageIndex;
+        this.correctPages = correctPages;
     }
 
     @Nonnull
@@ -171,12 +185,29 @@ public class DebuggingSessionStateResult implements Result {
         return rBoxFilter;
     }
 
+    @Deprecated
     public int getIndex() {
-        return index;
+        return possiblyFaultyPageIndex;
     }
 
+    @Deprecated
     public int getPages() {
-        return pages;
+        return possiblyFaultyPages;
     }
 
+    public int getPossiblyFaultyPageIndex() {
+        return possiblyFaultyPageIndex;
+    }
+
+    public int getPossiblyFaultyPages() {
+        return possiblyFaultyPages;
+    }
+
+    public int getCorrectPageIndex() {
+        return correctPageIndex;
+    }
+
+    public int getCorrectPages() {
+        return correctPages;
+    }
 }
