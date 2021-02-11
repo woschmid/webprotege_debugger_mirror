@@ -82,7 +82,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
     private void changePage(int step) {
         GWT.log("[BackgroundPresenter] step is"+ step);
-        this.dsm.execute(new PaginationAction( projectId,step),
+        this.dsm.execute(new PaginationAction( projectId,true,step),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {
                     @Override
@@ -143,10 +143,10 @@ public class BackgroundPresenter extends DebuggerPresenter {
     boolean isChecked = true;
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         isChecked = debuggingSessionStateResult.getSessionState() != SessionState.STARTED && debuggingSessionStateResult.getSessionState() != SessionState.COMPUTING;
-        GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getIndex()+1);
-        GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPages()+1);
-        view.setPageNumber(debuggingSessionStateResult.getIndex()+1);
-        view.setPageCount(debuggingSessionStateResult.getPages());
+        GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPossiblyFaultyPageIndex());
+        GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPossiblyFaultyPages());
+        view.setPageNumber(debuggingSessionStateResult.getPossiblyFaultyPageIndex()+1);
+        view.setPageCount(debuggingSessionStateResult.getPossiblyFaultyPages());
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
