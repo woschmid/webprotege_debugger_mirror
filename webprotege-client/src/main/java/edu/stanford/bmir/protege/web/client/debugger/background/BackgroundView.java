@@ -21,11 +21,19 @@ public interface BackgroundView extends DebuggerView {
 
     void setChangePage(ChangePage changePage);
 
-    void setPageCount(int pageCount);
+    void setPageCountP(int pageCount);
 
-    void setPageNumber(int pageNumber);
+    void setPageNumberP(int pageNumber);
 
-    int getPageNumber();
+    int getPageNumberP();
 
-    void setPageNumberChangedHandler(HasPagination.PageNumberChangedHandler handler);
+    void setPageNumberChangedHandlerP(HasPagination.PageNumberChangedHandler handler);
+
+    void setPageCountC(int pageCount);
+
+    void setPageNumberC(int pageNumber);
+
+    int getPageNumberC();
+
+    void setPageNumberChangedHandlerC(HasPagination.PageNumberChangedHandler handler);
 }

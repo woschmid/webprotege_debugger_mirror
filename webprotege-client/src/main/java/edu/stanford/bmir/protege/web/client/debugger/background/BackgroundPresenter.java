@@ -76,13 +76,35 @@ public class BackgroundPresenter extends DebuggerPresenter {
 
         view.setFilterAxiomsHandler(this::filterAxioms);
         view.setMoveAllAxiom(this::moveAllAxiom);
-        view.setChangePage(this::changePage);
-        view.setPageNumberChangedHandler(this::changePage);
+        view.setChangePage(this::changePageP);
+        view.setPageNumberChangedHandlerP(this::changePageP);
+        view.setPageNumberChangedHandlerC(this::changePageC);
     }
 
-    private void changePage(int step) {
+    private void changePageP(int step) {
         GWT.log("[BackgroundPresenter] step is"+ step);
         this.dsm.execute(new PaginationAction( projectId,true,step),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Reading Axioms";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
+    }
+
+    private void changePageC(int step) {
+        GWT.log("[BackgroundPresenter] step is"+ step);
+        this.dsm.execute(new PaginationAction( projectId,false,step),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {
                     @Override
@@ -145,8 +167,10 @@ public class BackgroundPresenter extends DebuggerPresenter {
         isChecked = debuggingSessionStateResult.getSessionState() != SessionState.STARTED && debuggingSessionStateResult.getSessionState() != SessionState.COMPUTING;
         GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPossiblyFaultyPageIndex());
         GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPossiblyFaultyPages());
-        view.setPageNumber(debuggingSessionStateResult.getPossiblyFaultyPageIndex()+1);
-        view.setPageCount(debuggingSessionStateResult.getPossiblyFaultyPages());
+        view.setPageNumberP(debuggingSessionStateResult.getPossiblyFaultyPageIndex()+1);
+        view.setPageCountP(debuggingSessionStateResult.getPossiblyFaultyPages());
+        view.setPageNumberC(debuggingSessionStateResult.getCorrectPageIndex()+1);
+        view.setPageCountC(debuggingSessionStateResult.getCorrectPages());
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
