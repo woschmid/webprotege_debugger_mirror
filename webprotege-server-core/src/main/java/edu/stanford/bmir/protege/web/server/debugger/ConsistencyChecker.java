@@ -189,7 +189,7 @@ public class ConsistencyChecker {
     }
 
     private static OWLReasoner createReasoner(OWLOntology ontology, OWLReasonerFactory factory, ReasonerProgressMonitor monitor) {
-        OWLReasonerConfiguration configuration = new SimpleConfiguration(monitor);
+        OWLReasonerConfiguration configuration = new SimpleConfiguration(monitor, Preferences.REASONER_TIMEOUT_IN_MILLIS);
         return factory.createReasoner(ontology, configuration);
     }
 
