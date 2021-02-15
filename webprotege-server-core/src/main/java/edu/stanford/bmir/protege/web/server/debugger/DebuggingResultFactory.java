@@ -45,8 +45,12 @@ public class DebuggingResultFactory {
         if (diagnosisModel != null) {
             positiveTestCases = renderTestCases(diagnosisModel.getEntailedExamples(), session.getRenderingManager());
             negativeTestCases = renderTestCases(diagnosisModel.getNotEntailedExamples(), session.getRenderingManager());
-            possiblyFaultyAxioms = new PossiblyFaultyAxioms(renderAxioms(filterAndPaginatePossiblyFaultyAxioms(diagnosisModel.getPossiblyFaultyFormulas(), session), session.getRenderingManager()));
-            correctAxioms = new CorrectAxioms(renderAxioms(filterAndPaginateCorrectAxioms(diagnosisModel.getCorrectFormulas(), session), session.getRenderingManager()));
+            final Collection<OWLLogicalAxiom> presentedPossiblyFaultyAxioms = filterAndPaginatePossiblyFaultyAxioms(diagnosisModel.getPossiblyFaultyFormulas(), session);
+            possiblyFaultyAxioms = new PossiblyFaultyAxioms(renderAxioms(presentedPossiblyFaultyAxioms, session.getRenderingManager()));
+            session.setPresentedPossiblyFaultyAxioms(presentedPossiblyFaultyAxioms);
+            final Collection<OWLLogicalAxiom> presentedCorrectAxioms = filterAndPaginateCorrectAxioms(diagnosisModel.getCorrectFormulas(), session);
+            correctAxioms = new CorrectAxioms(renderAxioms(presentedCorrectAxioms, session.getRenderingManager()));
+            session.setPresentedCorrectAxioms(presentedCorrectAxioms);
         }
 
         return new DebuggingSessionStateResult(isOk,

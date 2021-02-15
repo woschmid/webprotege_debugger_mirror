@@ -114,6 +114,10 @@ public class DebuggingSession implements HasDispose {
      */
     private int correctPages = 0;
 
+    private Collection<OWLLogicalAxiom> presentedPossiblyFaultyAxioms = Collections.emptyList();
+
+    private Collection<OWLLogicalAxiom> presentedCorrectAxioms = Collections.emptyList();
+
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
                             @Nonnull RevisionManager revisionManager,
@@ -243,6 +247,22 @@ public class DebuggingSession implements HasDispose {
 
     public void setCorrectPages(int correctPages) {
         this.correctPages = correctPages;
+    }
+
+    public void setPresentedPossiblyFaultyAxioms(Collection<OWLLogicalAxiom> presentedPossiblyFaultyAxioms) {
+        this.presentedPossiblyFaultyAxioms = presentedPossiblyFaultyAxioms;
+    }
+
+    public Collection<OWLLogicalAxiom> getPresentedPossiblyFaultyAxioms() {
+        return presentedPossiblyFaultyAxioms;
+    }
+
+    public void setPresentedCorrectAxioms(Collection<OWLLogicalAxiom> presentedCorrectAxioms) {
+        this.presentedCorrectAxioms = presentedCorrectAxioms;
+    }
+
+    public Collection<OWLLogicalAxiom> getPresentedCorrectAxioms() {
+        return presentedCorrectAxioms;
     }
 
     /**
@@ -493,10 +513,12 @@ public class DebuggingSession implements HasDispose {
 
             if (isMoveDown) {
                 // move all presented possibly faulty axioms to the correct axioms
-                // TODO
+                getDiagnosisModel().getPossiblyFaultyFormulas().removeAll(getPresentedPossiblyFaultyAxioms());
+                getDiagnosisModel().getCorrectFormulas().addAll(getPresentedPossiblyFaultyAxioms());
             } else {
                 // move all presented correct axioms to the possibly faulty axioms
-                // TODO
+                getDiagnosisModel().getCorrectFormulas().removeAll(getPresentedCorrectAxioms());
+                getDiagnosisModel().getPossiblyFaultyFormulas().addAll(getPresentedCorrectAxioms());
             }
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
@@ -751,6 +773,8 @@ public class DebuggingSession implements HasDispose {
         filter.reset();
         possiblyFaultyIndex = 0;
         correctIndex = 0;
+        presentedPossiblyFaultyAxioms = Collections.emptyList();
+        presentedCorrectAxioms = Collections.emptyList();
         loadOntology();
     }
 

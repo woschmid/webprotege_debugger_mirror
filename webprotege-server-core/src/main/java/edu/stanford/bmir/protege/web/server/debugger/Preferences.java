@@ -11,12 +11,12 @@ public class Preferences {
     /**
      * The number of maximal shown visible possibly faulty axioms
      */
-    static int MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = 15;
+    static int MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = 10;
 
     /**
      * The number of maximal shown visible correct axioms
      */
-    static int MAX_VISIBLE_CORRECT_AXIOMS = 15;
+    static int MAX_VISIBLE_CORRECT_AXIOMS = 10;
 
 
     protected static void setSessionKeepaliveInMillis(Long sessionKeepaliveInMillis) {
