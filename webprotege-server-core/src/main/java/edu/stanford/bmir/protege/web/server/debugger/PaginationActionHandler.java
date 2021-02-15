@@ -32,7 +32,7 @@ public class PaginationActionHandler extends AbstractProjectActionHandler<Pagina
     @Override
     public DebuggingSessionStateResult execute(@Nonnull PaginationAction action, @Nonnull ExecutionContext executionContext) {
         try {
-            return session.paginate(executionContext.getUserId(), action.getPageFlag(), action.getStep());
+            return session.paginate(executionContext.getUserId(), action.getPageFlag(), action.getPage());
         } catch (ConcurrentUserException | RuntimeException  e) {
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }

@@ -25,23 +25,22 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
     private Boolean pageFlag = Boolean.TRUE;
 
     /**
-     * The step when paginating through the shown possibly faulty axioms.
+     * The page when paginating through the shown possibly faulty and correct axioms.
      * Any numbers are possible - positive, zero and negative.
      * The paging will be checked serverside.
-     * A step size of -1 means navigating one page back, and a size of 1 means navigating one page forward.
      */
-    private int step;
+    private int page;
 
     /**
      *
      * @param projectId The current project's id.
-     * @param step The step size. Any positive or negative number is allowed. A value of <code>-1</code> indicates
-     *             navigating backwards by one page, a value of <code>1</code> indicates a navigation forward by one page.
+     * @param page The page to be shown. Any positive or negative number is allowed.
+     *             The paging will be checked serverside.
      */
     @Deprecated
-    public PaginationAction(ProjectId projectId, int step) {
+    public PaginationAction(ProjectId projectId, int page) {
         this.projectId = checkNotNull(projectId);
-        this.step = step;
+        this.page = page;
     }
 
     /**
@@ -50,13 +49,13 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
      * @param pageFlag The flag indicates which page is meant to be navigated.
      *                 <code>true</code> indicates the possibly faulty axioms.
      *                 <code>false</code> indicates the correct axioms.
-     * @param step The step size. Any positive or negative number is allowed. A value of <code>-1</code> indicates
-     *             navigating backwards by one page, a value of <code>1</code> indicates a navigation forward by one page.
+     * @param page The page to be shown. Any positive or negative number is allowed.
+     *             The paging will be checked serverside.
      */
-    public PaginationAction(ProjectId projectId, Boolean pageFlag, int step) {
+    public PaginationAction(ProjectId projectId, Boolean pageFlag, int page) {
         this.projectId = checkNotNull(projectId);
         this.pageFlag = checkNotNull(pageFlag);
-        this.step = step;
+        this.page = page;
     }
 
     @GwtSerializationConstructor
@@ -68,8 +67,8 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
         return projectId;
     }
 
-    public int getStep() {
-        return step;
+    public int getPage() {
+        return page;
     }
 
     @Nonnull
@@ -82,12 +81,12 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PaginationAction that = (PaginationAction) o;
-        return step == that.step && Objects.equals(projectId, that.projectId) && Objects.equals(pageFlag, that.pageFlag);
+        return page == that.page && Objects.equals(projectId, that.projectId) && Objects.equals(pageFlag, that.pageFlag);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, pageFlag, step);
+        return Objects.hash(projectId, pageFlag, page);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class PaginationAction implements ProjectAction<DebuggingSessionStateResu
         return toStringHelper("PaginationAction")
                 .addValue(projectId)
                 .addValue(pageFlag)
-                .addValue(step)
+                .addValue(page)
                 .toString();
     }
 }

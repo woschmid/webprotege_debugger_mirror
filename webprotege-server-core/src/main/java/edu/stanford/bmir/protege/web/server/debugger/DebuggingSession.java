@@ -95,9 +95,9 @@ public class DebuggingSession implements HasDispose {
     private final SearchFilter filter;
 
     /**
-     * Page index for possibly faulty axioms.
+     * Current page for possibly faulty axioms.
      */
-    private int possiblyFaultyIndex = 0;
+    private int currentPossiblyFaultyPage = 0;
 
     /**
      * Number of pages for possibly faulty axioms.
@@ -107,7 +107,7 @@ public class DebuggingSession implements HasDispose {
     /**
      * Page index for correct axioms.
      */
-    private int correctIndex = 0;
+    private int currentCorrectPage = 0;
 
     /**
      * Number of pages for correct axioms.
@@ -216,12 +216,12 @@ public class DebuggingSession implements HasDispose {
     }
 
     /** Return the currently set index for the shown possibly faulty axioms. */
-    public int getPossiblyFaultyIndex() {
-        return possiblyFaultyIndex;
+    public int getCurrentPossiblyFaultyPage() {
+        return currentPossiblyFaultyPage;
     }
 
-    void setPossiblyFaultyIndex(int possiblyFaultyIndex) {
-        this.possiblyFaultyIndex = possiblyFaultyIndex;
+    void setCurrentPossiblyFaultyPage(int currentPossiblyFaultyPage) {
+        this.currentPossiblyFaultyPage = currentPossiblyFaultyPage;
     }
 
     public int getPossiblyFaultyPages() {
@@ -233,12 +233,12 @@ public class DebuggingSession implements HasDispose {
     }
 
     /** Return the currently set index for the shown correct axioms. */
-    public int getCorrectIndex() {
-        return correctIndex;
+    public int getCurrentCorrectPage() {
+        return currentCorrectPage;
     }
 
-    public void setCorrectIndex(int correctIndex) {
-        this.correctIndex = correctIndex;
+    public void setCurrentCorrectPage(int currentCorrectPage) {
+        this.currentCorrectPage = currentCorrectPage;
     }
 
     public int getCorrectPages() {
@@ -674,11 +674,13 @@ public class DebuggingSession implements HasDispose {
             filter.setTBox(tBox);
             filter.setRBox(rBox);
 
-            // reset the possiblyFaultyIndex
-            possiblyFaultyIndex = 0;
+            // reset the currentPossiblyFaultyPage
+            currentPossiblyFaultyPage = 0;
+            possiblyFaultyPages = 0;
 
-            // reset the correctIndex
-            correctIndex = 0;
+            // reset the currentCorrectPage
+            currentCorrectPage = 0;
+            correctPages = 0;
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
@@ -691,18 +693,18 @@ public class DebuggingSession implements HasDispose {
      * @param pageFlag The flag indicates which page shall be navigated.
      *                 <code>true</code> indicates the possibly faulty axioms.
      *                 <code>false</code> indicates the correct axioms.
-     * @param step The step size. A positive number steps forward, a negative number steps backward. Internal checks prevent out of bounds pagination.
+     * @param page The page to be shown. Internal checks prevent out of bounds pagination.
      * @return The current state of the backend for the frontend.
      * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
      */
-    public DebuggingSessionStateResult paginate(@Nonnull UserId userId, Boolean pageFlag, int step) throws ConcurrentUserException {
+    public DebuggingSessionStateResult paginate(@Nonnull UserId userId, Boolean pageFlag, int page) throws ConcurrentUserException {
         synchronized (this) {
             checkUser(userId);
 
             if (pageFlag)
-                possiblyFaultyIndex = Math.max(possiblyFaultyIndex + step, 0);
+                currentPossiblyFaultyPage = Math.max(page, 1);
             else
-                correctIndex = Math.max(correctIndex + step, 0);
+                currentCorrectPage = Math.max(page, 1);
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
@@ -771,9 +773,11 @@ public class DebuggingSession implements HasDispose {
         diagnoses = null;
         consistencyCheckResult = null;
         filter.reset();
-        possiblyFaultyIndex = 0;
-        correctIndex = 0;
+        currentPossiblyFaultyPage = 0;
+        possiblyFaultyPages = 0;
         presentedPossiblyFaultyAxioms = Collections.emptyList();
+        currentCorrectPage = 0;
+        correctPages = 0;
         presentedCorrectAxioms = Collections.emptyList();
         loadOntology();
     }
