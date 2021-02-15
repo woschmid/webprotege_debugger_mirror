@@ -43,7 +43,7 @@ public class MoveAllAction implements ProjectAction<DebuggingSessionStateResult>
     @Nonnull
     @Override
     public ProjectId getProjectId() {
-        return null;
+        return projectId;
     }
 
     @Nonnull
