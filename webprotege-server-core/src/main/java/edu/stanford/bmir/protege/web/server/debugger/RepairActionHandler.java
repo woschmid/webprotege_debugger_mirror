@@ -42,6 +42,7 @@ public class RepairActionHandler extends AbstractProjectActionHandler<RepairActi
         try {
             return session.repair(executionContext.getUserId(), action.getAxiomsToModify(), action.getAxiomsToDelete(), action.getIndex(), applyChanges);
         } catch (RuntimeException | ConcurrentUserException | UnsatisfiedPreconditionException | OWLOntologyCreationException | RepairException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

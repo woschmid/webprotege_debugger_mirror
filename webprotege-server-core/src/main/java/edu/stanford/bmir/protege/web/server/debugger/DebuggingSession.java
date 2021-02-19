@@ -769,7 +769,7 @@ public class DebuggingSession implements HasDispose {
     /**
      * Keeping the current debugging session alive because of an activity from an authenticated user.
      */
-    private void keepSessionAlive() {
+    protected void keepSessionAlive() {
         this.lastActivityTimeInMillis = System.currentTimeMillis();
     }
 

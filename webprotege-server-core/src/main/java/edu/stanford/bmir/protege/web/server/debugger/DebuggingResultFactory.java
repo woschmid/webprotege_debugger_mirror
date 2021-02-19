@@ -53,6 +53,8 @@ public class DebuggingResultFactory {
             session.setPresentedCorrectAxioms(presentedCorrectAxioms);
         }
 
+        session.keepSessionAlive();
+
         return new DebuggingSessionStateResult(isOk,
                 session.getUserId(),
                 query,
@@ -62,7 +64,7 @@ public class DebuggingResultFactory {
                 possiblyFaultyAxioms,
                 correctAxioms,
                 session.getState(),
-                StringUtil.escapeHtml(message),
+                Util.escapeHtml(message),
                 session.getSearchFilter().isABox(),
                 session.getSearchFilter().isTBox(),
                 session.getSearchFilter().isRBox(),

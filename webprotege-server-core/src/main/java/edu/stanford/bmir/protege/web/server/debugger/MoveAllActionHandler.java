@@ -36,6 +36,7 @@ public class MoveAllActionHandler extends AbstractProjectActionHandler<MoveAllAc
         try {
             return session.moveAllAxiomsTo(executionContext.getUserId(), action.isMoveDown());
         } catch (UnsatisfiedPreconditionException | ConcurrentUserException | RuntimeException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

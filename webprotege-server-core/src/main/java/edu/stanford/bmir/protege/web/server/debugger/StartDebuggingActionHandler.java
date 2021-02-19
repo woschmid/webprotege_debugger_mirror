@@ -39,8 +39,10 @@ public class StartDebuggingActionHandler extends AbstractProjectActionHandler<St
             return session.start(executionContext.getUserId());
         } catch (RuntimeException | OWLOntologyCreationException e) {
             session.stop();
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
+            Util.logException(getActionClass(), e);
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage() + "\nSession has been stopped!");
         } catch (ConcurrentUserException | UnsatisfiedPreconditionException | AxiomNotFoundException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

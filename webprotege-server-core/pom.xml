@@ -249,18 +249,20 @@
         <dependency>
             <groupId>org.exquisite</groupId>
             <artifactId>diagnosis</artifactId>
-            <version>0.2.2</version>
+            <version>0.2.3</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/diagnosis-0.2.2.jar</systemPath>
+            <systemPath>${project.basedir}/src/main/resources/diagnosis-0.2.3.jar</systemPath>
         </dependency>
 
         <dependency>
             <groupId>org.exquisite</groupId>
             <artifactId>owl-plugin</artifactId>
-            <version>0.2.2</version>
+            <version>0.2.3</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/owl-plugin-0.2.2.jar</systemPath>
+            <systemPath>${project.basedir}/src/main/resources/owl-plugin-0.2.3.jar</systemPath>
         </dependency>
+
+        <!-- Reasoners -->
 
         <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/org.semanticweb.hermit -->
         <dependency>
@@ -283,6 +285,26 @@
             <version>4.0.4</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/de.tu-dresden.inf.lat.jcel/jcel-owlapi -->
+        <dependency>
+            <groupId>de.tu-dresden.inf.lat.jcel</groupId>
+            <artifactId>jcel-owlapi</artifactId>
+            <version>0.24.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/au.csiro/snorocket-owlapi -->
+        <dependency>
+            <groupId>au.csiro</groupId>
+            <artifactId>snorocket-owlapi</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.semanticweb.elk/elk-owlapi -->
+        <dependency>
+            <groupId>org.semanticweb.elk</groupId>
+            <artifactId>elk-owlapi</artifactId>
+            <version>0.4.3</version>
+        </dependency>
 
     </dependencies>
 

@@ -38,8 +38,11 @@ public class SubmitDebuggingActionHandler extends AbstractProjectActionHandler<S
             return session.calculateQuery(executionContext.getUserId(), action.getAnswers());
         } catch (RuntimeException | AxiomNotFoundException e) {
             session.stop();
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
+            Util.logException(getActionClass(), e);
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage() + "\nSession has been stopped!");
         } catch (ConcurrentUserException | UnsatisfiedPreconditionException e) {
+            e.printStackTrace();
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

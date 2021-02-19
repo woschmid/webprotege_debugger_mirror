@@ -36,6 +36,7 @@ public class MoveToActionHandler extends AbstractProjectActionHandler<MoveToActi
         try {
             return session.moveAxiomTo(executionContext.getUserId(), action.getAxiom());
         } catch (UnsatisfiedPreconditionException | ConcurrentUserException | AxiomNotFoundException | RuntimeException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
