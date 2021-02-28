@@ -78,6 +78,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
         view.setChangePage(this::changePageP);
         view.setPageNumberChangedHandlerP(this::changePageP);
         view.setPageNumberChangedHandlerC(this::changePageC);
+        view.setSearchStringChangedHandler(this::searchAxioms);
     }
 
     private void changePageP(int step) {
@@ -164,12 +165,12 @@ public class BackgroundPresenter extends DebuggerPresenter {
     boolean isChecked = true;
     public void setAxioms(DebuggingSessionStateResult debuggingSessionStateResult){
         isChecked = debuggingSessionStateResult.getSessionState() != SessionState.STARTED && debuggingSessionStateResult.getSessionState() != SessionState.COMPUTING;
-        GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPossiblyFaultyPageIndex());
-        GWT.log("[BackgroundPresenter]"+ debuggingSessionStateResult.getPossiblyFaultyPages());
         view.setPageNumberP(debuggingSessionStateResult.getPossiblyFaultyPageIndex());
         view.setPageCountP(debuggingSessionStateResult.getPossiblyFaultyPages());
         view.setPageNumberC(debuggingSessionStateResult.getCorrectPageIndex());
         view.setPageCountC(debuggingSessionStateResult.getCorrectPages());
+        view.setPFANumber(debuggingSessionStateResult.getNrPossiblyFaultyAxioms());
+        view.setCANumber(debuggingSessionStateResult.getNrCorrectAxioms());
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
@@ -196,6 +197,10 @@ public class BackgroundPresenter extends DebuggerPresenter {
             backgroundAxioms.addAll(items);
             setAxiomsToViews();
         }
+    }
+
+    public void searchAxioms(){
+        GWT.log("[BackgroundPresenter] Search keys are: "+ view.getSearchString());
     }
 
     private void setAxiomsToViews() {
