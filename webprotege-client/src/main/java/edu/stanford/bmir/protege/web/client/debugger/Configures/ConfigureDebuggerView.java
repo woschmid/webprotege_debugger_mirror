@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.debugger;
+package edu.stanford.bmir.protege.web.client.debugger.Configures;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
