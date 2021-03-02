@@ -22,6 +22,8 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
 
     private boolean rBox;
 
+    private String searchString;
+
     @GwtSerializationConstructor
     private SetFilterAction() {}
 
@@ -30,6 +32,14 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
         this.aBox = aBox;
         this.tBox = tBox;
         this.rBox = rBox;
+    }
+
+    public SetFilterAction(@Nonnull ProjectId projectId, boolean aBox, boolean tBox, boolean rBox, String searchString) {
+        this.projectId = projectId;
+        this.aBox = aBox;
+        this.tBox = tBox;
+        this.rBox = rBox;
+        this.searchString = searchString;
     }
 
     @Nonnull
@@ -50,17 +60,21 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
         return rBox;
     }
 
+    public String getSearchString() {
+        return searchString;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SetFilterAction that = (SetFilterAction) o;
-        return aBox == that.aBox && tBox == that.tBox && rBox == that.rBox && Objects.equals(projectId, that.projectId);
+        return aBox == that.aBox && tBox == that.tBox && rBox == that.rBox && Objects.equals(projectId, that.projectId) && Objects.equals(searchString, that.searchString);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, aBox, tBox, rBox);
+        return Objects.hash(projectId, aBox, tBox, rBox, searchString);
     }
 
     @Override
@@ -70,6 +84,7 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
                 .addValue(aBox)
                 .addValue(tBox)
                 .addValue(rBox)
+                .addValue(searchString)
                 .toString();
 
     }
