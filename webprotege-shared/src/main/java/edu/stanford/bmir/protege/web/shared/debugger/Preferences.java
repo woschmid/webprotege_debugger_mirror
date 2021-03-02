@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.server.debugger;
+package edu.stanford.bmir.protege.web.shared.debugger;
 
 public class Preferences {
 

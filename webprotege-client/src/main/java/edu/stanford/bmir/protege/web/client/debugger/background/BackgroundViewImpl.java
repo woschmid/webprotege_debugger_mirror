@@ -2,6 +2,7 @@ package edu.stanford.bmir.protege.web.client.debugger.background;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -10,9 +11,12 @@ import com.google.gwt.user.client.ui.*;
 import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
 import edu.stanford.bmir.protege.web.client.pagination.PaginatorPresenter;
 import edu.stanford.bmir.protege.web.client.pagination.PaginatorView;
+import edu.stanford.bmir.protege.web.client.search.SearchStringChangedHandler;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Matthew Horridge
@@ -41,6 +45,15 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     @UiField
     CheckBox RBox;
 
+    @UiField
+    Label PFANumber;
+
+    @UiField
+    Label CANumber;
+
+    @UiField
+    protected TextBox searchBox;
+
 //    @UiField
 //    Button allDown;
 //
@@ -53,17 +66,13 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     @UiField(provided = true)
     protected PaginatorView paginatorC;
 
-    private FilterAxiomsHandler filterAxiomsHandler = (isAbox, isTbox, isRbox) -> {
+    private FilterAxiomsHandler filterAxiomsHandler = (isAbox, isTbox, isRbox) -> {};
 
-    };
+    private MoveAllAxiom moveAllAxiom = (boolean down) -> {};
 
-    private MoveAllAxiom moveAllAxiom = (boolean down) -> {
+    private ChangePage changePage = (int step) -> {};
 
-    };
-
-    private ChangePage changePage = (int step) -> {
-
-    };
+    private SearchStringChangedHandler searchStringChangedHandler = () -> {};
 
     @Override
     public AcceptsOneWidget getCriteriaContainer() {
@@ -122,15 +131,21 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
         moveAllAxiom.handleMoveAllAxiom(false);
     }
 
-//    @UiHandler("lastPage")
-//    protected void LastPageButtonClick(ClickEvent event) {
-//        changePage.handleChangePage(-1);
-//    }
-//
-//    @UiHandler("nextPage")
-//    protected void NextPageButtonClick(ClickEvent event) {
-//        changePage.handleChangePage(1);
-//    }
+    @UiHandler("searchBox")
+    protected void handleSearchStringChanged(KeyUpEvent event) {
+        searchStringChangedHandler.handleSearchStringChanged();
+    }
+
+    @Override
+    public String getSearchString() {
+        return searchBox.getText();
+    }
+
+    @Override
+    public void clearSearchString() {
+        searchBox.setText("");
+    }
+
 
 
     @UiHandler("helpButton")
@@ -195,4 +210,20 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     public void setPageNumberChangedHandlerC(HasPagination.PageNumberChangedHandler handler) {
         paginatorCPresenter.setPageNumberChangedHandler(handler);
     }
+
+    @Override
+    public void setPFANumber(int number) {
+        PFANumber.setText(number+"  Axioms");
+    }
+
+    @Override
+    public void setCANumber(int number) {
+        CANumber.setText(number+"   Axioms");
+    }
+
+    @Override
+    public void setSearchStringChangedHandler(@Nonnull SearchStringChangedHandler handler) {
+        searchStringChangedHandler = checkNotNull(handler);
+    }
+
 }

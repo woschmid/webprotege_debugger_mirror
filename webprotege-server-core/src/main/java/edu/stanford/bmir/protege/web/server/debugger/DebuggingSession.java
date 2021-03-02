@@ -118,6 +118,16 @@ public class DebuggingSession implements HasDispose {
 
     private Collection<OWLLogicalAxiom> presentedCorrectAxioms = Collections.emptyList();
 
+    /**
+     * Number of possibly faulty axioms. Also regarding filters.
+     */
+    private int nrPossiblyFaultyAxioms = 0;
+
+    /**
+     * Number of correct axioms. Also regarding filters.
+     */
+    private int nrCorrectAxioms = 0;
+
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
                             @Nonnull RevisionManager revisionManager,
@@ -263,6 +273,22 @@ public class DebuggingSession implements HasDispose {
 
     public Collection<OWLLogicalAxiom> getPresentedCorrectAxioms() {
         return presentedCorrectAxioms;
+    }
+
+    public int getNrPossiblyFaultyAxioms() {
+        return nrPossiblyFaultyAxioms;
+    }
+
+    public void setNrPossiblyFaultyAxioms(int nrPossiblyFaultyAxioms) {
+        this.nrPossiblyFaultyAxioms = nrPossiblyFaultyAxioms;
+    }
+
+    public int getNrCorrectAxioms() {
+        return nrCorrectAxioms;
+    }
+
+    public void setNrCorrectAxioms(int nrCorrectAxioms) {
+        this.nrCorrectAxioms = nrCorrectAxioms;
     }
 
     /**
@@ -743,7 +769,7 @@ public class DebuggingSession implements HasDispose {
     /**
      * Keeping the current debugging session alive because of an activity from an authenticated user.
      */
-    private void keepSessionAlive() {
+    protected void keepSessionAlive() {
         this.lastActivityTimeInMillis = System.currentTimeMillis();
     }
 
@@ -779,6 +805,8 @@ public class DebuggingSession implements HasDispose {
         currentCorrectPage = 0;
         correctPages = 0;
         presentedCorrectAxioms = Collections.emptyList();
+        nrPossiblyFaultyAxioms = 0;
+        nrCorrectAxioms = 0;
         loadOntology();
     }
 

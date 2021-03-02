@@ -34,6 +34,7 @@ public class SetFilterActionHandler extends AbstractProjectActionHandler<SetFilt
         try {
             return session.setSearchFilter(executionContext.getUserId(), action.isABox(), action.isTBox(), action.isRBox());
         } catch (ConcurrentUserException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

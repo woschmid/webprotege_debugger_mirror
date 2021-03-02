@@ -8,6 +8,7 @@ import org.exquisite.core.solver.ExquisiteOWLReasoner;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import javax.annotation.Nonnull;
 
@@ -25,10 +26,15 @@ public class DiagnosisEngineFactory {
                                                                           @Nonnull DebuggingSession debuggingSession) throws OWLOntologyCreationException {
 
         // create a reasoner using a reasoner factory and the diagnosis model from the ontology provided
-        final ExquisiteOWLReasoner solver = new ExquisiteOWLReasoner(diagnosisModel, ReasonerFactory.getReasonerFactory(),  new LoggingReasonerProgressMonitor(debuggingSession));
-
-        // define the entailment types
-        solver.setEntailmentTypes(InferenceType.CLASS_HIERARCHY, InferenceType.DISJOINT_CLASSES);
+        final ExquisiteOWLReasoner solver =
+                new ExquisiteOWLReasoner(
+                        diagnosisModel,
+                        ReasonerFactory.getReasonerFactory(),
+                        new SimpleConfiguration(
+                                new LoggingReasonerProgressMonitor(debuggingSession),
+                                Preferences.REASONER_TIMEOUT_IN_MILLIS),
+                        new InferenceType[] {InferenceType.CLASS_HIERARCHY, InferenceType.DISJOINT_CLASSES}
+        );
 
         // creates diagnosis engine using the solver
         final HSTreeEngine<OWLLogicalAxiom> engine = new HSTreeEngine<>(solver, new QuickXPlain<>(solver));

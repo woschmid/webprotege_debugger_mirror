@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.debugger;
+package edu.stanford.bmir.protege.web.client.debugger.Configures;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -17,8 +17,6 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
 
     private static ConfigureDebuggerViewImplUiBinder ourUiBinder = GWT.create(ConfigureDebuggerViewImplUiBinder.class);
 
-    @UiField
-    ExpandingTextBoxImpl textBox;
 
     @Inject
     public ConfigureDebuggerViewImpl() {

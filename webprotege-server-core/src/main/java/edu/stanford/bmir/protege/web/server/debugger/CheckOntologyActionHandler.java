@@ -39,8 +39,10 @@ public class CheckOntologyActionHandler extends AbstractProjectActionHandler<Che
             return session.checkOntology(executionContext.getUserId());
         } catch (RuntimeException | OWLOntologyCreationException e) {
             session.stop();
-            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
+            Util.logException(getActionClass(), e);
+            return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage() + "\nSession has been stopped!");
         } catch (ConcurrentUserException | UnsatisfiedPreconditionException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

@@ -7,7 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
-import edu.stanford.bmir.protege.web.client.debugger.ConfigureDebuggerView;
+import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;

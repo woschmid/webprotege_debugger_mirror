@@ -84,6 +84,16 @@ public class DebuggingSessionStateResult implements Result {
      */
     private int correctPages = 0;
 
+    /**
+     * Number of possibly faulty axioms. Also regarding filters.
+     */
+    private int nrPossiblyFaultyAxioms = 0;
+
+    /**
+     * Number of correct axioms. Also regarding filters.
+     */
+    private int nrCorrectAxioms = 0;
+
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
@@ -103,7 +113,9 @@ public class DebuggingSessionStateResult implements Result {
                                        int possiblyFaultyPageIndex,
                                        int possiblyFaultyPages,
                                        int correctPageIndex,
-                                       int correctPages) {
+                                       int correctPages,
+                                       int nrPossiblyFaultyAxioms,
+                                       int nrCorrectAxioms) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
@@ -121,6 +133,8 @@ public class DebuggingSessionStateResult implements Result {
         this.possiblyFaultyPages = possiblyFaultyPages;
         this.correctPageIndex = correctPageIndex;
         this.correctPages = correctPages;
+        this.nrPossiblyFaultyAxioms = nrPossiblyFaultyAxioms;
+        this.nrCorrectAxioms = nrCorrectAxioms;
     }
 
     @Nonnull
@@ -209,5 +223,13 @@ public class DebuggingSessionStateResult implements Result {
 
     public int getCorrectPages() {
         return correctPages;
+    }
+
+    public int getNrPossiblyFaultyAxioms() {
+        return nrPossiblyFaultyAxioms;
+    }
+
+    public int getNrCorrectAxioms() {
+        return nrCorrectAxioms;
     }
 }

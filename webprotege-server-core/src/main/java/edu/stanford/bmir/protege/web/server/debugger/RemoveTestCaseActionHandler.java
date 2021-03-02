@@ -34,6 +34,7 @@ public class RemoveTestCaseActionHandler extends AbstractProjectActionHandler<Re
         try {
             return session.removeTestCase(executionContext.getUserId(), action.getTestCase());
         } catch (RuntimeException | ConcurrentUserException | UnsatisfiedPreconditionException | AxiomNotFoundException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }

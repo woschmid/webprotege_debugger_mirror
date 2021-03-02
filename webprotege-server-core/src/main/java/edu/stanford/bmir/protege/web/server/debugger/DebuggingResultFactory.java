@@ -53,6 +53,8 @@ public class DebuggingResultFactory {
             session.setPresentedCorrectAxioms(presentedCorrectAxioms);
         }
 
+        session.keepSessionAlive();
+
         return new DebuggingSessionStateResult(isOk,
                 session.getUserId(),
                 query,
@@ -62,14 +64,16 @@ public class DebuggingResultFactory {
                 possiblyFaultyAxioms,
                 correctAxioms,
                 session.getState(),
-                StringUtil.escapeHtml(message),
+                Util.escapeHtml(message),
                 session.getSearchFilter().isABox(),
                 session.getSearchFilter().isTBox(),
                 session.getSearchFilter().isRBox(),
                 session.getCurrentPossiblyFaultyPage(),
                 session.getPossiblyFaultyPages(),
                 session.getCurrentCorrectPage(),
-                session.getCorrectPages()
+                session.getCorrectPages(),
+                session.getNrPossiblyFaultyAxioms(),
+                session.getNrCorrectAxioms()
         );
     }
 
@@ -88,6 +92,8 @@ public class DebuggingResultFactory {
 
         final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection((Supplier<ArrayList<OWLLogicalAxiom>>) ArrayList<OWLLogicalAxiom>::new));
         int size = list.size();
+
+        session.setNrPossiblyFaultyAxioms(size);
 
         if (size > 0) {
             // check the maximal possible page
@@ -118,6 +124,8 @@ public class DebuggingResultFactory {
 
         final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection((Supplier<ArrayList<OWLLogicalAxiom>>) ArrayList<OWLLogicalAxiom>::new));
         int size = list.size();
+
+        session.setNrCorrectAxioms(size);
 
         if (size > 0) {
             int maxPage = (size / Preferences.MAX_VISIBLE_CORRECT_AXIOMS);

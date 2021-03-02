@@ -7,6 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.HTMLTable.ColumnFormatter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.RepairDebuggingHandler;
 import edu.stanford.bmir.protege.web.client.debugger.resources.DiffClientBundle;
 import edu.stanford.bmir.protege.web.client.debugger.resources.Icon;
@@ -58,6 +59,8 @@ public class StatementViewImpl extends Composite{
         DiffClientBundle.INSTANCE.style().ensureInjected();
         this.statementPresenter = statementPresenter;
         initWidget(ourUiBinder.createAndBindUi(this));
+        ColumnFormatter columnFormatter = table.getColumnFormatter();
+        columnFormatter.setWidth(0,"95%");
     }
 
     List<SafeHtml> queryAxioms = new ArrayList<>();

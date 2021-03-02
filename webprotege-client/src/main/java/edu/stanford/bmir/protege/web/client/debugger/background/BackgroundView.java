@@ -3,6 +3,9 @@ package edu.stanford.bmir.protege.web.client.debugger.background;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
 import edu.stanford.bmir.protege.web.client.pagination.HasPagination;
+import edu.stanford.bmir.protege.web.client.search.SearchStringChangedHandler;
+
+import javax.annotation.Nonnull;
 
 /**
  * Matthew Horridge
@@ -36,4 +39,14 @@ public interface BackgroundView extends DebuggerView {
     int getPageNumberC();
 
     void setPageNumberChangedHandlerC(HasPagination.PageNumberChangedHandler handler);
+
+    void setPFANumber(int number);
+
+    void setCANumber(int number);
+
+    String getSearchString();
+
+    void clearSearchString();
+
+    void setSearchStringChangedHandler(@Nonnull SearchStringChangedHandler handler);
 }

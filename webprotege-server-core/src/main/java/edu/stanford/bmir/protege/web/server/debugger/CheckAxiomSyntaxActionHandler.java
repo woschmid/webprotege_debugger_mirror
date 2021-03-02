@@ -40,6 +40,7 @@ public class CheckAxiomSyntaxActionHandler extends AbstractProjectActionHandler<
         try {
             return session.checkAxiomSyntax(executionContext.getUserId(), action.getAxiom());
         } catch (OWLParserException | ConcurrentUserException | UnsatisfiedPreconditionException e) {
+            Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());
         }
     }
