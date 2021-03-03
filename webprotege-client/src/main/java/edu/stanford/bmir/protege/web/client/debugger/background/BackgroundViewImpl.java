@@ -66,7 +66,7 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     @UiField(provided = true)
     protected PaginatorView paginatorC;
 
-    private FilterAxiomsHandler filterAxiomsHandler = (isAbox, isTbox, isRbox) -> {};
+    private FilterAxiomsHandler filterAxiomsHandler = (isAbox, isTbox, isRbox, text) -> {};
 
     private MoveAllAxiom moveAllAxiom = (boolean down) -> {};
 
@@ -102,23 +102,24 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     boolean isAbox = true;
     boolean isTbox = true;
     boolean isRbox = true ;
+    String text = "";
 
     @UiHandler("ABox")
     protected void ABoxButtonClick(ClickEvent event) {
         isAbox = ABox.getValue();
-        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox);
+        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox, text);
     }
 
     @UiHandler("TBox")
     protected void TBoxButtonClick(ClickEvent event) {
         isTbox = TBox.getValue();
-        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox);
+        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox, text);
     }
 
     @UiHandler("RBox")
     protected void RBoxButtonClick(ClickEvent event) {
         isRbox = RBox.getValue();
-        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox);
+        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox, text);
     }
 
     @UiHandler("allDown")
@@ -133,7 +134,8 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
 
     @UiHandler("searchBox")
     protected void handleSearchStringChanged(KeyUpEvent event) {
-        searchStringChangedHandler.handleSearchStringChanged();
+        text = searchBox.getText();
+        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox, text);
     }
 
     @Override
