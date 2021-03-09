@@ -5,6 +5,7 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.shared.debugger.CorrectAxioms;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.PossiblyFaultyAxioms;
+import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
@@ -97,8 +98,8 @@ public class DebuggingResultFactory {
 
         if (size > 0) {
             // check the maximal possible page
-            int maxPage = (size / Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS);
-            if ((size % Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS) > 0) maxPage += 1;
+            int maxPage = (size / Preferences.getMaxVisiblePossiblyFaultyAxioms());
+            if ((size % Preferences.getMaxVisiblePossiblyFaultyAxioms()) > 0) maxPage += 1;
             if (session.getCurrentPossiblyFaultyPage() > maxPage)
                 session.setCurrentPossiblyFaultyPage(maxPage);
             if (session.getCurrentPossiblyFaultyPage() <= 0)
@@ -107,8 +108,8 @@ public class DebuggingResultFactory {
             // set the number of possible pages
             session.setPossiblyFaultyPages(maxPage);
 
-            int fromIndex = Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS * (session.getCurrentPossiblyFaultyPage() - 1); // inclusive
-            int toIndex = fromIndex + Preferences.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS; // exclusive
+            int fromIndex = Preferences.getMaxVisiblePossiblyFaultyAxioms() * (session.getCurrentPossiblyFaultyPage() - 1); // inclusive
+            int toIndex = fromIndex + Preferences.getMaxVisiblePossiblyFaultyAxioms(); // exclusive
             if (toIndex > size)
                 toIndex = size;
 
@@ -128,8 +129,8 @@ public class DebuggingResultFactory {
         session.setNrCorrectAxioms(size);
 
         if (size > 0) {
-            int maxPage = (size / Preferences.MAX_VISIBLE_CORRECT_AXIOMS);
-            if ((size % Preferences.MAX_VISIBLE_CORRECT_AXIOMS) > 0) maxPage += 1;
+            int maxPage = (size / Preferences.getMaxVisibleCorrectAxioms());
+            if ((size % Preferences.getMaxVisibleCorrectAxioms()) > 0) maxPage += 1;
             if (session.getCurrentCorrectPage() > maxPage)
                 session.setCurrentCorrectPage(maxPage);
             if (session.getCurrentCorrectPage() <= 0)
@@ -137,8 +138,8 @@ public class DebuggingResultFactory {
 
             session.setCorrectPages(maxPage);
 
-            int fromIndex = Preferences.MAX_VISIBLE_CORRECT_AXIOMS * (session.getCurrentCorrectPage() - 1); // inclusive
-            int toIndex = fromIndex + Preferences.MAX_VISIBLE_CORRECT_AXIOMS; // exclusive
+            int fromIndex = Preferences.getMaxVisibleCorrectAxioms() * (session.getCurrentCorrectPage() - 1); // inclusive
+            int toIndex = fromIndex + Preferences.getMaxVisibleCorrectAxioms(); // exclusive
             if (toIndex > size)
                 toIndex = size;
 

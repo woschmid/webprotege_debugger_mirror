@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import org.exquisite.core.conflictsearch.QuickXPlain;
 import org.exquisite.core.engines.HSTreeEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
@@ -32,7 +33,7 @@ public class DiagnosisEngineFactory {
                         ReasonerFactory.getReasonerFactory(),
                         new SimpleConfiguration(
                                 new LoggingReasonerProgressMonitor(debuggingSession),
-                                Preferences.REASONER_TIMEOUT_IN_MILLIS),
+                                Preferences.getReasonerTimeoutInMillis()),
                         new InferenceType[] {InferenceType.CLASS_HIERARCHY, InferenceType.DISJOINT_CLASSES}
         );
 

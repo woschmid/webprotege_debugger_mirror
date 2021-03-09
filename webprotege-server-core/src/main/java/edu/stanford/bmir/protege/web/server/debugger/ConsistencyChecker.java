@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import org.exquisite.core.DiagnosisRuntimeException;
 import org.exquisite.core.IExquisiteProgressMonitor;
 import org.exquisite.core.model.DiagnosisModel;
@@ -189,7 +190,7 @@ public class ConsistencyChecker {
     }
 
     private static OWLReasoner createReasoner(OWLOntology ontology, OWLReasonerFactory factory, ReasonerProgressMonitor monitor) {
-        OWLReasonerConfiguration configuration = new SimpleConfiguration(monitor, Preferences.REASONER_TIMEOUT_IN_MILLIS);
+        OWLReasonerConfiguration configuration = new SimpleConfiguration(monitor, Preferences.getReasonerTimeoutInMillis());
         return factory.createReasoner(ontology, configuration);
     }
 

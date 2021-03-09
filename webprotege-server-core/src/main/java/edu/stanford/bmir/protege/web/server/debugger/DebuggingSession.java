@@ -13,6 +13,7 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
 import edu.stanford.bmir.protege.web.shared.inject.ProjectSingleton;
@@ -167,7 +168,7 @@ public class DebuggingSession implements HasDispose {
                     (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING) // .. it must be running
                     &&
                     // .. and must have been used within a certain time slot
-                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < Preferences.SESSION_KEEPALIVE_IN_MILLIS)) {
+                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < Preferences.getSessionKeepaliveInMillis())) {
 
                 logger.info("Keeping project {} loaded for running {} ...", projectId, this);
                 projectManager.ensureProjectIsLoaded(projectId, getUserId());
@@ -731,6 +732,16 @@ public class DebuggingSession implements HasDispose {
                 currentPossiblyFaultyPage = Math.max(page, 1);
             else
                 currentCorrectPage = Math.max(page, 1);
+
+            return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
+        }
+    }
+
+    public DebuggingSessionStateResult setPreferences(UserId userId, edu.stanford.bmir.protege.web.shared.debugger.Preferences preferences) throws ConcurrentUserException {
+        synchronized (this) {
+            checkUser(userId);
+
+            // TODO
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }

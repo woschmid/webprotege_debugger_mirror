@@ -675,4 +675,7 @@ public class ProjectActionHandlersModule {
     @Provides @IntoSet
     public ProjectActionHandler providePaginationActionHandler(PaginationActionHandler handler) { return handler; }
 
+    @Provides @IntoSet
+    public ProjectActionHandler provideSetPreferencesActionHandler(SetPreferencesActionHandler handler) { return handler; }
+
 }
