@@ -22,8 +22,6 @@ import edu.stanford.bmir.protege.web.client.color.ColorSwatchView;
 import edu.stanford.bmir.protege.web.client.color.ColorSwatchViewImpl;
 import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellView;
 import edu.stanford.bmir.protege.web.client.color.ColorSwatchWellViewImpl;
-import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerView;
-import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerViewImpl;
 import edu.stanford.bmir.protege.web.client.dispatch.*;
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletView;
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletViewImpl;
@@ -530,10 +528,6 @@ public class ClientApplicationModule {
 //    QueriesView provideQueriesView(QueriesViewImpl impl) {
 //        return impl;
 //    }
-
-    @Provides
-    ConfigureDebuggerView provideConfigureDebuggerView(ConfigureDebuggerViewImpl impl) {
-        return impl;
-    }
+//
 
 }

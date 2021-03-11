@@ -25,28 +25,23 @@
     <g:HTMLPanel>
         <div class="{wp.style.formGroup}">
             <g:Label text="Debugger Seesion Keep Time" ui:field="DSKTLabel" addStyleNames="{wp.style.formLabel}"/>
-            <text:ExpandingTextBoxImpl ui:field="DSKTtextBox"
-                                       anchorVisible="false"/>
+            <g:TextBox  ui:field="DSKTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Reasoner timeout" ui:field="RTLabel" addStyleNames="{wp.style.formLabel}"/>
-            <text:ExpandingTextBoxImpl ui:field="RTtextBox"
-                                       anchorVisible="false"/>
+            <g:TextBox  ui:field="RTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Max Visible Possibly Faulty Axioms" ui:field="MVPFALabel" addStyleNames="{wp.style.formLabel}"/>
-            <text:ExpandingTextBoxImpl ui:field="MVPFAtextBox"
-                                       anchorVisible="false"/>
+            <g:TextBox  ui:field="MVPFAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Max visible correct axioms" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
-            <text:ExpandingTextBoxImpl ui:field="MVCAtextBox"
-                                       anchorVisible="false"/>
+            <g:TextBox  ui:field="MVCAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Reasoner" ui:field="ReasonerLabel" addStyleNames="{wp.style.formLabel}"/>
-            <text:ExpandingTextBoxImpl ui:field="ReasonertextBox"
-                                       anchorVisible="false"/>
+            <g:TextBox  ui:field="ReasonertextBox"/>
         </div>
     </g:HTMLPanel>
 </ui:UiBinder>

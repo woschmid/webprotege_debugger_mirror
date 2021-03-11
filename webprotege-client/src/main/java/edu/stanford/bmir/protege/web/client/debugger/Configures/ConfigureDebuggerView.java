@@ -1,7 +1,7 @@
 package edu.stanford.bmir.protege.web.client.debugger.Configures;
 
-import com.google.gwt.user.client.ui.IsWidget;
+import edu.stanford.bmir.protege.web.client.debugger.DebuggerView;
 
-public interface ConfigureDebuggerView extends IsWidget {
+public interface ConfigureDebuggerView extends DebuggerView {
 
 }

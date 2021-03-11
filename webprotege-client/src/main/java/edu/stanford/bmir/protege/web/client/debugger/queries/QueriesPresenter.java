@@ -7,7 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.CheckBox;
-import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerView;
+import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
@@ -48,14 +48,16 @@ public class QueriesPresenter extends DebuggerPresenter {
     private DispatchServiceManager dsm;
 
     @Nonnull
-    private final ConfigureDebuggerView configureDebuggerView;
+    private final ConfigureDebuggerPresenter configureDebuggerPresenter;
 
 
     @Inject
     public QueriesPresenter(@Nonnull ProjectId projectId,
                             DispatchServiceManager dispatchServiceManager,
                             MessageBox messageBox, StatementPresenter statementPresenter,
-                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager, QueriesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager, @Nonnull ConfigureDebuggerView configureDebuggerView) {
+                            DispatchErrorMessageDisplay errorDisplay, ProgressDisplay progressDisplay, DebuggerResultManager debuggerResultManager,
+                            QueriesView view, LoggedInUserProvider loggedInUserProvider, @Nonnull ModalManager modalManager,
+                            @Nonnull ConfigureDebuggerPresenter configureDebuggerPresenter) {
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
         this.projectId = projectId;
         this.loggedInUserProvider = loggedInUserProvider;
@@ -63,7 +65,7 @@ public class QueriesPresenter extends DebuggerPresenter {
         this.statementPresenter = statementPresenter;
         this.view = view;
         this.modalManager = modalManager;
-        this.configureDebuggerView = configureDebuggerView;
+        this.configureDebuggerPresenter = configureDebuggerPresenter;
         statementPresenter.addCheckBoxClickhandler(this::CheckCheckBox);
     }
 
@@ -279,7 +281,8 @@ public class QueriesPresenter extends DebuggerPresenter {
     private void ConfigureTimeout() {
         ModalPresenter modalPresenter = modalManager.createPresenter();
         modalPresenter.setTitle("Configure Timeout");
-        modalPresenter.setView(configureDebuggerView);
+        modalPresenter.setView(configureDebuggerPresenter.getView());
+        configureDebuggerPresenter.run();
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
         modalPresenter.setButtonHandler(DialogButton.OK,
@@ -293,6 +296,7 @@ public class QueriesPresenter extends DebuggerPresenter {
     }
 
     private void handleModalButton(ModalCloser closer) {
+        configureDebuggerPresenter.handleSubmitPreference();
         closer.closeModal();
     }
 
