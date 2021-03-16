@@ -71,4 +71,8 @@ public class Preferences implements Serializable, IsSerializable {
         if (maxVisibleCorrectAxioms > 0 && maxVisibleCorrectAxioms <= 50)
             MAX_VISIBLE_CORRECT_AXIOMS = maxVisibleCorrectAxioms;
     }
+
+    public static void setReasonerTimeoutInMillis(Long reasonerTimeoutInMillis) {
+        REASONER_TIMEOUT_IN_MILLIS = reasonerTimeoutInMillis;
+    }
 }

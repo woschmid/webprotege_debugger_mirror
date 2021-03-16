@@ -1,7 +1,5 @@
 package edu.stanford.bmir.protege.web.client.debugger.Configures;
 
-import com.google.gwt.core.client.GWT;
-import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
@@ -16,6 +14,7 @@ import edu.stanford.bmir.protege.web.client.library.modal.ModalManager;
 import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import edu.stanford.bmir.protege.web.shared.debugger.SetPreferencesAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -104,6 +103,7 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
         preferences.setMaxVisibleCorrectAxioms(Integer.parseInt(view.getMVCAtextBox()));
         preferences.setMaxVisiblePossiblyFaultyAxioms(Integer.parseInt(view.getMVPFAtextBox()));
         preferences.setSessionKeepaliveInMillis(Long.parseLong(view.getDSKTtextBox()));
+        preferences.setReasonerTimeoutInMillis(Long.parseLong(view.getRTtextBox()));
         return preferences;
     }
 
