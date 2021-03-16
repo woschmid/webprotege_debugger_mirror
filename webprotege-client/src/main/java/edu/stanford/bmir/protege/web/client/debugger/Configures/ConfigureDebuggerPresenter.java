@@ -28,8 +28,6 @@ import java.util.Set;
 
 public class ConfigureDebuggerPresenter extends DebuggerPresenter {
 
-    ConfigureDebuggerViewImpl configureDebuggerView;
-
     @Nonnull
     private final ModalManager modalManager;
 
@@ -66,6 +64,7 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
                                       MessageBox messageBox, StatementPresenter statementPresenter, DebuggerResultManager debuggerResultManager
                                      ){
         super(statementPresenter, debuggerResultManager,view,loggedInUserProvider,errorDisplay,progressDisplay,messageBox);
+        this.progressDisplay = progressDisplay;
         this.modalManager = modalManager;
         this.dsm = dsm;
         this.view = view;

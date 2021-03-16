@@ -41,7 +41,14 @@
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Reasoner" ui:field="ReasonerLabel" addStyleNames="{wp.style.formLabel}"/>
-            <g:TextBox  ui:field="ReasonertextBox"/>
+            <g:ListBox ui:field="ReseanerFild">
+                <g:item value="HermiT">HermiT</g:item>
+                <g:item value="pellet">pellet</g:item>
+                <g:item value="jfact">jfact</g:item>
+                <g:item value="JCEL">JCEL</g:item>
+                <g:item value="Snorocket">Snorocket</g:item>
+                <g:item value="ELK">ELK</g:item>
+            </g:ListBox>
         </div>
     </g:HTMLPanel>
 </ui:UiBinder>

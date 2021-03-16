@@ -5,10 +5,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.*;
 import edu.stanford.bmir.protege.web.client.library.text.ExpandingTextBoxImpl;
 import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 
@@ -30,7 +27,7 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
     protected TextBox MVCAtextBox;
 
     @UiField
-    protected TextBox ReasonertextBox;
+    protected ListBox ReseanerFild;
 
 
     @Override
@@ -86,7 +83,7 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
         return MVCAtextBox.getText();
     }
 
-    public String getReasonertextBox() {
-        return ReasonertextBox.getText();
+    public String getReseanerFild() {
+        return ReseanerFild.getSelectedItemText();
     }
 }
