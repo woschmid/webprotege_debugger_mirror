@@ -129,6 +129,8 @@ public class DebuggingSession implements HasDispose {
      */
     private int nrCorrectAxioms = 0;
 
+    private Preferences preferences;
+
     @Inject
     public DebuggingSession(@Nonnull ProjectId projectId,
                             @Nonnull RevisionManager revisionManager,
@@ -147,6 +149,8 @@ public class DebuggingSession implements HasDispose {
         this.diagnoses = null;
 
         this.filter = new SearchFilter();
+
+        this.preferences = new Preferences(10L * 60L * 1000L, 10L * 60L * 1000L * 90 / 100, 10, 10);
 
         keepSessionAlive();
 
@@ -168,7 +172,7 @@ public class DebuggingSession implements HasDispose {
                     (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING) // .. it must be running
                     &&
                     // .. and must have been used within a certain time slot
-                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < Preferences.getSessionKeepaliveInMillis())) {
+                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < preferences.getSessionKeepaliveInMillis())) {
 
                 logger.info("Keeping project {} loaded for running {} ...", projectId, this);
                 projectManager.ensureProjectIsLoaded(projectId, getUserId());
@@ -317,7 +321,7 @@ public class DebuggingSession implements HasDispose {
 
             // creating a solver includes a possibly long-lasting consistency and coherency check
             this.state = SessionState.COMPUTING;
-            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(), new LoggingReasonerProgressMonitor(this));
+            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(), new LoggingReasonerProgressMonitor(this), getPreferences());
             this.diagnosisModel = consistencyCheckResult.getDiagnosisModel();
 
             // since we have done the check we can set the flag and return the appropriate result
@@ -528,8 +532,8 @@ public class DebuggingSession implements HasDispose {
      * @param isMoveDown <code>true</code> means the currently shown possible faulty axioms (i.e. moveDown),
      *                   <code>false</code> means the correct axioms to be moved (i.e. moveUp).
      * @return A result for the front end representing the current state of the backend.
-     * @throws ConcurrentUserException
-     * @throws UnsatisfiedPreconditionException
+     * @throws ConcurrentUserException If the current debugging session is in use until stop by another user.
+     * @throws UnsatisfiedPreconditionException If the precondition for an action is not fulfilled.
      */
     public DebuggingSessionStateResult moveAllAxiomsTo(UserId userId, Boolean isMoveDown) throws ConcurrentUserException, UnsatisfiedPreconditionException {
         synchronized (this) {
@@ -737,14 +741,21 @@ public class DebuggingSession implements HasDispose {
         }
     }
 
-    public DebuggingSessionStateResult setPreferences(UserId userId, edu.stanford.bmir.protege.web.shared.debugger.Preferences preferences) throws ConcurrentUserException {
+    public DebuggingSessionStateResult setPreferences(@Nonnull UserId userId, @Nonnull Preferences preferences) throws ConcurrentUserException {
         synchronized (this) {
             checkUser(userId);
 
             // TODO
+            this.preferences = preferences;
+            stop();
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
+    }
+
+    @Nonnull
+    public Preferences getPreferences() {
+        return preferences;
     }
 
     @Override

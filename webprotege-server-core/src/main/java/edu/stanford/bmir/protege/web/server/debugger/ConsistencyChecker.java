@@ -26,7 +26,8 @@ public class ConsistencyChecker {
     public static ConsistencyCheckResult checkConsistencyAndCoherency(@Nonnull OWLOntology ontology,
                                                                       @Nonnull DiagnosisModel<OWLLogicalAxiom> dm,
                                                                       @Nonnull OWLReasonerFactory reasonerFactory,
-                                                                      @Nonnull ReasonerProgressMonitor reasonerProgressMonitor) throws OWLOntologyCreationException {
+                                                                      @Nonnull ReasonerProgressMonitor reasonerProgressMonitor,
+                                                                      @Nonnull Preferences preferences) throws OWLOntologyCreationException {
 
         OWLReasoner reasoner = null; // this is a temporary reasoner to be used for consistency and coherency checks
         ConsistencyCheckResult result = new ConsistencyCheckResult();
@@ -40,7 +41,7 @@ public class ConsistencyChecker {
             OWLOntology ontologyCopy = ontologyManager.copyOntology(ontology, OntologyCopy.DEEP); // (1) ontology already does contain the correct
             List<OWLLogicalAxiom> addedEntailedAxioms = addAxiomsToOntology(dm.getEntailedExamples(), ontologyCopy);
 
-            reasoner = createReasoner(ontologyCopy, reasonerFactory, reasonerProgressMonitor);
+            reasoner = createReasoner(ontologyCopy, reasonerFactory, reasonerProgressMonitor, preferences);
 
             Set<OWLLogicalAxiom> possiblyFaulty = new TreeSet<>();
 
@@ -125,7 +126,7 @@ public class ConsistencyChecker {
         } finally {
             // In the advent of some exception (which might occur, depending on the reasoners and their support
             // of the given ontology, in any case we stop all tasks.
-            if (reasonerProgressMonitor != null) reasonerProgressMonitor.reasonerTaskStopped();
+            reasonerProgressMonitor.reasonerTaskStopped();
             if (reasoner != null) reasoner.dispose(); // call this after the monitors
         }
 
@@ -189,8 +190,8 @@ public class ConsistencyChecker {
         return addedAxioms;
     }
 
-    private static OWLReasoner createReasoner(OWLOntology ontology, OWLReasonerFactory factory, ReasonerProgressMonitor monitor) {
-        OWLReasonerConfiguration configuration = new SimpleConfiguration(monitor, Preferences.getReasonerTimeoutInMillis());
+    private static OWLReasoner createReasoner(OWLOntology ontology, OWLReasonerFactory factory, ReasonerProgressMonitor monitor, Preferences preferences) {
+        OWLReasonerConfiguration configuration = new SimpleConfiguration(monitor, preferences.getReasonerTimeoutInMillis());
         return factory.createReasoner(ontology, configuration);
     }
 

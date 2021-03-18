@@ -1,6 +1,5 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
-import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import org.exquisite.core.conflictsearch.QuickXPlain;
 import org.exquisite.core.engines.HSTreeEngine;
 import org.exquisite.core.engines.IDiagnosisEngine;
@@ -18,10 +17,10 @@ public class DiagnosisEngineFactory {
     /**
      * Creates a HSTree Diagnosis engine with QuickXPlain as conflict searcher.
      *
-     * @param diagnosisModel
-     * @param debuggingSession
-     * @return
-     * @throws OWLOntologyCreationException
+     * @param diagnosisModel The diagosis model.
+     * @param debuggingSession The debugging session.
+     * @return A diagnosis engine.
+     * @throws OWLOntologyCreationException If an error occurs.
      */
     public static IDiagnosisEngine<OWLLogicalAxiom> createDiagnosisEngine(@Nonnull DiagnosisModel<OWLLogicalAxiom> diagnosisModel,
                                                                           @Nonnull DebuggingSession debuggingSession) throws OWLOntologyCreationException {
@@ -33,7 +32,7 @@ public class DiagnosisEngineFactory {
                         ReasonerFactory.getReasonerFactory(),
                         new SimpleConfiguration(
                                 new LoggingReasonerProgressMonitor(debuggingSession),
-                                Preferences.getReasonerTimeoutInMillis()),
+                                debuggingSession.getPreferences().getReasonerTimeoutInMillis()),
                         new InferenceType[] {InferenceType.CLASS_HIERARCHY, InferenceType.DISJOINT_CLASSES}
         );
 

@@ -5,7 +5,6 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.shared.debugger.CorrectAxioms;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.PossiblyFaultyAxioms;
-import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import org.exquisite.core.model.Diagnosis;
 import org.exquisite.core.model.DiagnosisModel;
 import org.exquisite.core.query.Query;
@@ -15,7 +14,6 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -74,7 +72,8 @@ public class DebuggingResultFactory {
                 session.getCurrentCorrectPage(),
                 session.getCorrectPages(),
                 session.getNrPossiblyFaultyAxioms(),
-                session.getNrCorrectAxioms()
+                session.getNrCorrectAxioms(),
+                session.getPreferences()
         );
     }
 
@@ -91,15 +90,15 @@ public class DebuggingResultFactory {
 
     private static Collection<OWLLogicalAxiom> filterAndPaginatePossiblyFaultyAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull DebuggingSession session) {
 
-        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection((Supplier<ArrayList<OWLLogicalAxiom>>) ArrayList<OWLLogicalAxiom>::new));
+        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection(ArrayList<OWLLogicalAxiom>::new));
         int size = list.size();
 
         session.setNrPossiblyFaultyAxioms(size);
 
         if (size > 0) {
             // check the maximal possible page
-            int maxPage = (size / Preferences.getMaxVisiblePossiblyFaultyAxioms());
-            if ((size % Preferences.getMaxVisiblePossiblyFaultyAxioms()) > 0) maxPage += 1;
+            int maxPage = (size / session.getPreferences().getMaxVisiblePossiblyFaultyAxioms());
+            if ((size % session.getPreferences().getMaxVisiblePossiblyFaultyAxioms()) > 0) maxPage += 1;
             if (session.getCurrentPossiblyFaultyPage() > maxPage)
                 session.setCurrentPossiblyFaultyPage(maxPage);
             if (session.getCurrentPossiblyFaultyPage() <= 0)
@@ -108,8 +107,8 @@ public class DebuggingResultFactory {
             // set the number of possible pages
             session.setPossiblyFaultyPages(maxPage);
 
-            int fromIndex = Preferences.getMaxVisiblePossiblyFaultyAxioms() * (session.getCurrentPossiblyFaultyPage() - 1); // inclusive
-            int toIndex = fromIndex + Preferences.getMaxVisiblePossiblyFaultyAxioms(); // exclusive
+            int fromIndex = session.getPreferences().getMaxVisiblePossiblyFaultyAxioms() * (session.getCurrentPossiblyFaultyPage() - 1); // inclusive
+            int toIndex = fromIndex + session.getPreferences().getMaxVisiblePossiblyFaultyAxioms(); // exclusive
             if (toIndex > size)
                 toIndex = size;
 
@@ -123,14 +122,14 @@ public class DebuggingResultFactory {
 
     private static Collection<OWLLogicalAxiom> filterAndPaginateCorrectAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull DebuggingSession session) {
 
-        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection((Supplier<ArrayList<OWLLogicalAxiom>>) ArrayList<OWLLogicalAxiom>::new));
+        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection(ArrayList<OWLLogicalAxiom>::new));
         int size = list.size();
 
         session.setNrCorrectAxioms(size);
 
         if (size > 0) {
-            int maxPage = (size / Preferences.getMaxVisibleCorrectAxioms());
-            if ((size % Preferences.getMaxVisibleCorrectAxioms()) > 0) maxPage += 1;
+            int maxPage = (size / session.getPreferences().getMaxVisibleCorrectAxioms());
+            if ((size % session.getPreferences().getMaxVisibleCorrectAxioms()) > 0) maxPage += 1;
             if (session.getCurrentCorrectPage() > maxPage)
                 session.setCurrentCorrectPage(maxPage);
             if (session.getCurrentCorrectPage() <= 0)
@@ -138,8 +137,8 @@ public class DebuggingResultFactory {
 
             session.setCorrectPages(maxPage);
 
-            int fromIndex = Preferences.getMaxVisibleCorrectAxioms() * (session.getCurrentCorrectPage() - 1); // inclusive
-            int toIndex = fromIndex + Preferences.getMaxVisibleCorrectAxioms(); // exclusive
+            int fromIndex = session.getPreferences().getMaxVisibleCorrectAxioms() * (session.getCurrentCorrectPage() - 1); // inclusive
+            int toIndex = fromIndex + session.getPreferences().getMaxVisibleCorrectAxioms(); // exclusive
             if (toIndex > size)
                 toIndex = size;
 

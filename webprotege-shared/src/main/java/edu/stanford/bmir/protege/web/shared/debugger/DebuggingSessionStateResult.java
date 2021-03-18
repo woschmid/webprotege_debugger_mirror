@@ -94,6 +94,11 @@ public class DebuggingSessionStateResult implements Result {
      */
     private int nrCorrectAxioms = 0;
 
+    /**
+     * Preferences on server.
+     */
+    private Preferences preferences;
+
     @GwtSerializationConstructor
     private DebuggingSessionStateResult() {}
 
@@ -115,7 +120,8 @@ public class DebuggingSessionStateResult implements Result {
                                        int correctPageIndex,
                                        int correctPages,
                                        int nrPossiblyFaultyAxioms,
-                                       int nrCorrectAxioms) {
+                                       int nrCorrectAxioms,
+                                       @Nonnull Preferences preferences) {
         this.isOk = isOk;
         this.userId = userId;
         this.query = query;
@@ -135,6 +141,7 @@ public class DebuggingSessionStateResult implements Result {
         this.correctPages = correctPages;
         this.nrPossiblyFaultyAxioms = nrPossiblyFaultyAxioms;
         this.nrCorrectAxioms = nrCorrectAxioms;
+        this.preferences = preferences;
     }
 
     @Nonnull
@@ -199,16 +206,6 @@ public class DebuggingSessionStateResult implements Result {
         return rBoxFilter;
     }
 
-    @Deprecated
-    public int getIndex() {
-        return possiblyFaultyPageIndex;
-    }
-
-    @Deprecated
-    public int getPages() {
-        return possiblyFaultyPages;
-    }
-
     public int getPossiblyFaultyPageIndex() {
         return possiblyFaultyPageIndex;
     }
@@ -231,5 +228,9 @@ public class DebuggingSessionStateResult implements Result {
 
     public int getNrCorrectAxioms() {
         return nrCorrectAxioms;
+    }
+
+    public Preferences getPreferences() {
+        return preferences;
     }
 }

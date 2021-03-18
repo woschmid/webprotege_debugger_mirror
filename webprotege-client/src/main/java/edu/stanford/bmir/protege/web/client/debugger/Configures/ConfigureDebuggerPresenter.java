@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.client.debugger.Configures;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
@@ -72,10 +73,10 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
 
     public void run(){
         view.setLimitToInput();
-        view.DSKTtextBox.setText(Preferences.getSessionKeepaliveInMillis().toString());
-        view.MVCAtextBox.setText(String.valueOf(Preferences.getMaxVisibleCorrectAxioms()));
-        view.MVPFAtextBox.setText(String.valueOf(Preferences.getMaxVisiblePossiblyFaultyAxioms()));
-        view.RTtextBox.setText(Preferences.getReasonerTimeoutInMillis().toString());
+        view.DSKTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getSessionKeepaliveInMillis().toString());
+        view.MVCAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisibleCorrectAxioms()));
+        view.MVPFAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisiblePossiblyFaultyAxioms()));
+        view.RTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getReasonerTimeoutInMillis().toString());
     }
 
     public void handleSubmitPreference() {
@@ -99,11 +100,14 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
     }
 
     private Preferences getPreferences() {
-        Preferences preferences = new Preferences();
+        Preferences preferences = new Preferences(Long.parseLong(view.getDSKTtextBox()), Long.parseLong(view.getRTtextBox()), Integer.parseInt(view.getMVPFAtextBox()), Integer.parseInt(view.getMVCAtextBox()));
+        /*
         preferences.setMaxVisibleCorrectAxioms(Integer.parseInt(view.getMVCAtextBox()));
         preferences.setMaxVisiblePossiblyFaultyAxioms(Integer.parseInt(view.getMVPFAtextBox()));
         preferences.setSessionKeepaliveInMillis(Long.parseLong(view.getDSKTtextBox()));
         preferences.setReasonerTimeoutInMillis(Long.parseLong(view.getRTtextBox()));
+        */
+        GWT.log("Preferences: " + preferences);
         return preferences;
     }
 
