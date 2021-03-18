@@ -73,7 +73,7 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
 
     public void run(){
         view.setLimitToInput();
-        view.DSKTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getSessionKeepaliveInMillis().toString());
+        view.DSKTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getSessionKeepAliveInMillis().toString());
         view.MVCAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisibleCorrectAxioms()));
         view.MVPFAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisiblePossiblyFaultyAxioms()));
         view.RTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getReasonerTimeoutInMillis().toString());
@@ -100,13 +100,13 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
     }
 
     private Preferences getPreferences() {
-        Preferences preferences = new Preferences(Long.parseLong(view.getDSKTtextBox()), Long.parseLong(view.getRTtextBox()), Integer.parseInt(view.getMVPFAtextBox()), Integer.parseInt(view.getMVCAtextBox()));
-        /*
-        preferences.setMaxVisibleCorrectAxioms(Integer.parseInt(view.getMVCAtextBox()));
-        preferences.setMaxVisiblePossiblyFaultyAxioms(Integer.parseInt(view.getMVPFAtextBox()));
-        preferences.setSessionKeepaliveInMillis(Long.parseLong(view.getDSKTtextBox()));
-        preferences.setReasonerTimeoutInMillis(Long.parseLong(view.getRTtextBox()));
-        */
+        Preferences preferences = new Preferences(
+                Long.parseLong(view.getDSKTtextBox()),
+                Long.parseLong(view.getRTtextBox()),
+                Integer.parseInt(view.getMVPFAtextBox()),
+                Integer.parseInt(view.getMVCAtextBox()),
+                "HermiT",
+                0);
         GWT.log("Preferences: " + preferences);
         return preferences;
     }

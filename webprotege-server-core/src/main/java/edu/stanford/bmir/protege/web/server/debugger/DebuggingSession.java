@@ -150,7 +150,7 @@ public class DebuggingSession implements HasDispose {
 
         this.filter = new SearchFilter();
 
-        this.preferences = new Preferences(10L * 60L * 1000L, 10L * 60L * 1000L * 90 / 100, 10, 10);
+        this.preferences = new Preferences(10L * 60L * 1000L, 10L * 60L * 1000L * 90 / 100, 10, 10, "HermiT", 0);
 
         keepSessionAlive();
 
@@ -172,7 +172,7 @@ public class DebuggingSession implements HasDispose {
                     (getState() == SessionState.STARTED || getState() == SessionState.COMPUTING) // .. it must be running
                     &&
                     // .. and must have been used within a certain time slot
-                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < preferences.getSessionKeepaliveInMillis())) {
+                    ((System.currentTimeMillis() - lastActivityTimeInMillis) < preferences.getSessionKeepAliveInMillis())) {
 
                 logger.info("Keeping project {} loaded for running {} ...", projectId, this);
                 projectManager.ensureProjectIsLoaded(projectId, getUserId());
@@ -321,7 +321,7 @@ public class DebuggingSession implements HasDispose {
 
             // creating a solver includes a possibly long-lasting consistency and coherency check
             this.state = SessionState.COMPUTING;
-            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(), new LoggingReasonerProgressMonitor(this), getPreferences());
+            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(getPreferences().getReasonerId()), new LoggingReasonerProgressMonitor(this), getPreferences());
             this.diagnosisModel = consistencyCheckResult.getDiagnosisModel();
 
             // since we have done the check we can set the flag and return the appropriate result
@@ -745,9 +745,10 @@ public class DebuggingSession implements HasDispose {
         synchronized (this) {
             checkUser(userId);
 
-            // TODO
-            this.preferences = preferences;
-            stop();
+            if (!preferences.equals(this.preferences)) {
+                this.preferences = preferences;
+                stop();
+            }
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }

@@ -29,7 +29,7 @@ public class DiagnosisEngineFactory {
         final ExquisiteOWLReasoner solver =
                 new ExquisiteOWLReasoner(
                         diagnosisModel,
-                        ReasonerFactory.getReasonerFactory(),
+                        ReasonerFactory.getReasonerFactory(debuggingSession.getPreferences().getReasonerId()),
                         new SimpleConfiguration(
                                 new LoggingReasonerProgressMonitor(debuggingSession),
                                 debuggingSession.getPreferences().getReasonerTimeoutInMillis()),
@@ -38,7 +38,7 @@ public class DiagnosisEngineFactory {
 
         // creates diagnosis engine using the solver
         final HSTreeEngine<OWLLogicalAxiom> engine = new HSTreeEngine<>(solver, new QuickXPlain<>(solver));
-        engine.setMaxNumberOfDiagnoses(0);
+        engine.setMaxNumberOfDiagnoses(debuggingSession.getPreferences().getMaxNumberOfDiagnoses());
 
         return engine;
     }

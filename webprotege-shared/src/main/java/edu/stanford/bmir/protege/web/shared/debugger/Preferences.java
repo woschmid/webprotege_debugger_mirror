@@ -4,6 +4,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class Preferences implements Serializable, IsSerializable {
 
@@ -11,12 +13,12 @@ public class Preferences implements Serializable, IsSerializable {
      * Keep alive time span in milliseconds of a debugging session from it's last activity.
      * If this time span is exceeded the project (and it's debugging session) can be purged.
      */
-    private Long SESSION_KEEPALIVE_IN_MILLIS = 10L * 60L * 1000L; // 10 minutes
+    private Long SESSION_KEEP_ALIVE_IN_MILLIS = 10L * 60L * 1000L; // 10 minutes
 
     /**
-     * Sets the reasoner timeout to 90% of SESSION_KEEPALIVE_IN_MILLIS;
+     * Sets the reasonerId timeout to 90% of SESSION_KEEP_ALIVE_IN_MILLIS;
      */
-    private Long REASONER_TIMEOUT_IN_MILLIS = SESSION_KEEPALIVE_IN_MILLIS * 90 / 100;
+    private Long REASONER_TIMEOUT_IN_MILLIS = SESSION_KEEP_ALIVE_IN_MILLIS * 90 / 100;
 
     /**
      * The number of maximal shown visible possibly faulty axioms
@@ -28,18 +30,64 @@ public class Preferences implements Serializable, IsSerializable {
      */
     private int MAX_VISIBLE_CORRECT_AXIOMS = 10;
 
+    /**
+     * The id string of the currently used reasoner.
+     */
+    private String reasonerId = "HermiT";
+
+    /**
+     * The max number of Diagnoses. 0 means computation of all diagnoses.
+     */
+    private int maxNumberOfDiagnoses = 0;
+
     @GwtSerializationConstructor
     private Preferences() {}
 
-    public Preferences(Long SESSION_KEEPALIVE_IN_MILLIS, Long REASONER_TIMEOUT_IN_MILLIS, int MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS, int MAX_VISIBLE_CORRECT_AXIOMS) {
-        this.SESSION_KEEPALIVE_IN_MILLIS = SESSION_KEEPALIVE_IN_MILLIS;
-        this.REASONER_TIMEOUT_IN_MILLIS = REASONER_TIMEOUT_IN_MILLIS;
-        this.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS;
-        this.MAX_VISIBLE_CORRECT_AXIOMS = MAX_VISIBLE_CORRECT_AXIOMS;
+    /**
+     *
+     * @param sessionKeepAliveInMillis
+     * @param reasonerTimeoutInMillis
+     * @param maxVisiblePossiblyFaultyAxioms
+     * @param maxVisibleCorrectAxioms
+     * @param reasonerId
+     * @param maxNumberOfDiagnoses
+     * @throws IllegalArgumentException
+     */
+    public Preferences(Long sessionKeepAliveInMillis,
+                       Long reasonerTimeoutInMillis,
+                       int maxVisiblePossiblyFaultyAxioms,
+                       int maxVisibleCorrectAxioms,
+                       String reasonerId,
+                       int maxNumberOfDiagnoses) throws IllegalArgumentException {
+
+        if (! (sessionKeepAliveInMillis >= 1000L * 60L && sessionKeepAliveInMillis <= 1000L * 60L * 60L + 6L) )
+            throw new IllegalArgumentException("Values for SESSION_KEEP_ALIVE_IN_MILLIS are only allowed within a range of [" + (1000L * 60L) + ',' + (1000L * 60L * 60L + 6L) + "]");
+
+        if (! (reasonerTimeoutInMillis >= 1000L * 60L &&  reasonerTimeoutInMillis <= sessionKeepAliveInMillis))
+            throw new IllegalArgumentException("Values for REASONER_TIMEOUT_IN_MILLIS are only allowed within a range of " + (1000L * 60L) + " and SESSION_KEEP_ALIVE_IN_MILLIS");
+
+        this.SESSION_KEEP_ALIVE_IN_MILLIS = sessionKeepAliveInMillis;
+        this.REASONER_TIMEOUT_IN_MILLIS = reasonerTimeoutInMillis;
+
+        if (! (maxVisiblePossiblyFaultyAxioms > 0 && maxVisiblePossiblyFaultyAxioms <= 50))
+            throw new IllegalArgumentException("Values for MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS are only allowed within a range of [1..50]");
+        MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = maxVisiblePossiblyFaultyAxioms;
+
+        if (! (maxVisibleCorrectAxioms > 0 && maxVisibleCorrectAxioms <= 50))
+            throw new IllegalArgumentException("Values for MAX_VISIBLE_CORRECT_AXIOMS are only allowed within a range of [1..50]");
+        this.MAX_VISIBLE_CORRECT_AXIOMS = maxVisibleCorrectAxioms;
+
+        if (!Arrays.asList(getReasoners()).contains(reasonerId))
+            throw new IllegalArgumentException("The reasoner '" + reasonerId + "' is not supported!");
+        this.reasonerId = reasonerId;
+
+        if (maxNumberOfDiagnoses < 0)
+            throw new IllegalArgumentException("A negative number for maxNumberOfDiagnoses is not allowed");
+        this.maxNumberOfDiagnoses = maxNumberOfDiagnoses;
     }
 
-    public Long getSessionKeepaliveInMillis() {
-        return SESSION_KEEPALIVE_IN_MILLIS;
+    public Long getSessionKeepAliveInMillis() {
+        return SESSION_KEEP_ALIVE_IN_MILLIS;
     }
 
     public Long getReasonerTimeoutInMillis() {
@@ -54,46 +102,40 @@ public class Preferences implements Serializable, IsSerializable {
         return MAX_VISIBLE_CORRECT_AXIOMS;
     }
 
-    /**
-     * Possibility to change SESSION_KEEPALIVE_IN_MILLIS to a value in milliseconds between 1 minute to 6 hours.
-     * @param sessionKeepaliveInMillis Time in milliseconds [1 minute ... 6 hours]
-     */
-    public void setSessionKeepaliveInMillis(Long sessionKeepaliveInMillis) {
-        if (sessionKeepaliveInMillis >= 1000L * 60L && sessionKeepaliveInMillis <= 1000L * 60L * 60L + 6L) {
-            SESSION_KEEPALIVE_IN_MILLIS = sessionKeepaliveInMillis;
-            REASONER_TIMEOUT_IN_MILLIS = SESSION_KEEPALIVE_IN_MILLIS * 90 / 100;
-        }
+    public String getReasonerId() {
+        return reasonerId;
     }
 
-    /**
-     * Possibility to change MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS to a value between 1 and 50.
-     * @param maxVisiblePossiblyFaultyAxioms Value between [1 .. 50]
-     */
-    public void setMaxVisiblePossiblyFaultyAxioms(int maxVisiblePossiblyFaultyAxioms) {
-        if (maxVisiblePossiblyFaultyAxioms > 0 && maxVisiblePossiblyFaultyAxioms <= 50)
-            MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = maxVisiblePossiblyFaultyAxioms;
+    public String[] getReasoners() {
+        return new String[] {"HermiT","Pellet","JFact","JCEL","Snorocket","ELK"};
     }
 
-    /**
-     * Possibility to change MAX_VISIBLE_CORRECT_AXIOMS to a value between 1 and 50.
-     * @param maxVisibleCorrectAxioms Value between [1 .. 50]
-     */
-    public void setMaxVisibleCorrectAxioms(int maxVisibleCorrectAxioms) {
-        if (maxVisibleCorrectAxioms > 0 && maxVisibleCorrectAxioms <= 50)
-            MAX_VISIBLE_CORRECT_AXIOMS = maxVisibleCorrectAxioms;
-    }
-
-    public void setReasonerTimeoutInMillis(Long reasonerTimeoutInMillis) {
-        REASONER_TIMEOUT_IN_MILLIS = reasonerTimeoutInMillis;
+    public int getMaxNumberOfDiagnoses() {
+        return maxNumberOfDiagnoses;
     }
 
     @Override
     public String toString() {
         return "Preferences{" +
-                "SESSION_KEEPALIVE_IN_MILLIS=" + SESSION_KEEPALIVE_IN_MILLIS +
+                "SESSION_KEEP_ALIVE_IN_MILLIS=" + SESSION_KEEP_ALIVE_IN_MILLIS +
                 ", REASONER_TIMEOUT_IN_MILLIS=" + REASONER_TIMEOUT_IN_MILLIS +
                 ", MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS=" + MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS +
                 ", MAX_VISIBLE_CORRECT_AXIOMS=" + MAX_VISIBLE_CORRECT_AXIOMS +
+                ", REASONER=" + reasonerId +
+                ", MAX_NUMBER_OF_DIAGNOSES=" + maxNumberOfDiagnoses +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Preferences that = (Preferences) o;
+        return MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS == that.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS && MAX_VISIBLE_CORRECT_AXIOMS == that.MAX_VISIBLE_CORRECT_AXIOMS && maxNumberOfDiagnoses == that.maxNumberOfDiagnoses && SESSION_KEEP_ALIVE_IN_MILLIS.equals(that.SESSION_KEEP_ALIVE_IN_MILLIS) && REASONER_TIMEOUT_IN_MILLIS.equals(that.REASONER_TIMEOUT_IN_MILLIS) && reasonerId.equals(that.reasonerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(SESSION_KEEP_ALIVE_IN_MILLIS, REASONER_TIMEOUT_IN_MILLIS, MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS, MAX_VISIBLE_CORRECT_AXIOMS, reasonerId, maxNumberOfDiagnoses);
     }
 }
