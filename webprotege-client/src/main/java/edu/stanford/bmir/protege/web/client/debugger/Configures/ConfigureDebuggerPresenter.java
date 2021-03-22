@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static edu.stanford.bmir.protege.web.client.library.msgbox.MessageStyle.QUESTION;
+
 public class ConfigureDebuggerPresenter extends DebuggerPresenter {
 
     @Nonnull
@@ -72,41 +74,50 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
     }
 
     public void run(){
-        view.setLimitToInput();
+//        view.setLimitToInput();
         view.DSKTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getSessionKeepAliveInMillis().toString());
         view.MVCAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisibleCorrectAxioms()));
         view.MVPFAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisiblePossiblyFaultyAxioms()));
         view.RTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getReasonerTimeoutInMillis().toString());
+        String[] reasoners = debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getReasoners();
+        for (String resoner:
+             reasoners) {
+            view.ReseanerFild.addItem(resoner);
+        }
+
     }
 
     public void handleSubmitPreference() {
-        this.dsm.execute(new SetPreferencesAction(projectId,getPreferences()),
-                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                        progressDisplay) {
-                    @Override
-                    public String getProgressDisplayTitle() {
-                        return "Setting the Preferences";
-                    }
+        messageBox.showAlert("Information","Are you sure to change the preference?",this::submitPreference);
+        messageBox.showAlert("");
+    }
 
-                    @Override
-                    public String getProgressDisplayMessage() {
-                        return "Please wait";
-                    }
+    private void submitPreference(){
+        try{
+            this.dsm.execute(new SetPreferencesAction(projectId,getPreferences()),
+                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                            progressDisplay) {
+                        @Override
+                        public String getProgressDisplayTitle() {
+                            return "Setting the Preferences";
+                        }
 
-                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                        handlerDebugging(debuggingSessionStateResult);
-                    }
-                });
+                        @Override
+                        public String getProgressDisplayMessage() {
+                            return "Please wait";
+                        }
+
+                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                            handlerDebugging(debuggingSessionStateResult);
+                        }
+                    });
+        } catch (IllegalArgumentException e){
+            messageBox.showAlert("Wrong Arguments.", e.getMessage());
+        }
     }
 
     private Preferences getPreferences() {
-        Preferences preferences = new Preferences(
-                Long.parseLong(view.getDSKTtextBox()),
-                Long.parseLong(view.getRTtextBox()),
-                Integer.parseInt(view.getMVPFAtextBox()),
-                Integer.parseInt(view.getMVCAtextBox()),
-                "HermiT",
-                0);
+        Preferences preferences = new Preferences(Long.parseLong(view.getDSKTtextBox()), Long.parseLong(view.getRTtextBox()), Integer.parseInt(view.getMVPFAtextBox()), Integer.parseInt(view.getMVCAtextBox()),view.getReseanerFild(),20);
         GWT.log("Preferences: " + preferences);
         return preferences;
     }

@@ -24,11 +24,11 @@
     </ui:style>
     <g:HTMLPanel>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Debugger Seesion Keep Time" ui:field="DSKTLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Debugger Session Keep Time" ui:field="DSKTLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="DSKTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Reasoner timeout" ui:field="RTLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Reasoner Timeout" ui:field="RTLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="RTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
@@ -36,18 +36,12 @@
             <g:TextBox  ui:field="MVPFAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Max visible correct axioms" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Max Visible Correct Axioms" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MVCAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Reasoner" ui:field="ReasonerLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:ListBox ui:field="ReseanerFild">
-                <g:item value="HermiT">HermiT</g:item>
-                <g:item value="pellet">pellet</g:item>
-                <g:item value="jfact">jfact</g:item>
-                <g:item value="JCEL">JCEL</g:item>
-                <g:item value="Snorocket">Snorocket</g:item>
-                <g:item value="ELK">ELK</g:item>
             </g:ListBox>
         </div>
     </g:HTMLPanel>

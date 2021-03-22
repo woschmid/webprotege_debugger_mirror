@@ -47,25 +47,6 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 
-    public void setLimitToInput(){
-        addKeyPressHandler(DSKTtextBox);
-        addKeyPressHandler(RTtextBox);
-        addKeyPressHandler(MVPFAtextBox);
-        addKeyPressHandler(MVCAtextBox);
-    }
-
-    private void addKeyPressHandler(TextBox textBox){
-        textBox.addKeyPressHandler(event -> {
-            String input = textBox.getText();
-            String rest = input.substring(0,input.length() - 1);
-            textBox.setText(rest);
-            String last = input.substring(input.length() - 1);
-            if (last.matches("[0-9]")) {
-                textBox.setText(input);
-            }
-        });
-    }
-
 
     public String getDSKTtextBox() {
         return DSKTtextBox.getText();
