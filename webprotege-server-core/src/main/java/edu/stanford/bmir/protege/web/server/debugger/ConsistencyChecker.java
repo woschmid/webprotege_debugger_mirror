@@ -23,7 +23,8 @@ public class ConsistencyChecker {
     private static final Logger logger = LoggerFactory.getLogger(ConsistencyChecker.class);
 
     @Nonnull
-    public static ConsistencyCheckResult checkConsistencyAndCoherency(@Nonnull OWLOntology ontology,
+    public static ConsistencyCheckResult checkConsistencyAndCoherency(@Nonnull DebuggingSession debuggingSession,
+                                                                      @Nonnull OWLOntology ontology,
                                                                       @Nonnull DiagnosisModel<OWLLogicalAxiom> dm,
                                                                       @Nonnull OWLReasonerFactory reasonerFactory,
                                                                       @Nonnull ReasonerProgressMonitor reasonerProgressMonitor,
@@ -33,7 +34,7 @@ public class ConsistencyChecker {
         ConsistencyCheckResult result = new ConsistencyCheckResult();
         try {
             // start a new progress monitor task for consistency/coherency check
-            logger.info(IExquisiteProgressMonitor.CONSISTENCY_COHERENCY_CHECK + " using " + ((reasonerFactory.getReasonerName() != null) ? reasonerFactory.getReasonerName() : "HermiT"));
+            logger.info("{} " + IExquisiteProgressMonitor.CONSISTENCY_COHERENCY_CHECK + " using " + ((reasonerFactory.getReasonerName() != null) ? reasonerFactory.getReasonerName() : "HermiT"), debuggingSession);
 
             final OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
             result.setOntologyManager(ontologyManager);
@@ -42,21 +43,22 @@ public class ConsistencyChecker {
             List<OWLLogicalAxiom> addedEntailedAxioms = addAxiomsToOntology(dm.getEntailedExamples(), ontologyCopy);
 
             reasoner = createReasoner(ontologyCopy, reasonerFactory, reasonerProgressMonitor, preferences);
+            logger.info("{} Solver created: {}", debuggingSession, reasoner);
 
             Set<OWLLogicalAxiom> possiblyFaulty = new TreeSet<>();
 
             // in case the ontology is consistent we assume that the user wants to debug the incoherency.
-            logger.info("Checking the consistency of the ontology ...");
+            logger.info("{} Checking the consistency of the ontology ...", debuggingSession);
 
             if (reasoner.isConsistent()) {
                 result.setConsistent(true);
 
-                logger.info("... the ontology is consistent!");
+                logger.info("{} ... the ontology is consistent!", debuggingSession);
 
                 // we check for coherency
 
-                logger.info("Checking the coherency of the ontology ...");
-                logger.info("... computing unsatisfiable classes ...");
+                logger.info("{} Checking the coherency of the ontology ...", debuggingSession);
+                logger.info("{} ... computing unsatisfiable classes ...", debuggingSession);
 
                 reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
                 final Set<OWLClass> unsatisfiableClasses = reasoner.getUnsatisfiableClasses().getEntitiesMinusBottom();
@@ -66,8 +68,8 @@ public class ConsistencyChecker {
                     result.setUnsatisfiableClasses(unsatisfiableClasses);
                     result.setCoherent(false);
 
-                    logger.info("... found " + unsatisfiableClasses.size() + " unsatisfiable classes ...");
-                    logger.info("... the ontology is incoherent!");
+                    logger.info("{} ... found " + unsatisfiableClasses.size() + " unsatisfiable classes ...", debuggingSession);
+                    logger.info("{} ... the ontology is incoherent!", debuggingSession);
 
                     //if (isModuleExtractionEnabled) {
                     // Module Extraction
@@ -85,12 +87,12 @@ public class ConsistencyChecker {
                         entities.addAll(fEntities);
                     }
 
-                    logger.info("Applying module extraction based on the seed signature of " + entities.size() + " entities ...");
+                    logger.info("{} Applying module extraction based on the seed signature of " + entities.size() + " entities ...", debuggingSession);
 
                     possiblyFaulty = extractor.extract(entities).stream().filter(OWLLogicalAxiom.class::isInstance).
                             map(o -> (OWLLogicalAxiom) o).collect(Collectors.toSet());
 
-                    logger.info("... leads to a reduction to " + possiblyFaulty.size() + " possibly faulty axioms.");
+                    logger.info("{} ... leads to a reduction to " + possiblyFaulty.size() + " possibly faulty axioms.", debuggingSession);
 
                     // } else { // no module extraction or no unsatisfiable classes
                     //     possiblyFaulty.addAll(ontologyCopy.getLogicalAxioms());
@@ -101,8 +103,8 @@ public class ConsistencyChecker {
 
                 } else { // no unsatisfiable classes therefore coherent ontology
                     result.setCoherent(true);
-                    logger.info("... no unsatisfiable classes found ...");
-                    logger.info("... the ontology is coherent!");
+                    logger.info("{} ... no unsatisfiable classes found ...", debuggingSession);
+                    logger.info("{} ... the ontology is coherent!", debuggingSession);
 
                     possiblyFaulty.addAll(ontologyCopy.getLogicalAxioms());
                 } // end of incoherency check
@@ -127,7 +129,10 @@ public class ConsistencyChecker {
             // In the advent of some exception (which might occur, depending on the reasoners and their support
             // of the given ontology, in any case we stop all tasks.
             reasonerProgressMonitor.reasonerTaskStopped();
-            if (reasoner != null) reasoner.dispose(); // call this after the monitors
+            if (reasoner != null) {
+                reasoner.dispose(); // call this after the monitors
+                logger.info("{} Solver disposed: {}", debuggingSession, reasoner);
+            }
         }
 
     }

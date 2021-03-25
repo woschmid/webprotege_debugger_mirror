@@ -13,6 +13,7 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
+import edu.stanford.bmir.protege.web.shared.debugger.DefaultPrefs;
 import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
@@ -150,7 +151,15 @@ public class DebuggingSession implements HasDispose {
 
         this.filter = new SearchFilter();
 
-        this.preferences = new Preferences(10L * 60L * 1000L, 10L * 60L * 1000L * 90 / 100, 10, 10, "HermiT", 0);
+        //this.preferences = new Preferences(10L * 60L * 1000L, 10L * 60L * 1000L * 90 / 100, 10, 10, "HermiT", 0);
+        this.preferences = new Preferences(
+                DefaultPrefs.SESSION_KEEP_ALIVE_IN_MILLIS,
+                DefaultPrefs.REASONER_TIMEOUT_IN_MILLIS,
+                DefaultPrefs.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS,
+                DefaultPrefs.MAX_VISIBLE_CORRECT_AXIOMS,
+                DefaultPrefs.reasonerId,
+                DefaultPrefs.maxNumberOfDiagnoses
+                );
 
         keepSessionAlive();
 
@@ -321,7 +330,7 @@ public class DebuggingSession implements HasDispose {
 
             // creating a solver includes a possibly long-lasting consistency and coherency check
             this.state = SessionState.COMPUTING;
-            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(getPreferences().getReasonerId()), new LoggingReasonerProgressMonitor(this), getPreferences());
+            this.consistencyCheckResult = ConsistencyChecker.checkConsistencyAndCoherency(this, ontology, diagnosisModel, ReasonerFactory.getReasonerFactory(getPreferences().getReasonerId()), new LoggingReasonerProgressMonitor(this), getPreferences());
             this.diagnosisModel = consistencyCheckResult.getDiagnosisModel();
 
             // since we have done the check we can set the flag and return the appropriate result
@@ -879,10 +888,10 @@ public class DebuggingSession implements HasDispose {
 
         this.ontology = ontologies.get(0);
         this.ontologyID = ontology.getOntologyID();
-        logger.info("Found ontology {} from current revision {})", ontology, revisionManager.getCurrentRevision());
+        logger.info("{} Found ontology {} from current revision {})", this, ontology, revisionManager.getCurrentRevision());
 
         this.diagnosisModel = ExquisiteOWLReasoner.generateDiagnosisModel(ontology, null);
-        logger.info("Diagnosis model created {})", this.diagnosisModel);
+        logger.info("{} Diagnosis model created {})", this, this.diagnosisModel);
     }
 
     protected OWLOntology getOntology() {
