@@ -32,7 +32,7 @@ public class SetFilterActionHandler extends AbstractProjectActionHandler<SetFilt
     @Override
     public DebuggingSessionStateResult execute(@Nonnull SetFilterAction action, @Nonnull ExecutionContext executionContext) {
         try {
-            return session.setSearchFilter(executionContext.getUserId(), action.isABox(), action.isTBox(), action.isRBox());
+            return session.setSearchFilter(executionContext.getUserId(), action.isABox(), action.isTBox(), action.isRBox(), action.getSearchString());
         } catch (ConcurrentUserException e) {
             Util.logException(getActionClass(), e);
             return DebuggingResultFactory.generateResult(session, Boolean.FALSE, e.getMessage());

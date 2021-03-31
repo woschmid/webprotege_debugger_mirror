@@ -700,10 +700,11 @@ public class DebuggingSession implements HasDispose {
      * @param aBox <code>true</code> if a-box axioms to be shown.
      * @param tBox <code>true</code> if t-box axioms to be shown.
      * @param rBox <code>true</code> if r-box axioms to be shown.
+     * @param searchString A search string.
      * @return The current state of the backend for the frontend.
      * @throws ConcurrentUserException if the current debugging session is in use until stop by another user.
      */
-    public DebuggingSessionStateResult setSearchFilter(@Nonnull UserId userId, boolean aBox, boolean tBox, boolean rBox) throws ConcurrentUserException {
+    public DebuggingSessionStateResult setSearchFilter(@Nonnull UserId userId, boolean aBox, boolean tBox, boolean rBox, @Nullable String searchString) throws ConcurrentUserException {
         synchronized (this) {
             checkUser(userId);
 
@@ -713,6 +714,7 @@ public class DebuggingSession implements HasDispose {
             filter.setABox(aBox);
             filter.setTBox(tBox);
             filter.setRBox(rBox);
+            filter.setSearchString(searchString);
 
             // reset the currentPossiblyFaultyPage
             currentPossiblyFaultyPage = 0;

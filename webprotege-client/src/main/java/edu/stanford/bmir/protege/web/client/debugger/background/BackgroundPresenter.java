@@ -144,7 +144,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
     }
 
     public void filterAxioms(boolean Abox, boolean Tbox, boolean Rbox, String text){
-        this.dsm.execute(new SetFilterAction( projectId, Abox, Tbox, Rbox),
+        this.dsm.execute(new SetFilterAction( projectId, Abox, Tbox, Rbox, text),
                 new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
                         progressDisplay) {
                     @Override

@@ -90,7 +90,7 @@ public class DebuggingResultFactory {
 
     private static Collection<OWLLogicalAxiom> filterAndPaginatePossiblyFaultyAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull DebuggingSession session) {
 
-        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection(ArrayList<OWLLogicalAxiom>::new));
+        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter(), session.getRenderingManager())).distinct().sorted().collect(Collectors.toCollection(ArrayList<OWLLogicalAxiom>::new));
         int size = list.size();
 
         session.setNrPossiblyFaultyAxioms(size);
@@ -122,7 +122,7 @@ public class DebuggingResultFactory {
 
     private static Collection<OWLLogicalAxiom> filterAndPaginateCorrectAxioms(@Nonnull Collection<OWLLogicalAxiom> axioms, @Nonnull DebuggingSession session) {
 
-        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter())).distinct().sorted().collect(Collectors.toCollection(ArrayList<OWLLogicalAxiom>::new));
+        final List<OWLLogicalAxiom> list = axioms.stream().filter(axiom -> doesSearchFilterMatch(axiom, session.getSearchFilter(), session.getRenderingManager())).distinct().sorted().collect(Collectors.toCollection(ArrayList<OWLLogicalAxiom>::new));
         int size = list.size();
 
         session.setNrCorrectAxioms(size);
@@ -150,15 +150,20 @@ public class DebuggingResultFactory {
         }
     }
 
-    private static boolean doesSearchFilterMatch(@Nonnull OWLLogicalAxiom axiom, @Nonnull SearchFilter filter) {
+    private static boolean doesSearchFilterMatch(@Nonnull OWLLogicalAxiom axiom, @Nonnull SearchFilter filter, @Nonnull RenderingManager renderingManager) {
         final AxiomType<?> axiomType = axiom.getAxiomType();
-        return (
+        final boolean isAxiomTypeMatched =
                 (filter.isTBox() && AxiomType.TBoxAxiomTypes.contains(axiomType))
                 ||
                 (filter.isABox() && AxiomType.ABoxAxiomTypes.contains(axiomType))
                 ||
-                (filter.isRBox() && AxiomType.RBoxAxiomTypes.contains(axiomType))
-                );
+                (filter.isRBox() && AxiomType.RBoxAxiomTypes.contains(axiomType));
+
+        final String searchString = filter.getSearchString();
+        if (isAxiomTypeMatched && searchString != null && searchString.length() >= 3)
+            return renderingManager.getBrowserText(axiom).toLowerCase().contains(searchString.toLowerCase());
+        else
+            return isAxiomTypeMatched;
     }
 
     @Nullable
