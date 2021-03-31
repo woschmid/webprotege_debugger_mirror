@@ -5,6 +5,7 @@ import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -22,19 +23,17 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
 
     private boolean rBox;
 
+    @Nullable
     private String searchString;
 
     @GwtSerializationConstructor
     private SetFilterAction() {}
 
     public SetFilterAction(@Nonnull ProjectId projectId, boolean aBox, boolean tBox, boolean rBox) {
-        this.projectId = projectId;
-        this.aBox = aBox;
-        this.tBox = tBox;
-        this.rBox = rBox;
+        this(projectId, aBox, tBox, rBox, null);
     }
 
-    public SetFilterAction(@Nonnull ProjectId projectId, boolean aBox, boolean tBox, boolean rBox, String searchString) {
+    public SetFilterAction(@Nonnull ProjectId projectId, boolean aBox, boolean tBox, boolean rBox, @Nullable String searchString) {
         this.projectId = projectId;
         this.aBox = aBox;
         this.tBox = tBox;
@@ -60,7 +59,7 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
         return rBox;
     }
 
-    public String getSearchString() {
+    public @Nullable String getSearchString() {
         return searchString;
     }
 
@@ -69,7 +68,7 @@ public class SetFilterAction implements ProjectAction<DebuggingSessionStateResul
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SetFilterAction that = (SetFilterAction) o;
-        return aBox == that.aBox && tBox == that.tBox && rBox == that.rBox && Objects.equals(projectId, that.projectId) && Objects.equals(searchString, that.searchString);
+        return aBox == that.aBox && tBox == that.tBox && rBox == that.rBox && projectId.equals(that.projectId) && Objects.equals(searchString, that.searchString);
     }
 
     @Override
