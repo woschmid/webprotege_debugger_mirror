@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.server.debugger;
 
+import edu.stanford.bmir.protege.web.shared.debugger.DefaultValues;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import javax.annotation.Nonnull;
@@ -16,22 +17,22 @@ public class ReasonerFactory {
         // Select between different popular reasoners here - recompilation necessary!
 
         switch (reasonerId) {
-            case "HermiT": // HermiT Reasoner Factory
+            case DefaultValues.REASONER_ID_HERMIT: // HermiT Reasoner Factory
                 reasonerFactory = new org.semanticweb.HermiT.ReasonerFactory();
                 break;
-            case "Pellet": // Pellet Reasoner Factory (pellet-owlapi-ignazio1977/2.4.0-ignazio1977)
+            case DefaultValues.REASONER_ID_PELLET: // Pellet Reasoner Factory (pellet-owlapi-ignazio1977/2.4.0-ignazio1977)
                 reasonerFactory = new com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory();
                 break;
-            case "JFact": // JFact DL Reasoner Factory (http://jfact.sourceforge.net/)
+            case DefaultValues.REASONER_ID_JFACT: // JFact DL Reasoner Factory (http://jfact.sourceforge.net/)
                 reasonerFactory = new uk.ac.manchester.cs.jfact.JFactFactory();
                 break;
-            case "JCEL": // JCEL OWL API 0.24.1 (https://github.com/julianmendez/jcel)
+            case DefaultValues.REASONER_ID_JCEL: // JCEL OWL API 0.24.1 (https://github.com/julianmendez/jcel)
                 reasonerFactory = new de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory();
                 break;
-            case "Snorocket": // Snorocket OWL API 4.0.1 (https://github.com/aehrc/snorocket)
+            case DefaultValues.REASONER_ID_SNOROCKET: // Snorocket OWL API 4.0.1 (https://github.com/aehrc/snorocket)
                 reasonerFactory = new au.csiro.snorocket.owlapi.SnorocketReasonerFactory();
                 break;
-            case "ELK": // ELK Reasoner 0.4.3 (https://github.com/liveontologies/elk-reasoner)
+            case DefaultValues.REASONER_ID_ELK: // ELK Reasoner 0.4.3 (https://github.com/liveontologies/elk-reasoner)
                 reasonerFactory = new org.semanticweb.elk.owlapi.ElkReasonerFactory();
                 break;
             default:

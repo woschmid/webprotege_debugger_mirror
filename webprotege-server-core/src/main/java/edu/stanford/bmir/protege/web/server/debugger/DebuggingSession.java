@@ -13,7 +13,7 @@ import edu.stanford.bmir.protege.web.server.renderer.RenderingManager;
 import edu.stanford.bmir.protege.web.server.revision.RevisionManager;
 import edu.stanford.bmir.protege.web.shared.HasDispose;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
-import edu.stanford.bmir.protege.web.shared.debugger.DefaultPrefs;
+import edu.stanford.bmir.protege.web.shared.debugger.DefaultValues;
 import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
 import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.dispatch.ActionExecutionException;
@@ -153,12 +153,12 @@ public class DebuggingSession implements HasDispose {
 
         //this.preferences = new Preferences(10L * 60L * 1000L, 10L * 60L * 1000L * 90 / 100, 10, 10, "HermiT", 0);
         this.preferences = new Preferences(
-                DefaultPrefs.SESSION_KEEP_ALIVE_IN_MILLIS,
-                DefaultPrefs.REASONER_TIMEOUT_IN_MILLIS,
-                DefaultPrefs.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS,
-                DefaultPrefs.MAX_VISIBLE_CORRECT_AXIOMS,
-                DefaultPrefs.reasonerId,
-                DefaultPrefs.maxNumberOfDiagnoses
+                DefaultValues.SESSION_KEEP_ALIVE_IN_MILLIS,
+                DefaultValues.REASONER_TIMEOUT_IN_MILLIS,
+                DefaultValues.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS,
+                DefaultValues.MAX_VISIBLE_CORRECT_AXIOMS,
+                DefaultValues.reasonerId,
+                DefaultValues.maxNumberOfDiagnoses
                 );
 
         keepSessionAlive();
@@ -553,12 +553,18 @@ public class DebuggingSession implements HasDispose {
 
             if (isMoveDown) {
                 // move all presented possibly faulty axioms to the correct axioms
-                getDiagnosisModel().getPossiblyFaultyFormulas().removeAll(getPresentedPossiblyFaultyAxioms());
-                getDiagnosisModel().getCorrectFormulas().addAll(getPresentedPossiblyFaultyAxioms());
+                if (getDiagnosisModel() != null) {
+                    getDiagnosisModel().getPossiblyFaultyFormulas().removeAll(getPresentedPossiblyFaultyAxioms());
+                    getDiagnosisModel().getCorrectFormulas().addAll(getPresentedPossiblyFaultyAxioms());
+                } else
+                    throw new RuntimeException("Diagnosis model is unexpected to be null during moveAllAction!");
             } else {
-                // move all presented correct axioms to the possibly faulty axioms
-                getDiagnosisModel().getCorrectFormulas().removeAll(getPresentedCorrectAxioms());
-                getDiagnosisModel().getPossiblyFaultyFormulas().addAll(getPresentedCorrectAxioms());
+                if (getDiagnosisModel() != null) {
+                    // move all presented correct axioms to the possibly faulty axioms
+                    getDiagnosisModel().getCorrectFormulas().removeAll(getPresentedCorrectAxioms());
+                    getDiagnosisModel().getPossiblyFaultyFormulas().addAll(getPresentedCorrectAxioms());
+                } else
+                    throw new RuntimeException("Diagnosis model is unexpected to be null during moveAllAction!");
             }
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
@@ -580,7 +586,10 @@ public class DebuggingSession implements HasDispose {
             // verify that the session is NOT in STARTED yet
             verifyPreCondition(state == SessionState.STARTED || state == SessionState.COMPUTING);
 
-            moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
+            if (getDiagnosisModel() != null)
+                moveBetween(axiom, getDiagnosisModel().getPossiblyFaultyFormulas(), getDiagnosisModel().getCorrectFormulas());
+            else
+                throw new RuntimeException("Diagnosis model is unexpected to be null during moveToAction!");
 
             return DebuggingResultFactory.generateResult(this, Boolean.TRUE, null);
         }
@@ -624,6 +633,7 @@ public class DebuggingSession implements HasDispose {
 
             // search and remove in positive test cases
             try {
+                if (getDiagnosisModel()==null) throw new RuntimeException("Diagnosis model is unexpected to be null during removeTestCaseAction!");
                 final OWLLogicalAxiom positiveTestcase = lookupAxiomInCollection(testCase, getDiagnosisModel().getEntailedExamples());
                 getDiagnosisModel().getEntailedExamples().remove(positiveTestcase);
 

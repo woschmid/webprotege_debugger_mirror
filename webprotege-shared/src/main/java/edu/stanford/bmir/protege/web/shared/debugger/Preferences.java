@@ -91,7 +91,14 @@ public class Preferences implements Serializable, IsSerializable {
     }
 
     public String[] getReasoners() {
-        return new String[] {"HermiT","Pellet","JFact","JCEL","Snorocket","ELK"};
+        return new String[] {
+                DefaultValues.REASONER_ID_HERMIT,
+                DefaultValues.REASONER_ID_PELLET,
+                DefaultValues.REASONER_ID_JFACT,
+                DefaultValues.REASONER_ID_JCEL,
+                DefaultValues.REASONER_ID_SNOROCKET,
+                DefaultValues.REASONER_ID_ELK
+        };
     }
 
     public int getMaxNumberOfDiagnoses() {
@@ -102,18 +109,18 @@ public class Preferences implements Serializable, IsSerializable {
      * Resets the preference settings to it's default settings.
      */
     public void reset() {
-        validate(DefaultPrefs.SESSION_KEEP_ALIVE_IN_MILLIS,
-                DefaultPrefs.REASONER_TIMEOUT_IN_MILLIS,
-                DefaultPrefs.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS,
-                DefaultPrefs.MAX_VISIBLE_CORRECT_AXIOMS,
-                DefaultPrefs.reasonerId,
-                DefaultPrefs.maxNumberOfDiagnoses);
-        this.SESSION_KEEP_ALIVE_IN_MILLIS = DefaultPrefs.SESSION_KEEP_ALIVE_IN_MILLIS;
-        this.REASONER_TIMEOUT_IN_MILLIS = DefaultPrefs.REASONER_TIMEOUT_IN_MILLIS;
-        this.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = DefaultPrefs.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS;
-        this.MAX_VISIBLE_CORRECT_AXIOMS = DefaultPrefs.MAX_VISIBLE_CORRECT_AXIOMS;
-        this.reasonerId = DefaultPrefs.reasonerId;
-        this.maxNumberOfDiagnoses = DefaultPrefs.maxNumberOfDiagnoses;
+        validate(DefaultValues.SESSION_KEEP_ALIVE_IN_MILLIS,
+                DefaultValues.REASONER_TIMEOUT_IN_MILLIS,
+                DefaultValues.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS,
+                DefaultValues.MAX_VISIBLE_CORRECT_AXIOMS,
+                DefaultValues.reasonerId,
+                DefaultValues.maxNumberOfDiagnoses);
+        this.SESSION_KEEP_ALIVE_IN_MILLIS = DefaultValues.SESSION_KEEP_ALIVE_IN_MILLIS;
+        this.REASONER_TIMEOUT_IN_MILLIS = DefaultValues.REASONER_TIMEOUT_IN_MILLIS;
+        this.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS = DefaultValues.MAX_VISIBLE_POSSIBLY_FAULTY_AXIOMS;
+        this.MAX_VISIBLE_CORRECT_AXIOMS = DefaultValues.MAX_VISIBLE_CORRECT_AXIOMS;
+        this.reasonerId = DefaultValues.reasonerId;
+        this.maxNumberOfDiagnoses = DefaultValues.maxNumberOfDiagnoses;
     }
 
     /**
