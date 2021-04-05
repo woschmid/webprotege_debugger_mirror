@@ -1,10 +1,12 @@
 package edu.stanford.bmir.protege.web.client.debugger.Configures;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.stanford.bmir.protege.web.client.library.text.ExpandingTextBoxImpl;
 import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
@@ -29,6 +31,15 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
     @UiField
     protected ListBox ReseanerFild;
 
+    @UiField
+    protected TextBox MNODtextBox;
+
+    @UiField
+    protected Button ResetButton;
+
+    private ResetHandler resetHandler= () -> {
+    };
+
 
     @Override
     public AcceptsOneWidget getCriteriaContainer() {
@@ -47,6 +58,10 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 
+    @UiHandler("ResetButton")
+    protected void handleStartDebugging(ClickEvent clickEvent) {
+        resetHandler.handleReset();
+    }
 
     public String getDSKTtextBox() {
         return DSKTtextBox.getText();
@@ -66,5 +81,13 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
 
     public String getReseanerFild() {
         return ReseanerFild.getSelectedItemText();
+    }
+
+    public String getMNODtextBox() {
+        return MNODtextBox.getText();
+    }
+
+    public void setReset(ResetHandler resetHandler) {
+        this.resetHandler = resetHandler;
     }
 }

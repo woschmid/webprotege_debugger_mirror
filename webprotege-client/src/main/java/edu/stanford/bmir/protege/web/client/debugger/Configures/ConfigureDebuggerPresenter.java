@@ -16,6 +16,7 @@ import edu.stanford.bmir.protege.web.client.library.msgbox.MessageBox;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.debugger.DebuggingSessionStateResult;
 import edu.stanford.bmir.protege.web.shared.debugger.Preferences;
+import edu.stanford.bmir.protege.web.shared.debugger.SessionState;
 import edu.stanford.bmir.protege.web.shared.debugger.SetPreferencesAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -51,10 +52,13 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
         void handleModalButton(@Nonnull ModalCloser closer);
     }
 
+
     @Nonnull
     private ProjectId projectId;
 
     private ConfigureDebuggerViewImpl view;
+
+    private ModalCloser closer;
 
 
     @Inject
@@ -74,56 +78,67 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
     }
 
     public void run(){
-//        view.setLimitToInput();
-        view.DSKTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getSessionKeepAliveInMillis().toString());
-        view.MVCAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisibleCorrectAxioms()));
-        view.MVPFAtextBox.setText(String.valueOf(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getMaxVisiblePossiblyFaultyAxioms()));
-        view.RTtextBox.setText(debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getReasonerTimeoutInMillis().toString());
-        String[] reasoners = debuggerResultManager.getDebuggingSessionStateResult().getPreferences().getReasoners();
-        for (String resoner:
-             reasoners) {
-            view.ReseanerFild.addItem(resoner);
-        }
-
+        Preferences preferences = debuggerResultManager.getDebuggingSessionStateResult().getPreferences();
+        setPreference(preferences);
+        view.setReset(this::handleReset);
     }
 
+
     public void handleSubmitPreference() {
-        messageBox.showAlert("Information","Are you sure to change the preference?",this::submitPreference);
-        messageBox.showAlert("");
+        try{
+            Preferences newPreference = getPreferences();
+            if (newPreference.equals(debuggerResultManager.getDebuggingSessionStateResult().getPreferences())){
+                closer.closeModal();
+            }else{
+                if (!(debuggerResultManager.getDebuggingSessionStateResult().getSessionState() == SessionState.INIT ||
+                        debuggerResultManager.getDebuggingSessionStateResult().getSessionState() == SessionState.STOPPED)){
+                    messageBox.showYesNoConfirmBox("Information","Are you sure to change the preference? The Debugging session will be terminated",this::submitPreference);
+                    messageBox.showAlert("");
+                }else{
+                    submitPreference();
+                }
+            }
+        } catch (IllegalArgumentException e){
+            messageBox.showErrorMessage("Wrong Arguments.", e);
+            messageBox.showErrorMessage("",e);
+        }
     }
 
     private void submitPreference(){
-        try{
-            this.dsm.execute(new SetPreferencesAction(projectId,getPreferences()),
-                    new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
-                            progressDisplay) {
-                        @Override
-                        public String getProgressDisplayTitle() {
-                            return "Setting the Preferences";
-                        }
+        this.dsm.execute(new SetPreferencesAction(projectId,getPreferences()),
+                new DispatchServiceCallbackWithProgressDisplay<DebuggingSessionStateResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Setting the Preferences";
+                    }
 
-                        @Override
-                        public String getProgressDisplayMessage() {
-                            return "Please wait";
-                        }
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
 
-                        public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
-                            handlerDebugging(debuggingSessionStateResult);
-                        }
-                    });
-        } catch (IllegalArgumentException e){
-            messageBox.showAlert("Wrong Arguments.", e.getMessage());
-        }
+                    public void handleSuccess(DebuggingSessionStateResult debuggingSessionStateResult) {
+                        handlerDebugging(debuggingSessionStateResult);
+                    }
+                });
+        closer.closeModal();
     }
 
     private Preferences getPreferences() {
-        Preferences preferences = new Preferences(Long.parseLong(view.getDSKTtextBox()), Long.parseLong(view.getRTtextBox()), Integer.parseInt(view.getMVPFAtextBox()), Integer.parseInt(view.getMVCAtextBox()),view.getReseanerFild(),20);
+        Preferences preferences = new Preferences(Long.parseLong(view.getDSKTtextBox()), Long.parseLong(view.getRTtextBox()), Integer.parseInt(view.getMVPFAtextBox()), Integer.parseInt(view.getMVCAtextBox()),view.getReseanerFild(),Integer.parseInt(view.getMNODtextBox()));
         GWT.log("Preferences: " + preferences);
         return preferences;
     }
 
     public ConfigureDebuggerViewImpl getView(){
         return view;
+    }
+
+    private void handleReset(){
+        Preferences preferences = getPreferences();
+        preferences.reset();
+        setPreference(preferences);
     }
 
     @Override
@@ -138,6 +153,32 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
 
     @Override
     public void setEnabledButton(String buttonTyp) {
+
+    }
+
+    public void setCloser(ModalCloser closer) {
+        this.closer = closer;
+    }
+
+    private void setPreference(Preferences preferences){
+        view.ReseanerFild.clear();
+        view.DSKTtextBox.setText(preferences.getSessionKeepAliveInMillis().toString());
+        view.MVCAtextBox.setText(String.valueOf(preferences.getMaxVisibleCorrectAxioms()));
+        view.MVPFAtextBox.setText(String.valueOf(preferences.getMaxVisiblePossiblyFaultyAxioms()));
+        view.RTtextBox.setText(preferences.getReasonerTimeoutInMillis().toString());
+        view.MNODtextBox.setText(String.valueOf(preferences.getMaxNumberOfDiagnoses()));
+        String[] reasoners = preferences.getReasoners();
+        int index = 0;
+        int i = 0;
+        for (String resoner:
+                reasoners) {
+            view.ReseanerFild.addItem(resoner);
+            if (preferences.getReasonerId().equals(resoner)){
+                index = i;
+            }
+            i++;
+        }
+        view.ReseanerFild.setSelectedIndex(index);
 
     }
 }

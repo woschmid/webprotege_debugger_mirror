@@ -296,6 +296,7 @@ public class QueriesPresenter extends DebuggerPresenter {
     }
 
     private void handleModalButton(ModalCloser closer) {
+        configureDebuggerPresenter.setCloser(closer);
         configureDebuggerPresenter.handleSubmitPreference();
         closer.closeModal();
     }

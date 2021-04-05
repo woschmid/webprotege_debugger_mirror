@@ -21,6 +21,11 @@
         .warningField {
         margin-top: 20px;
         }
+        .executeButton {
+        <!--            align-self: flex-start;-->
+        flex-grow: 0;
+        flex-shrink: 0;
+        }
     </ui:style>
     <g:HTMLPanel>
         <div class="{wp.style.formGroup}">
@@ -40,9 +45,16 @@
             <g:TextBox  ui:field="MVCAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
+            <g:Label text="Max Number Of Diagnoses" ui:field="MNODLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:TextBox  ui:field="MNODtextBox"/>
+        </div>
+        <div class="{wp.style.formGroup}">
             <g:Label text="Reasoner" ui:field="ReasonerLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:ListBox ui:field="ReseanerFild">
             </g:ListBox>
+        </div>
+        <div class="{wp.style.formGroup}">
+            <g:Button ui:field="ResetButton" text="Reset"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
         </div>
     </g:HTMLPanel>
 </ui:UiBinder>
