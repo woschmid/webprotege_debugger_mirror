@@ -54,11 +54,13 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     @UiField
     protected TextBox searchBox;
 
-//    @UiField
-//    Button allDown;
-//
-//    @UiField
-//    Button allUp;
+    private int oriLenth = 0;
+
+    @UiField
+    Button allDown;
+
+    @UiField
+    Button allUp;
 
     @UiField(provided = true)
     protected PaginatorView paginatorP;
@@ -135,7 +137,10 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
     @UiHandler("searchBox")
     protected void handleSearchStringChanged(KeyUpEvent event) {
         text = searchBox.getText();
-        filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox, text);
+        if (text.length()>2 || text.length()<oriLenth){
+            filterAxiomsHandler.handleFilterAxioms(isAbox, isTbox, isRbox, text);
+        }
+        oriLenth = text.length();
     }
 
     @Override
@@ -228,4 +233,8 @@ public class BackgroundViewImpl extends Composite implements BackgroundView {
         searchStringChangedHandler = checkNotNull(handler);
     }
 
+    public void deActiveButton(boolean isChecked){
+        allDown.setVisible(isChecked);
+        allUp.setVisible(isChecked);
+    }
 }

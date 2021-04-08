@@ -68,7 +68,7 @@
                 <g:Label text="Queries" addStyleNames="{style.form-label}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_RIGHT">
-                <g:Button ui:field="editButton" text="Setting" title="Setting" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.editorSmall} {style.classNavButton}"/>
+                <g:Button ui:field="editButton" text="Setting" title="Setting" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.settings} {style.classNavButton}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_RIGHT">
                 <g:Button ui:field="helpButton" text="Help" title="Help" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.questionSmall} {style.classNavButton}"/>

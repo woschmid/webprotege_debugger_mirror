@@ -280,7 +280,7 @@ public class QueriesPresenter extends DebuggerPresenter {
 
     private void ConfigureTimeout() {
         ModalPresenter modalPresenter = modalManager.createPresenter();
-        modalPresenter.setTitle("User Preference");
+        modalPresenter.setTitle("Debugger Preferences");
         modalPresenter.setView(configureDebuggerPresenter.getView());
         configureDebuggerPresenter.run();
         modalPresenter.setEscapeButton(DialogButton.CANCEL);

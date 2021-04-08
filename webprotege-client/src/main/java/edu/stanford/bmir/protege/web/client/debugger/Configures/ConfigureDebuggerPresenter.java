@@ -136,9 +136,13 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
     }
 
     private void handleReset(){
-        Preferences preferences = getPreferences();
-        preferences.reset();
-        setPreference(preferences);
+        try{
+            Preferences preferences = getPreferences();
+            preferences.reset();
+            setPreference(preferences);
+        } catch (IllegalArgumentException e){
+            messageBox.showErrorMessage("Wrong Arguments.", e);
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@
 @url moveToParentIconUrl moveToParentIcon;
 
 @url crossIconUrl crossIcon;
+@url editorUrl editorIcon;
 @url changeOpAddTestIconUrl changeOpAddTestIcon;
 
 .line {
@@ -14,6 +15,19 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+.editor {
+    mask-image: editorUrl;
+    -webkit-mask-image: editorUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 14px;
+    height: 14px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    background-color: literal("var(--secondary--color)");
 }
 
 .add {
@@ -75,6 +89,19 @@
 .goTop {
     mask-image: moveToParentIconUrl;
     -webkit-mask-image: moveToParentIconUrl;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-color: literal("var(--delete--color)");
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.cross {
+    mask-image: crossIconUrl;
+    -webkit-mask-image: crossIconUrl;
     mask-repeat: no-repeat;
     -webkit-mask-repeat: no-repeat;
     width: 16px;

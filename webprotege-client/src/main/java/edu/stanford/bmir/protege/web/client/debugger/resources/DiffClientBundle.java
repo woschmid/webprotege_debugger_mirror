@@ -41,6 +41,10 @@ public interface DiffClientBundle extends ClientBundle {
     @DataResource.MimeType("image/svg+xml")
     DataResource crossIcon();
 
+    @Source("../resources/editor-icon.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource editorIcon();
+
     interface DiffCssResource extends CssResource {
 
         String line();
@@ -64,6 +68,8 @@ public interface DiffClientBundle extends ClientBundle {
         String cross();
 
         String addNTest();
+
+        String editor();
 
         String lineElement();
     }

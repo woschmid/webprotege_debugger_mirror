@@ -29,23 +29,23 @@
     </ui:style>
     <g:HTMLPanel>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Debugger Session Keep Time" ui:field="DSKTLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Debugger Timeout in Milliseconds" ui:field="DSKTLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="DSKTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Reasoner Timeout" ui:field="RTLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Reasoner Timeout in Milliseconds" ui:field="RTLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="RTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Max Visible Possibly Faulty Axioms" ui:field="MVPFALabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Maximal visible Possibly Faulty Axioms per Page" ui:field="MVPFALabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MVPFAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Max Visible Correct Axioms" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Maximal visible Correct Axioms per Page" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MVCAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Max Number Of Diagnoses" ui:field="MNODLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Maximal Number of Possible Ontology Repairs" ui:field="MNODLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MNODtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">

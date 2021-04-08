@@ -104,6 +104,8 @@ public class StatementViewImpl extends Composite{
             sb.append("<div class=\"").append(style.goTop()).append(" \">").append("</div>");
         }else if (b == Icon.CROSS){
             sb.append("<div class=\"").append(style.cross()).append(" \">").append("</div>");
+        }else if (b == Icon.EDITOR){
+            sb.append("<div class=\"").append(style.editor()).append(" \">").append("</div>");
         }
         return sb;
     }
@@ -114,6 +116,8 @@ public class StatementViewImpl extends Composite{
                 diagnoseStatement) {
             int row = table.getRowCount();
             Button repairButton = new Button("R");
+            StringBuilder sbN = getStyle(Icon.EDITOR);
+            repairButton.setHTML(sbN.toString());
             int finalNumOfRepairs = numOfRepairs;
             repairButton.addClickHandler(clickEvent -> repairDebuggingHandler.handleRepairDebugging(diagnosis, finalNumOfRepairs -1));
             Label repair = new Label("Repair #"+(numOfRepairs++));

@@ -44,6 +44,8 @@ public interface BackgroundView extends DebuggerView {
 
     void setCANumber(int number);
 
+    void deActiveButton(boolean isChecked);
+
     String getSearchString();
 
     void clearSearchString();

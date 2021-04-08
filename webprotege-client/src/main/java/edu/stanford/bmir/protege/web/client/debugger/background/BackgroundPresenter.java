@@ -171,6 +171,7 @@ public class BackgroundPresenter extends DebuggerPresenter {
         view.setPageCountC(debuggingSessionStateResult.getCorrectPages());
         view.setPFANumber(debuggingSessionStateResult.getNrPossiblyFaultyAxioms());
         view.setCANumber(debuggingSessionStateResult.getNrCorrectAxioms());
+        view.deActiveButton(isChecked);
         setPossibleFaultyAxioms(debuggingSessionStateResult.getPossiblyFaultyAxioms());
         setBackgroundAxioms(debuggingSessionStateResult.getCorrectAxioms());
     }
