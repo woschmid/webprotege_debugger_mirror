@@ -80,7 +80,6 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
     public void run(){
         Preferences preferences = debuggerResultManager.getDebuggingSessionStateResult().getPreferences();
         setPreference(preferences);
-        view.setReset(this::handleReset);
     }
 
 
@@ -135,7 +134,7 @@ public class ConfigureDebuggerPresenter extends DebuggerPresenter {
         return view;
     }
 
-    private void handleReset(){
+    public void handleReset(){
         try{
             Preferences preferences = getPreferences();
             preferences.reset();

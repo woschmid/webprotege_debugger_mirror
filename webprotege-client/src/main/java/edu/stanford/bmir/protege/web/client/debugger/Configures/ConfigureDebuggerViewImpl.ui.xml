@@ -37,24 +37,21 @@
             <g:TextBox  ui:field="RTtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Maximal visible Possibly Faulty Axioms per Page" ui:field="MVPFALabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Maximum Visible Possibly Faulty Axioms per Page" ui:field="MVPFALabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MVPFAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Maximal visible Correct Axioms per Page" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Maximum Visible Correct Axioms per Page" ui:field="MVCALabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MVCAtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
-            <g:Label text="Maximal Number of Possible Ontology Repairs" ui:field="MNODLabel" addStyleNames="{wp.style.formLabel}"/>
+            <g:Label text="Maximum Number of Possible Ontology Repairs" ui:field="MNODLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:TextBox  ui:field="MNODtextBox"/>
         </div>
         <div class="{wp.style.formGroup}">
             <g:Label text="Reasoner" ui:field="ReasonerLabel" addStyleNames="{wp.style.formLabel}"/>
             <g:ListBox ui:field="ReseanerFild">
             </g:ListBox>
-        </div>
-        <div class="{wp.style.formGroup}">
-            <g:Button ui:field="ResetButton" text="Reset"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
         </div>
     </g:HTMLPanel>
 </ui:UiBinder>

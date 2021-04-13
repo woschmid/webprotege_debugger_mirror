@@ -283,12 +283,20 @@ public class QueriesPresenter extends DebuggerPresenter {
         modalPresenter.setTitle("Debugger Preferences");
         modalPresenter.setView(configureDebuggerPresenter.getView());
         configureDebuggerPresenter.run();
+        DialogButton resetButton = DialogButton.get("Reset");
+        modalPresenter.setPrimaryButton(resetButton);
         modalPresenter.setEscapeButton(DialogButton.CANCEL);
         modalPresenter.setPrimaryButton(DialogButton.OK);
+        modalPresenter.setButtonHandler(resetButton,
+                this::handleReset);
         modalPresenter.setButtonHandler(DialogButton.OK,
                 this::handleModalButton);
         modalManager.showModal(modalPresenter);
 
+    }
+
+    private void handleReset(ModalCloser modalCloser) {
+        configureDebuggerPresenter.handleReset();
     }
 
     private void showHelp(){

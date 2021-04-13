@@ -34,12 +34,6 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
     @UiField
     protected TextBox MNODtextBox;
 
-    @UiField
-    protected Button ResetButton;
-
-    private ResetHandler resetHandler= () -> {
-    };
-
 
     @Override
     public AcceptsOneWidget getCriteriaContainer() {
@@ -58,10 +52,6 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
         initWidget(ourUiBinder.createAndBindUi(this));
     }
 
-    @UiHandler("ResetButton")
-    protected void handleStartDebugging(ClickEvent clickEvent) {
-        resetHandler.handleReset();
-    }
 
     public String getDSKTtextBox() {
         return DSKTtextBox.getText();
@@ -87,7 +77,4 @@ public class ConfigureDebuggerViewImpl extends Composite implements ConfigureDeb
         return MNODtextBox.getText();
     }
 
-    public void setReset(ResetHandler resetHandler) {
-        this.resetHandler = resetHandler;
-    }
 }

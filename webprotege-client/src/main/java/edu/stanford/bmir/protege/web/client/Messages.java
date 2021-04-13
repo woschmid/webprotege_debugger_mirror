@@ -141,6 +141,10 @@ public interface Messages extends com.google.gwt.i18n.client.Messages {
     @Key("create")
     String create();
 
+    @DefaultMessage("Reset")
+    @Key("Reset")
+    String reset();
+
     
     @DefaultMessage("Enter one name per line (press CTRL+ENTER to accept and close panel)")
     @Key("createEntityInstructions")
