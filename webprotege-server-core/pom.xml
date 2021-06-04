@@ -250,20 +250,16 @@
             <groupId>org.exquisite</groupId>
             <artifactId>diagnosis</artifactId>
             <version>0.2.3</version>
-            <!--
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/diagnosis-0.2.3.jar</systemPath>
-            -->
         </dependency>
 
         <dependency>
             <groupId>org.exquisite</groupId>
             <artifactId>owl-plugin</artifactId>
             <version>0.2.3</version>
-            <!--
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/owl-plugin-0.2.3.jar</systemPath>
-            -->
         </dependency>
 
         <!-- Reasoners -->

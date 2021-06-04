@@ -46,6 +46,7 @@ public class PerspectiveDataCopier {
             copyPerspectiveFile("OWL Classes.json");
             copyPerspectiveFile("OWL Properties.json");
             copyPerspectiveFile("Debugger.json");
+            copyPerspectiveFile("DynamicTabel.json");
 
 //            URL url = getClass().getResource(DEFAULT_PERSPECTIVE_DATA_RESOURCE_PATH);
 //            File templateDefaultPerspectiveDataDirectory = new File(url.toURI());

@@ -20,7 +20,7 @@ import static org.semanticweb.owlapi.model.EntityType.*;
  * 22 Mar 2017
  */
 @Portlet(
-        id = "portlets.DynamicTable",
+        id = "portlet.DynamicTable",
         title = "DynamicTable",
         tooltip = "Provides an dynamic table to show the details for selected entities"
 )

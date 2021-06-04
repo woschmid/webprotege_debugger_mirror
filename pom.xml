@@ -196,11 +196,11 @@
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
-        <repository>
-            <id>in-project</id>
-            <name>InProjectRepo</name>
-            <url>file://${project.basedir}repo</url>
-        </repository>
+<!--        <repository>-->
+<!--            <id>in-project</id>-->
+<!--            <name>InProjectRepo</name>-->
+<!--            <url>file://${project.basedir}repo</url>-->
+<!--        </repository>-->
     </repositories>
 
     <build>

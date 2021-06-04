@@ -67,7 +67,8 @@ public class PerspectiveLinkManagerImpl implements PerspectiveLinkManager {
                         PerspectiveId.get("Changes by Entity"),
                         PerspectiveId.get("History"),
                         PerspectiveId.get("Query"),
-                        PerspectiveId.get("Debugger")
+                        PerspectiveId.get("Debugger"),
+                        PerspectiveId.get("DynamicTabel")
                 )
         );
     }

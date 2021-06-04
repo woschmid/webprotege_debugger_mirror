@@ -1,3 +1,32 @@
 {
-  "portlet": "portlet.DynamicTable"
+  "direction": "ROW",
+
+  "children": [
+    {
+      "weight": 0.3,
+      "node": {
+        "direction": "COLUMN",
+        "children": [
+          {
+            "weight": 0.5,
+            "node": {
+              "portlet": "portlets.ClassHierarchy"
+            }
+          },
+          {
+            "weight": 0.5,
+            "node": {
+              "portlet": "portlets.IndividualsList"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "weight": 0.7,
+      "node": {
+        "portlet": "portlet.DynamicTable"
+      }
+    }
+  ]
 }
