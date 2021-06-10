@@ -39,12 +39,23 @@ To build WebProtégé from source
    ```
    mvn clean package
    ```
+   or
+   ```
+   mvn clean package -DskipTests
+   ```
+   to skip tests for faster compiles
+   
 5) The WebProtege .war file will be built into the webprotege-server directory
+
 
 Running from Maven
 ------------------
-
 To run WebProtégé in SuperDev Mode using maven
+
+0) a pre-installed **mongodb** instance 
+    ```
+    verify that you have installed and started mongodb on your host
+    ```
 
 1) Start the GWT code server in one terminal window
     ```
@@ -54,12 +65,20 @@ To run WebProtégé in SuperDev Mode using maven
     ```
     mvn -Denv=dev tomcat7:run
     ```
+   1. **IMPORTANT** verify you have created a folder /srv/webprotege which can be written to and read from
+   2. **IMPORTANT** veryfy your tomcat can write into an existing log folder named webprotege (e.g. /var/log/webprotege in Debian/Ubuntu)
+3)    
 3) Browse to WebProtégé in a Web browser by navigating to [http://localhost:8080](http://localhost:8080)
 
 
 Bootstrap WebProtégé with an Admin Account
 ------------------
 If not yet done, set up an administrator account
+
+0) a pre-installed **mongodb** instance
+    ```
+    verify that you have installed and started mongodb on your host
+    ```
 
 1) CD into the compiled target directory of the webprotege-cli module 
 
