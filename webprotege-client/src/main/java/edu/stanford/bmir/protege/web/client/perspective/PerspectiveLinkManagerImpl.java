@@ -68,7 +68,7 @@ public class PerspectiveLinkManagerImpl implements PerspectiveLinkManager {
                         PerspectiveId.get("History"),
                         PerspectiveId.get("Query"),
                         PerspectiveId.get("Debugger"),
-                        PerspectiveId.get("DynamicTabel")
+                        PerspectiveId.get("Shacl Tool")
                 )
         );
     }

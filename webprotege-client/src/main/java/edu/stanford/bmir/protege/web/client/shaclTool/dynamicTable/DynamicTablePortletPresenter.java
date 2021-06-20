@@ -1,4 +1,4 @@
-package edu.stanford.bmir.protege.web.client.dynamicTable;
+package edu.stanford.bmir.protege.web.client.shaclTool.dynamicTable;
 
 import edu.stanford.bmir.protege.web.client.editor.EditorPortletPresenter;
 import edu.stanford.bmir.protege.web.client.lang.DisplayNameRenderer;
@@ -38,11 +38,9 @@ public class DynamicTablePortletPresenter extends AbstractWebProtegePortletPrese
 
     @Override
     public void startPortlet(PortletUi portletUi, WebProtegeEventBus eventBus) {
-        editorPresenter.setDisplayedTypes(CLASS, DATATYPE,
-                                          NAMED_INDIVIDUAL,
-                                          OBJECT_PROPERTY,
-                                          DATA_PROPERTY,
-                                          ANNOTATION_PROPERTY);
+        editorPresenter.setDisplayedTypes(
+                                          NAMED_INDIVIDUAL
+                                          );
         editorPresenter.start(portletUi, eventBus);
     }
 }

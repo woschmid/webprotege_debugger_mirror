@@ -16,7 +16,7 @@
           {
             "weight": 0.5,
             "node": {
-              "portlet": "portlets.IndividualsList"
+              "portlet": "portlets.ShaclIndividualsList"
             }
           }
         ]
@@ -25,7 +25,21 @@
     {
       "weight": 0.7,
       "node": {
-        "portlet": "portlet.DynamicTable"
+        "direction": "COLUMN",
+        "children": [
+          {
+            "weight": 0.5,
+            "node": {
+              "portlet": "portlet.SchaclEditor"
+            }
+          },
+          {
+            "weight": 0.5,
+            "node": {
+              "portlet": "portlet.DynamicTable"
+            }
+          }
+        ]
       }
     }
   ]

@@ -4,7 +4,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.DebuggerResultManager;
-import edu.stanford.bmir.protege.web.client.debugger.queries.QueriesPresenter;
 import edu.stanford.bmir.protege.web.client.debugger.repairInterface.RepairInterfacePresenter;
 import edu.stanford.bmir.protege.web.client.debugger.statement.StatementPresenter;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;

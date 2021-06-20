@@ -10,6 +10,10 @@ import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditor;
 import edu.stanford.bmir.protege.web.client.crud.EntityCrudKitSettingsEditorImpl;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditor;
 import edu.stanford.bmir.protege.web.client.crud.obo.UserIdRangeEditorImpl;
+import edu.stanford.bmir.protege.web.client.individualslist.IndividualsListView;
+import edu.stanford.bmir.protege.web.client.individualslist.IndividualsListViewImpl;
+import edu.stanford.bmir.protege.web.client.shaclTool.individualslist.ShaclIndividualsListView;
+import edu.stanford.bmir.protege.web.client.shaclTool.individualslist.ShaclIndividualsListViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerView;
 import edu.stanford.bmir.protege.web.client.debugger.Configures.ConfigureDebuggerViewImpl;
 import edu.stanford.bmir.protege.web.client.debugger.ManchesterSyntaxEditor.DebuggerManchesterSyntaxFrameEditor;
@@ -34,8 +38,6 @@ import edu.stanford.bmir.protege.web.client.form.FormViewImpl;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditor;
 import edu.stanford.bmir.protege.web.client.frame.ManchesterSyntaxFrameEditorImpl;
 import edu.stanford.bmir.protege.web.client.hierarchy.*;
-import edu.stanford.bmir.protege.web.client.individualslist.IndividualsListView;
-import edu.stanford.bmir.protege.web.client.individualslist.IndividualsListViewImpl;
 import edu.stanford.bmir.protege.web.client.lang.*;
 import edu.stanford.bmir.protege.web.client.library.tokenfield.*;
 import edu.stanford.bmir.protege.web.client.list.EntityNodeListPopupView;
@@ -59,6 +61,8 @@ import edu.stanford.bmir.protege.web.client.renderer.AnnotationPropertyIriRender
 import edu.stanford.bmir.protege.web.client.renderer.AnnotationPropertyIriRendererImpl;
 import edu.stanford.bmir.protege.web.client.renderer.ClassIriRenderer;
 import edu.stanford.bmir.protege.web.client.renderer.ClassIriRendererImpl;
+import edu.stanford.bmir.protege.web.client.shaclTool.shaclEditor.ShaclView;
+import edu.stanford.bmir.protege.web.client.shaclTool.shaclEditor.ShaclViewImpl;
 import edu.stanford.bmir.protege.web.client.sharing.SharingSettingsView;
 import edu.stanford.bmir.protege.web.client.sharing.SharingSettingsViewImpl;
 import edu.stanford.bmir.protege.web.client.tag.*;
@@ -513,6 +517,11 @@ public class ClientProjectModule {
     @Provides
     DebuggerManchesterSyntaxFrameEditor provideDebuggerMSFEView(DebuggerManchesterSyntaxFrameEditor impl) { return impl; }
 
+    @Provides
+    ShaclIndividualsListView provideShaclIndividualsListView(ShaclIndividualsListViewImpl impl) { return impl; }
+
+    @Provides
+    ShaclView provideShaclView(ShaclViewImpl impl) { return impl; }
 }
 
 
