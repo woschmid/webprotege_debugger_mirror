@@ -6,6 +6,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.vocabulary.SH;
 
+import java.util.Vector;
+
 public class ShaclValidationResultJena {
 
     public final Model model;
@@ -32,6 +34,19 @@ public class ShaclValidationResultJena {
         if (stmt != null)
             return stmt.getObject();
         return null;
+    }
+
+    public static Vector<String> toRow(ShaclValidationResultJena res) {
+        Vector<String> row = new Vector<>();
+
+        row.add(JenaOwlConverter.getQName(res.model, res.resultSeverity));
+        row.add(JenaOwlConverter.getQName(res.model, res.sourceShape));
+        row.add(res.resultMessage == null ? null : res.resultMessage.toString());
+        row.add(JenaOwlConverter.getQName(res.model, res.focusNode));
+        row.add(JenaOwlConverter.getQName(res.model, res.resultPath));
+        row.add(JenaOwlConverter.getQName(res.model, res.value));
+
+        return row;
     }
 
 }
