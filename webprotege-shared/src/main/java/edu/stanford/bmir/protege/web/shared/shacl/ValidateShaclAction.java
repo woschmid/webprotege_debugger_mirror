@@ -1,5 +1,6 @@
 package edu.stanford.bmir.protege.web.shared.shacl;
 
+import edu.stanford.bmir.protege.web.shared.annotations.GwtSerializationConstructor;
 import edu.stanford.bmir.protege.web.shared.dispatch.ProjectAction;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 
@@ -16,6 +17,9 @@ public class ValidateShaclAction implements ProjectAction<ShaclValidationResult>
         this.projectId = projectId;
         this.shaclEditorText = shaclEditorText;
     }
+
+    @GwtSerializationConstructor
+    private ValidateShaclAction() {}
 
     @Nonnull
     @Override

@@ -99,7 +99,7 @@
         </g:HorizontalPanel>
 
         <g:HTMLPanel addStyleNames="{style.editor}">
-            <g:TextArea ui:field='textArea' styleName='{style.textArea}'></g:TextArea>
+            <g:TextArea ui:field='ContentArea' styleName='{style.textArea}'></g:TextArea>
         </g:HTMLPanel>
     </g:HTMLPanel>
 </ui:UiBinder>
