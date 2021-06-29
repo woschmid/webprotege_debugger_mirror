@@ -41,17 +41,7 @@ public class ValidateShaclActionHandler extends AbstractProjectActionHandler<Val
     @Nonnull
     @Override
     public ShaclValidationResult execute(@Nonnull ValidateShaclAction action, @Nonnull ExecutionContext executionContext) {
-        // return validate(action.getShaclEditorText()); // TODO activate for validation
-        return new ShaclValidationResult(convertTemporaryResult());
-    }
-
-    private List<Vector<String>> convertTemporaryResult() {
-        List<Vector<String>> list = new ArrayList<>();
-        Vector<String> v = new Vector();
-        v.add("Hallo");
-        v.add("Boda");
-        list.add(v);
-        return list;
+        return validate(action.getShaclEditorText());
     }
 
     private ShaclValidationResult validate(final String editorText) {
