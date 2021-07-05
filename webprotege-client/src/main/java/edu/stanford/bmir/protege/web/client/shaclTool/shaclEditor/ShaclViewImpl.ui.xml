@@ -76,7 +76,7 @@
 
         <g:HorizontalPanel width="100%">
             <g:cell horizontalAlignment="ALIGN_LEFT" width="100%" >
-                <g:Label text="Shacl Editor" addStyleNames="{style.form-label}"/>
+                <g:Label text="Shacl Validation Document Editor" addStyleNames="{style.form-label}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_RIGHT">
                 <g:Button ui:field="editButton" text="Setting" title="Setting" addStyleNames="{wp.buttons.btnGlyph} {wp.buttons.settings} {style.classNavButton}"/>
