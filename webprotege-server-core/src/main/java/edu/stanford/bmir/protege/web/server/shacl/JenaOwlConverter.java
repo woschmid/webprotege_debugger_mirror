@@ -14,8 +14,7 @@ import java.io.ByteArrayOutputStream;
 public class JenaOwlConverter {
     private boolean availablemain = true;
 
-    public JenaOwlConverter() {
-    }
+    public JenaOwlConverter() {}
 
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -68,9 +67,9 @@ public class JenaOwlConverter {
      * @param format   {RDF/XML or TURTLE}
      * @return {An OntModel that is a Jena object}
      */
-    public synchronized OntModel ModelOwlToJenaConvert(OWLOntology owlmodel, String format) {
+    public synchronized OntModel convertOwlModelToJenaFormat(OWLOntology owlmodel, String format) {
 
-        while (availablemain == false) {
+        while (!availablemain) {
             try {
                 wait();
             } catch (InterruptedException e) {

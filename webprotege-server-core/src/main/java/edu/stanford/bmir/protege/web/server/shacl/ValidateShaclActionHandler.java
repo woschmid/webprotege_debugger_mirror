@@ -50,7 +50,7 @@ public class ValidateShaclActionHandler extends AbstractProjectActionHandler<Val
             JenaOwlConverter converter = new JenaOwlConverter();
 
             OWLOntology ont = InferredOntologyLoader.loadInferredOntology(revisionManager);
-            Model dataModel = converter.ModelOwlToJenaConvert(ont, FileUtils.langTurtle);
+            Model dataModel = converter.convertOwlModelToJenaFormat(ont, FileUtils.langTurtle);
 
             // Load the main data model
             Model shapesModel = RdfModelReader.getModelFromString(editorText, FileUtils.langTurtle);
@@ -60,7 +60,7 @@ public class ValidateShaclActionHandler extends AbstractProjectActionHandler<Val
 
             // update table with result data
             for (ShaclValidationResultJena res : validationResults) {
-                Vector<String> row = toRow(res);
+                Vector<String> row = ShaclValidationResultJena.toRow(res);
                 list.add(row);
             }
             return new ShaclValidationResult(list);
@@ -79,19 +79,6 @@ public class ValidateShaclActionHandler extends AbstractProjectActionHandler<Val
         Stream<ShaclValidationResultJena> results = report.validationResults.stream();
         results = results.filter(row -> row.focusNode != null && row.focusNode.isURIResource());
         return results.collect(Collectors.toList());
-    }
-
-    private static Vector<String> toRow(ShaclValidationResultJena res) {
-        Vector<String> row = new Vector<>();
-
-        row.add(JenaOwlConverter.getQName(res.model, res.resultSeverity));
-        row.add(JenaOwlConverter.getQName(res.model, res.sourceShape));
-        row.add(res.resultMessage == null ? null : res.resultMessage.toString());
-        row.add(JenaOwlConverter.getQName(res.model, res.focusNode));
-        row.add(JenaOwlConverter.getQName(res.model, res.resultPath));
-        row.add(JenaOwlConverter.getQName(res.model, res.value));
-
-        return row;
     }
 
 }

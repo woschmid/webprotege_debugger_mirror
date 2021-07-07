@@ -27,9 +27,7 @@ public class ShaclValidationReport {
         this.validationResults = new HashSet<>(validationResults.size());
         for (Statement stmt : validationResults) {
             Resource subject = stmt.getSubject();
-
             ShaclValidationResultJena validationResult = new ShaclValidationResultJena(model, subject);
-
             this.validationResults.add(validationResult);
         }
     }
