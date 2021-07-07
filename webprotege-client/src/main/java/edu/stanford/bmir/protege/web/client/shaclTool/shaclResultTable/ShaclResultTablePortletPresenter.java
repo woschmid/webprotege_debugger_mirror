@@ -50,9 +50,11 @@ public class ShaclResultTablePortletPresenter extends AbstractWebProtegePortletP
     @Override
     protected void handleAfterSetEntity(Optional<OWLEntity> entity) {
         GWT.log("========================="+ entity);
-        if ( entity.isPresent() || (getSelectedEntity().get().getEntityType() == NAMED_INDIVIDUAL)) {
+        if ( entity.isPresent() && (getSelectedEntity().get().getEntityType() == NAMED_INDIVIDUAL)) {
             GWT.log("=========================");
             resultTablePresenter.setEntity(entity.get());
+        }else{
+            GWT.log("handleAfterSetEntity: not run");
         }
     }
 }

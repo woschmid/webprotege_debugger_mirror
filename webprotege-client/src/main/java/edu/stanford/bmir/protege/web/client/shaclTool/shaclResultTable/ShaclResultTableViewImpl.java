@@ -31,8 +31,8 @@ public class ShaclResultTableViewImpl extends Composite {
     public void addToTable(List<Vector<String>> data){
         for (Vector<String> d:  data
              ) {
-            GWT.log("[ShaclResultTableViewImpl] "+d.toString());
             int row = table.getRowCount();
+            GWT.log("[ShaclResultTableViewImpl] "+row);
             int index = 0;
             for (String v :
                     d) {
@@ -42,7 +42,7 @@ public class ShaclResultTableViewImpl extends Composite {
         }
     }
     public void setTableTitle(){
-        table.clear();
+        table.removeAllRows();
         Label col1 = new Label("Severity");
         Label col2 = new Label("SourceShape");
         Label col3 = new Label("Message");
