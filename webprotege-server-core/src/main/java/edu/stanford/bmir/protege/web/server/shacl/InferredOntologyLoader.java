@@ -23,14 +23,16 @@ import static edu.stanford.bmir.protege.web.shared.debugger.DefaultValues.REASON
 
 public class InferredOntologyLoader {
 
-    public static OWLOntology loadInferredOntology(final RevisionManager revisionManager)
+    private OWLReasoner reasoner;
+
+    public OWLOntology loadInferredOntology(final RevisionManager revisionManager)
             throws OWLOntologyCreationException {
         OWLOntology ont = loadOntology(revisionManager);
-        OWLReasoner reasoner = createReasoner(ont);
+        this.reasoner = createReasoner(ont);
         return loadInferredOntologyFromReasoner(ont, reasoner);
     }
 
-    public static OWLOntology loadInferredOntologyFromReasoner(OWLOntology ont, OWLReasoner reasoner)
+    private OWLOntology loadInferredOntologyFromReasoner(OWLOntology ont, OWLReasoner reasoner)
             throws OWLOntologyCreationException {
         // NOTE: we cannot use modelManager.getOWLOntologyManager()
         // as this would mess up the loaded ontologies in Protégé
@@ -50,7 +52,7 @@ public class InferredOntologyLoader {
     /**
      * Loads the ontology and generates a diagnosis model from this ontology.
      */
-    private static OWLOntology loadOntology(final RevisionManager revisionManager) {
+    private OWLOntology loadOntology(final RevisionManager revisionManager) {
         // loading ontology and generating diagnosis model
         final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
         final List<OWLOntology> ontologies = new ArrayList<>(ontologyManager.getOntologies());
@@ -60,8 +62,19 @@ public class InferredOntologyLoader {
         return ontologies.get(0);
     }
 
-    private static OWLReasoner createReasoner(final OWLOntology ontology) {
+    private OWLReasoner createReasoner(final OWLOntology ontology) {
         final OWLReasonerConfiguration configuration = new SimpleConfiguration(new TimedConsoleProgressMonitor(), REASONER_TIMEOUT_IN_MILLIS);
         return ReasonerFactory.getReasonerFactory(DefaultValues.reasonerId).createReasoner(ontology, configuration);
+    }
+
+    public OWLReasoner getReasoner() {
+        return reasoner;
+    }
+
+    public void dispose() {
+        if (reasoner != null) {
+            reasoner.dispose();
+            reasoner = null;
+        }
     }
 }
