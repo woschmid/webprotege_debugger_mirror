@@ -3,12 +3,15 @@ package edu.stanford.bmir.protege.web.client.shaclTool.shaclResultTable;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchErrorMessageDisplay;
+import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceCallbackWithProgressDisplay;
 import edu.stanford.bmir.protege.web.client.dispatch.DispatchServiceManager;
 import edu.stanford.bmir.protege.web.client.dispatch.ProgressDisplay;
 import edu.stanford.bmir.protege.web.client.shaclTool.ShaclResult;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
+import edu.stanford.bmir.protege.web.shared.shacl.ShaclValidationResult;
+import edu.stanford.bmir.protege.web.shared.shacl.ValidateShaclAction;
 import org.semanticweb.owlapi.model.OWLEntity;
 
 import javax.annotation.Nonnull;
@@ -62,7 +65,26 @@ public class ShaclResultTablePresenter {
 //        GWT.log("getShaclValidationResult "+shaclResult.getShaclValidationResult().getValidationResult());
         if (shaclResult.getShaclValidationResult().getValidationResult() != null){
             GWT.log("ShaclResultTablePresenter "+owlEntity.toString());
-            setData(shaclResult.getShaclValidationResult().getValidationResult());
+            this.dsm.execute(new ValidateShaclAction(projectId, shaclResult.getShaclContent(), owlEntity),
+                    new DispatchServiceCallbackWithProgressDisplay<ShaclValidationResult>(errorDisplay,
+                            progressDisplay) {
+                        @Override
+                        public String getProgressDisplayTitle() {
+                            return "Validate Ontology";
+                        }
+
+                        @Override
+                        public String getProgressDisplayMessage() {
+                            return "Please wait";
+                        }
+
+                        public void handleSuccess(ShaclValidationResult shaclValidationResult) {
+                            GWT.log("[ShaclEditorPresenter]shaclValidate Button pressed!!!!!" + shaclValidationResult.getValidationResult());
+                            shaclResult.setShaclValidationResult(shaclValidationResult);
+                            shaclResult.notifyToUpdate();
+                        }
+                    });
+//            setData(shaclResult.getShaclValidationResult().getValidationResult());
         }else{
             GWT.log("ShaclResultTablePresenter Result = null");
         }

@@ -6,6 +6,7 @@ import edu.stanford.bmir.protege.web.shared.project.ProjectId;
 import org.semanticweb.owlapi.model.OWLEntity;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ValidateShaclAction implements ProjectAction<ShaclValidationResult> {
@@ -14,14 +15,13 @@ public class ValidateShaclAction implements ProjectAction<ShaclValidationResult>
 
     private String shaclEditorText;
 
-    private OWLEntity owlEntity;
+    @Nullable private OWLEntity owlEntity;
 
     public ValidateShaclAction(ProjectId projectId, String shaclEditorText) {
-        this.projectId = projectId;
-        this.shaclEditorText = shaclEditorText;
+        this(projectId, shaclEditorText, null);
     }
 
-    public ValidateShaclAction(ProjectId projectId, String shaclEditorText, OWLEntity owlEntity) {
+    public ValidateShaclAction(ProjectId projectId, String shaclEditorText, @Nullable OWLEntity owlEntity) {
         this.projectId = projectId;
         this.shaclEditorText = shaclEditorText;
         this.owlEntity = owlEntity;
@@ -40,6 +40,7 @@ public class ValidateShaclAction implements ProjectAction<ShaclValidationResult>
         return shaclEditorText;
     }
 
+    @Nullable
     public OWLEntity getOwlEntity() {
         return owlEntity;
     }

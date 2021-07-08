@@ -62,6 +62,7 @@ public class ShaclEditorPresenter {
 
     private void shaclValidate(){
         GWT.log("[ShaclEditorPresenter]shaclValidate!!!!!");
+        shaclResult.setShaclContent(view.getContent());
         this.dsm.execute(new ValidateShaclAction(projectId, view.getContent()),
                 new DispatchServiceCallbackWithProgressDisplay<ShaclValidationResult>(errorDisplay,
                         progressDisplay) {

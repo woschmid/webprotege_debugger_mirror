@@ -14,6 +14,8 @@ public class ShaclResult {
     ShaclEditorPresenter shaclEditorPresenter;
 
     ShaclResultTablePresenter shaclResultTablePresenter;
+
+    String shaclContent;
     @Inject
     public ShaclResult() {}
 
@@ -38,7 +40,12 @@ public class ShaclResult {
     public void notifyToUpdate(){
         shaclResultTablePresenter.setData(shaclValidationResult.getValidationResult());
     }
-//    public boolean isEmpty(){
-//
-//    }
+
+    public String getShaclContent() {
+        return shaclContent;
+    }
+
+    public void setShaclContent(String shaclContent) {
+        this.shaclContent = shaclContent;
+    }
 }
