@@ -57,7 +57,7 @@ public class ValidateShaclActionHandler extends AbstractProjectActionHandler<Val
             inferredOntologyLoader = new InferredOntologyLoader();
 
             OWLOntology ont = inferredOntologyLoader.loadInferredOntology(revisionManager);
-            Model dataModel = converter.ModelOwlToJenaConvert(ont, FileUtils.langTurtle);
+            Model dataModel = converter.convertOwlModelToJenaFormat(ont, FileUtils.langTurtle);
 
             // Load the main data model
             Model shapesModel = RdfModelReader.getModelFromString(editorText, FileUtils.langTurtle);
