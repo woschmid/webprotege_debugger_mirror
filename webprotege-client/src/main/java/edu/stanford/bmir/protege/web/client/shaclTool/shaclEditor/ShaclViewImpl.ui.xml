@@ -88,6 +88,7 @@
 
         <g:HorizontalPanel width="100%">
             <g:cell horizontalAlignment="ALIGN_LEFT" >
+<!--                <g:FileUpload ui:field="openButton"  title="Open Shacl Document" />-->
                 <g:Button ui:field="openButton" text="Open"  title="Open Shacl Document"  addStyleNames="{style.executeButton} {wp.buttons.button} {wp.buttons.dialogButton} {wp.buttons.primaryButton}"/>
             </g:cell>
             <g:cell horizontalAlignment="ALIGN_LEFT" >

@@ -10,8 +10,10 @@ import edu.stanford.bmir.protege.web.client.shaclTool.ShaclResult;
 import edu.stanford.bmir.protege.web.client.user.LoggedInUserProvider;
 import edu.stanford.bmir.protege.web.shared.event.WebProtegeEventBus;
 import edu.stanford.bmir.protege.web.shared.project.ProjectId;
+import edu.stanford.bmir.protege.web.shared.shacl.SaveShaclAction;
 import edu.stanford.bmir.protege.web.shared.shacl.ShaclValidationResult;
 import edu.stanford.bmir.protege.web.shared.shacl.ValidateShaclAction;
+import org.semanticweb.owlapi.model.OWLEntity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -32,6 +34,8 @@ public class ShaclEditorPresenter {
     private ProgressDisplay progressDisplay;
 
     private ShaclResult shaclResult;
+
+    private OWLEntity selectedClass = null;
 
     WebProtegeEventBus eventBus;
 
@@ -58,6 +62,7 @@ public class ShaclEditorPresenter {
         this.eventBus = eventBus;
         view.setShaclValidateHandler(this::shaclValidate);
         shaclResult.setShaclEditorPresenter(this);
+        view.setShaclSaveHandler(this::shaclSave);
     }
 
     private void shaclValidate(){
@@ -82,5 +87,40 @@ public class ShaclEditorPresenter {
                         shaclResult.notifyToUpdate();
                     }
                 });
+    }
+
+    private void shaclSave(){
+        GWT.log("[ShaclEditorPresenter]shaclSave!!!!!");
+        shaclResult.setShaclContent(view.getContent());
+        SaveShaclAction saveShaclAction;
+        if(selectedClass == null){
+            saveShaclAction = new SaveShaclAction(projectId, view.getContent());
+        }else{
+            saveShaclAction = new SaveShaclAction(projectId, view.getContent(), selectedClass);
+        }
+        GWT.log("[ShaclEditorPresenter]"+ saveShaclAction.toString());
+        this.dsm.execute(saveShaclAction,
+                new DispatchServiceCallbackWithProgressDisplay<ShaclValidationResult>(errorDisplay,
+                        progressDisplay) {
+                    @Override
+                    public String getProgressDisplayTitle() {
+                        return "Validate Ontology";
+                    }
+
+                    @Override
+                    public String getProgressDisplayMessage() {
+                        return "Please wait";
+                    }
+
+                    public void handleSuccess(ShaclValidationResult shaclValidationResult) {
+                        GWT.log("[ShaclEditorPresenter]shaclValidate Button pressed!!!!!" + shaclValidationResult.getValidationResult());
+                        shaclResult.setShaclValidationResult(shaclValidationResult);
+                        shaclResult.notifyToUpdate();
+                    }
+                });
+    }
+
+    public void setEntity(OWLEntity owlEntity) {
+        this.selectedClass = owlEntity;
     }
 }
