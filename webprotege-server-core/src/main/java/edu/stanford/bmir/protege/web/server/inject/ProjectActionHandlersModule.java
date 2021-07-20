@@ -43,6 +43,7 @@ import edu.stanford.bmir.protege.web.server.projectsettings.SetProjectSettingsAc
 import edu.stanford.bmir.protege.web.server.revision.GetHeadRevisionNumberActionHandler;
 import edu.stanford.bmir.protege.web.server.revision.GetRevisionSummariesActionHandler;
 import edu.stanford.bmir.protege.web.server.search.PerformEntitySearchActionHandler;
+import edu.stanford.bmir.protege.web.server.shacl.SaveShaclActionHandler;
 import edu.stanford.bmir.protege.web.server.shacl.ValidateShaclActionHandler;
 import edu.stanford.bmir.protege.web.server.sharing.GetProjectSharingSettingsActionHandler;
 import edu.stanford.bmir.protege.web.server.sharing.SetProjectSharingSettingsActionHandler;
@@ -681,5 +682,8 @@ public class ProjectActionHandlersModule {
 
     @Provides @IntoSet
     public ProjectActionHandler provideValidateShaclActionHandler(ValidateShaclActionHandler handler) { return handler; }
+
+    @Provides @IntoSet
+    public ProjectActionHandler provideSaveShaclActionHandler(SaveShaclActionHandler handler) { return handler; }
 
 }
