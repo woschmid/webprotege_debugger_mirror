@@ -52,7 +52,7 @@ public class InferredOntologyLoader {
     /**
      * Loads the ontology and generates a diagnosis model from this ontology.
      */
-    private OWLOntology loadOntology(final RevisionManager revisionManager) {
+    public OWLOntology loadOntology(final RevisionManager revisionManager) {
         // loading ontology and generating diagnosis model
         final OWLOntologyManager ontologyManager = revisionManager.getOntologyManagerForRevision(revisionManager.getCurrentRevision());
         final List<OWLOntology> ontologies = new ArrayList<>(ontologyManager.getOntologies());

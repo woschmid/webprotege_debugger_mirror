@@ -72,7 +72,7 @@ public class ValidateShaclActionHandler extends AbstractProjectActionHandler<Val
             }
             return new ShaclValidationResult(list);
 
-        }  catch (Exception e) {
+        } catch (Exception e) {
             Util.logException(getActionClass(), e);
             List<Vector<String>> list = new ArrayList<>();
             Vector<String> v = new Vector();
