@@ -1,4 +1,4 @@
-WebProtégé
+   WebProtégé
 ==========
 
 What is WebProtégé?
@@ -32,7 +32,7 @@ To build WebProtégé from source
 
 1) Clone the github repository
    ```
-   git clone https://github.com/protegeproject/webprotege.git
+   git clone https://git-ainf.aau.at/interactive-KB-debugging/webprotege_debugger.git
    ```
 2) Open a terminal in the directory where you clone the repository to
 3) Use maven to package WebProtégé

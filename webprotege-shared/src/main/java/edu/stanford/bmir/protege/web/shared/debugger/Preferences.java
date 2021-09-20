@@ -93,7 +93,7 @@ public class Preferences implements Serializable, IsSerializable {
     public String[] getReasoners() {
         return new String[] {
                 DefaultValues.REASONER_ID_HERMIT,
-                DefaultValues.REASONER_ID_PELLET,
+                /*DefaultValues.REASONER_ID_PELLET,*/
                 DefaultValues.REASONER_ID_JFACT,
                 DefaultValues.REASONER_ID_JCEL,
                 DefaultValues.REASONER_ID_SNOROCKET,

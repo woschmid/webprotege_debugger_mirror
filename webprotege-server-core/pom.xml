@@ -274,13 +274,15 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/pellet-owlapi-ignazio1977 -->
+<!--
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>pellet-owlapi-ignazio1977</artifactId>
             <version>2.4.0-ignazio1977</version>
         </dependency>
-
+-->
         <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/jfact -->
+
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>jfact</artifactId>
@@ -288,6 +290,7 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/de.tu-dresden.inf.lat.jcel/jcel-owlapi -->
+
         <dependency>
             <groupId>de.tu-dresden.inf.lat.jcel</groupId>
             <artifactId>jcel-owlapi</artifactId>
@@ -295,6 +298,7 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/au.csiro/snorocket-owlapi -->
+
         <dependency>
             <groupId>au.csiro</groupId>
             <artifactId>snorocket-owlapi</artifactId>
@@ -302,6 +306,7 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.semanticweb.elk/elk-owlapi -->
+
         <dependency>
             <groupId>org.semanticweb.elk</groupId>
             <artifactId>elk-owlapi</artifactId>
@@ -309,7 +314,6 @@
         </dependency>
 
         <!-- Shacl -->
-
         <dependency>
             <groupId>org.topbraid</groupId>
             <artifactId>shacl</artifactId>
@@ -325,7 +329,6 @@
             <artifactId>jena-core</artifactId>
             <version>3.14.0</version>
         </dependency>
-
     </dependencies>
 
     <build>

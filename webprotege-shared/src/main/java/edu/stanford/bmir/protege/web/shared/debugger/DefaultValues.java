@@ -3,7 +3,7 @@ package edu.stanford.bmir.protege.web.shared.debugger;
 public class DefaultValues {
 
     public static final String REASONER_ID_HERMIT = "HermiT 1.4.3.456";
-    public static final String REASONER_ID_PELLET = "Pellet 2.4.0-ignazio1977";
+    /* public static final String REASONER_ID_PELLET = "Pellet 2.4.0-ignazio1977"; */
     public static final String REASONER_ID_JFACT = "JFact 4.0.4";
     public static final String REASONER_ID_JCEL = "JCEL 0.24.1";
     public static final String REASONER_ID_SNOROCKET = "Snorocket 4.0.1";

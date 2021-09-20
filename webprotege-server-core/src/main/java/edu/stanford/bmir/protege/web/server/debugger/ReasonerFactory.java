@@ -20,9 +20,11 @@ public class ReasonerFactory {
             case DefaultValues.REASONER_ID_HERMIT: // HermiT Reasoner Factory
                 reasonerFactory = new org.semanticweb.HermiT.ReasonerFactory();
                 break;
+/*
             case DefaultValues.REASONER_ID_PELLET: // Pellet Reasoner Factory (pellet-owlapi-ignazio1977/2.4.0-ignazio1977)
                 reasonerFactory = new com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory();
                 break;
+ */
             case DefaultValues.REASONER_ID_JFACT: // JFact DL Reasoner Factory (http://jfact.sourceforge.net/)
                 reasonerFactory = new uk.ac.manchester.cs.jfact.JFactFactory();
                 break;
