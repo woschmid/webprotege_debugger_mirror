@@ -1,15 +1,12 @@
-FROM maven:3.6.0-jdk-11-slim AS build
+FROM fedora:34 AS build
 
-RUN apt-get update && \
-    apt-get install -y git mongodb
+RUN dnf install -y maven git
 
 COPY . /webprotege
 
 WORKDIR /webprotege
 
-RUN mkdir -p /data/db \
-    && mongod --fork --syslog \
-    && mvn clean package
+RUN mvn clean package -DskipTests
 
 FROM tomcat:8-jre11-slim
 
