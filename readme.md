@@ -47,6 +47,10 @@ To build WebProtégé from source
    
 5) The WebProtege .war file will be built into the webprotege-server directory
 
+## Requirements
+
+1) Installation of a **mondodb** instance
+2) Create a folder **/srv/webprotege**
 
 Running from Maven
 ------------------
@@ -66,7 +70,7 @@ To run WebProtégé in SuperDev Mode using maven
     mvn -Denv=dev tomcat7:run
     ```
    1. **IMPORTANT** verify you have created a folder /srv/webprotege which can be written to and read from
-   2. **IMPORTANT** veryfy your tomcat can write into an existing log folder named webprotege (e.g. /var/log/webprotege in Debian/Ubuntu)
+   2. **IMPORTANT** verify your tomcat can write into an existing log folder named webprotege (e.g. /var/log/webprotege in Debian/Ubuntu)
 3)    
 3) Browse to WebProtégé in a Web browser by navigating to [http://localhost:8080](http://localhost:8080)
 
@@ -106,10 +110,11 @@ Edit the WebProtégé Settings
 
 1) Sign in using the admin account that you created as part of the setup above.
 
-2) Once you have signed in, navigate to the application settings page at the URL obtained by appending #application/settings to the URL of the WebProtégé home page. For example, 
+2) Once you have signed in, and you get the message `WebProtégé is not configured properly` on top of the page
+    navigate to the application settings page at the URL obtained by appending #application/settings to the URL of the WebProtégé home page. For example, 
 
    ``` http://localhost:8080/#application/settings```
-
+3) Enter values for every required (*) fields
 
 Building Docker image
 -------------------
