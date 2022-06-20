@@ -42,7 +42,7 @@ public class AvailableProjectPresenter {
     private final DownloadProjectRequestHandler downloadProjectRequestHandler;
 
     @Nonnull
-    private LoadProjectInNewWindowRequestHandler loadProjectInNewWindowRequestHandler;
+    private final LoadProjectInNewWindowRequestHandler loadProjectInNewWindowRequestHandler;
 
     @Inject
     public AvailableProjectPresenter(@Nonnull AvailableProject project,
@@ -108,6 +108,7 @@ public class AvailableProjectPresenter {
         addOpenInNewWindowAction();
         addDowloadAction();
         addTrashAction();
+        addExportIntoAction();
     }
 
     private void addOpenAction() {
@@ -162,5 +163,15 @@ public class AvailableProjectPresenter {
         trashAction.setEnabled(project.isTrashable());
     }
 
+    private void addExportIntoAction() {
+        AbstractUiAction exportAction = new AbstractUiAction("Export ontology into Neo4j ... ") {
+            @Override
+            public void execute() {
+                downloadProjectRequestHandler.handleProjectDownloadRequest(project.getProjectId());
+            }
+        };
+        exportAction.setEnabled(project.isDownloadable());
+        view.addAction(exportAction);
+    }
 
 }

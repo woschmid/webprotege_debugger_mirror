@@ -3,7 +3,7 @@ package edu.stanford.bmir.protege.web.client;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 
-import static com.google.gwt.i18n.client.LocalizableResource.*;
+import static com.google.gwt.i18n.client.LocalizableResource.DefaultLocale;
 
 @DefaultLocale()
 public interface Messages extends com.google.gwt.i18n.client.Messages {
@@ -581,6 +581,10 @@ public interface Messages extends com.google.gwt.i18n.client.Messages {
     @DefaultMessage("Open in New Window")
     @Key("openInNewWindow")
     String openInNewWindow();
+
+    @DefaultMessage("Export into ...")
+    @Key("openExportInto")
+    String openExportInto();
 
     
     @DefaultMessage("Owned by Me")
